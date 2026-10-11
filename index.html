@@ -1,14 +1,1588 @@
-<!doctype html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b0d12"><title>Challengeus</title><link rel="stylesheet" href="styles.css"></head>
-<body><aside class="sidebar"><a class="brand"><b>C</b> challenge<span>us</span></a><small>WORKSPACE</small><nav><button class="active" data-view="overview">◫ Overview</button><button data-view="challenges">⚑ Challenges</button><button data-view="targets">◎ My targets</button><button data-view="journal">▤ Journal</button><button data-view="community">⌁ Community</button></nav><div class="tip">✳<h3>Small steps.<br>Serious momentum.</h3><p>Progress is better when it's shared.</p></div></aside>
-<main><header><b class="mobile">challengeus</b><span>Workspace / <strong id="page-name">Overview</strong></span><button class="primary" id="create-top">＋ New challenge</button></header>
-<section class="view active" id="overview"><div class="hero"><div><small>YOUR SPACE · <span id="date"></span></small><h1>Make progress.<br><em>Make it together.</em></h1><p>A little consistency goes a long way. What's your next move?</p></div><div class="orb">C ✳</div></div><div class="stats"><article><small>ACTIVE CHALLENGES</small><strong id="s-challenges">0</strong></article><article><small>TARGETS IN MOTION</small><strong id="s-targets">0</strong></article><article><small>PROGRESS LOGGED</small><strong id="s-logs">0</strong></article></div><h2>Your challenges</h2><div id="overview-cards" class="cards"></div><h2>Recent activity</h2><div id="activity" class="activity"></div></section>
-<section class="view" id="challenges"><small>SHOW UP TOGETHER</small><h1>Challenges</h1><div class="toolbar"><div><button class="filter active" data-filter="all">All</button><button class="filter" data-filter="active">Active</button><button class="filter" data-filter="upcoming">Upcoming</button><button class="filter" data-filter="completed">Completed</button></div><button class="primary" id="create">＋ Create challenge</button></div><div id="all-cards" class="cards"></div></section>
-<section class="view" id="targets"><small>YOUR PERSONAL COMMITMENTS</small><h1>My targets</h1><button class="primary" id="add-target">＋ Add target</button><div id="target-list" class="target-list"></div></section>
-<section class="view" id="journal"><small>REFLECT · LEARN · REPEAT</small><h1>Your journal</h1><div class="compose"><textarea id="journal-text" rows="3" placeholder="What went well today? What did you learn?"></textarea><button class="primary" id="save-journal">Save reflection ↗</button></div><div id="journal-list"></div></section>
-<section class="view" id="community"><small>BETTER, TOGETHER</small><h1>Community</h1><div class="banner"><h2>Good things happen<br>when you <em>show up.</em></h2><button class="primary" id="community-create">Start a challenge ↗</button></div><div id="community-cards" class="cards"></div></section><footer>CHALLENGEUS · BUILD BETTER, TOGETHER</footer></main>
-<dialog id="challenge-modal"><form id="challenge-form"><h2>Create a challenge</h2><label>Name<input name="name" required maxlength="60" placeholder="The 21-day focus sprint"></label><label>Shared goal<textarea name="description" required rows="3"></textarea></label><div class="two"><label>Start<input name="start" type="date" required></label><label>End<input name="end" type="date" required></label></div><label>Group size<select name="size"><option>4</option><option>6</option><option selected>8</option></select></label><button class="primary">Create challenge</button><button type="button" class="close">Cancel</button></form></dialog>
-<dialog id="target-modal"><form id="target-form"><h2>Add a personal target</h2><label>Challenge<select name="challenge" id="target-challenge"></select></label><label>Target name<input name="name" required></label><div class="two"><label>Amount<input name="total" type="number" min="1" required></label><label>Unit<input name="unit" required placeholder="pages"></label></div><label>Why? <input name="why"></label><button class="primary">Save target</button><button type="button" class="close">Cancel</button></form></dialog>
-<dialog id="progress-modal"><form id="progress-form"><h2>Log progress</h2><input type="hidden" name="id"><p id="progress-name"></p><label>Amount completed<input name="amount" type="number" min=".01" step="any" required></label><label>Note<textarea name="note"></textarea></label><button class="primary">Save progress</button><button type="button" class="close">Cancel</button></form></dialog>
-<dialog id="blueprint-modal"><form id="blueprint-form"><h2>AI Blueprint <small>BETA</small></h2><p class="hint">Preview mode: this creates a starter template locally, not a Gemini response yet.</p><label>Describe the goal<textarea name="prompt" required rows="4"></textarea></label><button class="primary">Generate blueprint</button><div id="blueprint-result"></div><button type="button" class="close">Close</button></form></dialog>
-<dialog id="profile-modal"><form id="profile-form"><h2>Your profile</h2><label>Display name<input name="name" required></label><button class="primary">Save</button><button type="button" class="close">Cancel</button></form></dialog><div id="toast"></div><script type="module" src="app.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0E1526">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Challenge Room</title>
+<meta name="description" content="Study challenges with friends. Daily quests by subject and topic, streaks and a weekly league, built for JEE preparation.">
+<link rel="canonical" href="https://water17-ved.github.io/Challenges/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Challenge Room">
+<meta property="og:title" content="Challenge Room">
+<meta property="og:description" content="Study challenges with friends. Tick your targets, keep your streak, climb the board.">
+<meta property="og:url" content="https://water17-ved.github.io/Challenges/">
+<meta property="og:image" content="https://water17-ved.github.io/Challenges/icon-512.png">
+<meta name="twitter:card" content="summary">
+<meta name="apple-mobile-web-app-title" content="Challenges">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0E1526;--s1:#141D33;--s2:#1B2640;--line:#25324F;--tx:#E8EDF7;--mut:#8D9AB5;--acc:#5B8DEF;--ok:#34D399;--bad:#F87171;--f:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif}
+*{box-sizing:border-box;margin:0}
+body{font:500 16px/1.45 var(--f);background:var(--bg);color:var(--tx);font-variant-numeric:tabular-nums;min-height:100vh}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;text-align:inherit}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
+.top-in{max-width:520px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px;min-height:56px}
+.brand{font-weight:800;font-size:18px;letter-spacing:-.01em;flex:1}
+.back{display:none;align-items:center;gap:4px;color:var(--mut);font-weight:700}
+.back.on{display:flex}.back.on~.brand{display:none}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--s2);border:1px solid var(--line);display:grid;place-items:center;font-weight:800;font-size:13px;flex:none}
+.avatar.me{background:var(--acc);border-color:var(--acc);color:#0B1020}
+.avatar.lg{width:64px;height:64px;font-size:22px}
+.app{max-width:520px;margin:0 auto;padding:18px 16px calc(96px + env(safe-area-inset-bottom))}
+h1{font-size:25px;font-weight:800;letter-spacing:-.015em;line-height:1.2}
+.sub{color:var(--mut);font-size:15px;margin-top:4px}
+.lbl{font-size:13px;font-weight:700;color:var(--mut);margin:22px 0 8px}
+.view,.pane{display:none}.view.on,.pane.on{display:block}
+.group{background:var(--s1);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.li{display:flex;align-items:center;gap:12px;padding:14px;border-top:1px solid var(--line);width:100%}
+.group>.li:first-child{border-top:0}
+.li .grow,.grow{flex:1;min-width:0}
+.li b{font-weight:700}
+.li .meta{color:var(--mut);font-size:14px}
+button.li .grow,button.li .meta,button.li .mini{display:block}
+.chev{color:var(--mut)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.stat{background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:14px}
+.stat b{display:block;font-size:28px;font-weight:800;line-height:1.1}
+.stat span{font-size:13px;color:var(--mut)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px 16px;border-radius:10px;background:var(--acc);color:#0B1020;font-weight:700;border:1px solid var(--acc)}
+.btn.sec{background:transparent;color:var(--tx);border-color:var(--line)}
+.btn.bad{background:transparent;color:var(--bad);border-color:var(--line)}
+.btn.sm{width:auto;padding:8px 14px;font-size:14px}
+.btns{display:flex;gap:10px;margin-top:16px}.btns .btn{flex:1}
+label{display:block;font-size:14px;font-weight:700;color:var(--mut);margin:14px 0 6px}
+input,select,textarea{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:var(--s1);font-size:16px}
+input:focus,select:focus,textarea:focus{border-color:var(--acc);outline:0}
+textarea{min-height:96px;resize:vertical}
+.row{display:flex;gap:10px;align-items:center}
+.badge{display:inline-block;padding:2px 9px;border-radius:6px;font-size:12px;font-weight:700;border:1px solid var(--line);color:var(--mut)}
+.badge.live{color:var(--ok);border-color:rgba(52,211,153,.4)}.badge.upcoming{color:var(--acc);border-color:rgba(91,141,239,.45)}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--s1);border:1px solid var(--line);border-radius:10px;padding:3px;margin:16px 0 4px}
+.seg button{padding:8px 0;border-radius:8px;text-align:center;font-weight:700;font-size:14px;color:var(--mut)}
+.seg button[aria-pressed="true"]{background:var(--s2);color:var(--tx)}
+.bar{height:6px;border-radius:9px;background:var(--s2);overflow:hidden;margin-top:10px}
+.bar i{display:block;height:100%;background:var(--acc);border-radius:9px;transition:width .3s}
+.quest .box{flex:none;width:24px;height:24px;border:2px solid var(--mut);border-radius:7px;display:grid;place-items:center}
+.quest.on .box{background:var(--acc);border-color:var(--acc)}
+.quest.on .box::after{content:"";width:9px;height:5px;border:solid #0B1020;border-width:0 0 2.5px 2.5px;transform:rotate(-45deg) translate(1px,-1px)}
+.quest.on .t{color:var(--mut);text-decoration:line-through}
+.quest .t{flex:1;font-weight:600}.quest .p{font-size:13px;color:var(--mut);font-weight:700}
+.quest:disabled{opacity:.5;cursor:not-allowed}
+.rk{width:26px;text-align:center;font-weight:800;color:var(--mut)}
+.li.lead{box-shadow:inset 3px 0 0 var(--acc)}.li.lead .rk{color:var(--acc)}
+.pts{font-weight:800}
+.mini{height:4px;border-radius:9px;background:var(--s2);margin-top:6px;overflow:hidden}.mini i{display:block;height:100%;background:var(--acc)}
+.chart{background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:10px 6px 6px}
+.chart svg{width:100%;height:auto;display:block}
+.heat{display:grid;grid-template-columns:repeat(14,1fr);gap:4px}
+.heat i{aspect-ratio:1;border-radius:4px;background:var(--s2);display:block}
+.heat-l{display:flex;justify-content:space-between;font-size:12px;color:var(--mut);margin-top:6px}
+.codebox{font-weight:800;font-size:30px;letter-spacing:.2em;text-align:center;border:1px dashed var(--line);border-radius:10px;padding:10px;margin:10px 0;color:var(--acc)}
+.empty{text-align:center;color:var(--mut);padding:34px 12px}
+.empty b{display:block;color:var(--tx);font-size:17px;margin-bottom:4px}
+.draft{display:flex;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid var(--line)}
+.draft:first-child{border-top:0}
+.x{margin-left:auto;color:var(--bad);font-weight:700;font-size:14px;padding:4px 6px}
+.feed-d{font-size:13px;font-weight:700;color:var(--mut);margin:20px 0 8px}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:6}
+nav div{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+nav button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 9px;font-size:12px;font-weight:700;color:var(--mut);border-top:2px solid transparent;margin-top:-1px;text-align:center}
+nav button[aria-current="page"]{color:var(--acc);border-top-color:var(--acc)}
+#toast{z-index:60;position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--tx);color:#0B1020;font-weight:700;font-size:14px;padding:10px 16px;border-radius:10px;z-index:30;max-width:90%;opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.show{opacity:1}
+#gate{position:fixed;inset:0;background:var(--bg);z-index:40;overflow-y:auto;display:flex;padding:calc(24px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom))}
+#gate[hidden]{display:none}
+.gate-in{width:100%;max-width:400px;margin:auto}
+.gate-in img{display:block;width:64px;height:64px;margin-bottom:18px}
+.gate-in h1{font-size:28px}
+.gate-in form{margin-top:22px}
+.gate-in .note{margin:18px 0 0;color:var(--tx)}
+.or{display:flex;align-items:center;gap:10px;color:var(--mut);font-size:13px;margin:22px 0 0}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.g-hero{text-align:left}.g-hero img{display:block;width:72px;height:72px;border-radius:18px;margin-bottom:16px}
+.g-feats{list-style:none;padding:0;margin:18px 0 0;display:grid;gap:8px;color:var(--mut);font-size:14px}
+.g-feats li::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--acc);margin-right:10px}
+#g-google{background:#fff;color:#1f1f1f;border-color:#fff;margin-top:22px}
+.hub{display:grid;gap:12px;margin-top:18px}
+.hub-btn{display:flex;flex-direction:column;align-items:flex-start;gap:6px;width:100%;padding:22px 18px;border-radius:14px;background:var(--s1);border:1px solid var(--line)}
+.hub-btn svg{width:28px;height:28px;color:var(--acc);margin-bottom:4px}.hub-btn b{font-size:19px;font-weight:800}.hub-btn span{color:var(--mut);font-size:14px}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:14px}
+.facts div{background:var(--s1);padding:10px 12px;min-width:0}.facts span{display:block;font-size:12px;color:var(--mut);font-weight:700}.facts b{display:block;font-weight:700;font-size:14px;overflow-wrap:anywhere}
+.chk{display:flex;align-items:flex-start;gap:10px;margin:18px 0 0;font-size:14px;font-weight:600;color:var(--tx)}
+.chk input{width:20px;height:20px;padding:0;flex:none;margin-top:1px}
+.pr{display:flex;align-items:center;gap:12px;flex:1;min-width:0;text-align:left}
+nav button{position:relative}nav button.has-new::after{content:"";position:absolute;top:8px;left:calc(50% + 8px);width:9px;height:9px;border-radius:50%;background:var(--bad)}
+.g-err{color:var(--bad);font-size:14px;font-weight:600;margin-top:10px}
+.g-fine{font-size:13px;margin-top:16px;text-align:center}
+.g-fine a{color:var(--acc)}
+.btn:disabled{opacity:.6;cursor:progress}
+.exam{display:flex;align-items:center;gap:14px;background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:10px}
+.exam .big{font-size:34px;font-weight:800;line-height:1;color:var(--acc);min-width:64px;text-align:center}
+.exam input{width:auto;padding:6px 8px;font-size:14px;margin-top:6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chip{padding:7px 12px;border-radius:99px;border:1px solid var(--line);background:var(--s1);font-size:13px;font-weight:700;text-align:center}
+.chip[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:#0B1020}
+.step{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--mut);margin:18px 0 0}
+.step .x{color:var(--mut);font-weight:600}
+.step .n{width:20px;height:20px;border-radius:50%;background:var(--s2);display:grid;place-items:center;font-size:12px;color:var(--tx)}
+.sj .x,.tp .x{color:var(--mut);font-weight:600;font-size:13px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;flex:none}
+.sj{display:flex;align-items:center;gap:8px;margin:22px 0 8px;font-weight:800}
+.sj .meta{margin-left:auto;font-weight:700;font-size:13px;color:var(--mut)}
+.tp{font-size:13px;font-weight:700;color:var(--mut);margin:12px 0 6px 2px}
+.tag{font-size:11px;font-weight:700;color:var(--mut);border:1px solid var(--line);border-radius:5px;padding:0 5px;margin-left:6px}
+.rankline{background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:14px}
+.menu{margin-top:12px}.menu .li{font-weight:700}.menu .li.bad{color:var(--bad)}
+.hbar{display:flex;align-items:center;gap:8px;margin-top:10px}.hbar .back2{flex:none}
+.icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);display:grid;place-items:center;color:var(--mut);flex:none}
+.pl-days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:0 14px 12px;font-size:11px;color:var(--mut);text-align:center}
+.pl-days b{display:block;color:var(--tx);font-size:15px}
+.pw+.pw{border-top:1px solid var(--line)}.pw>.li{border-top:0}
+.mist.fixed .t{color:var(--mut);text-decoration:line-through}
+.note{background:var(--s1);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px;color:var(--mut);margin-bottom:14px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <button class="back" id="back" data-act="view" data-v="home" aria-label="Back"><svg class="i" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><span id="back-t">Home</span></button>
+  <div class="brand">Challenge Room</div>
+  <button class="icon-btn" id="crown" data-act="view" data-v="hall" aria-label="Hall of fame" style="color:#F5B14C"><svg class="i" viewBox="0 0 24 24"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z"/></svg></button>
+  <button class="avatar me" id="top-av" data-act="view" data-v="profile" aria-label="Open profile">?</button>
+</div></header>
+
+<main class="app">
+
+  <section class="view" id="view-home">
+    <h1 id="home-h">Hello</h1>
+    <p class="sub" id="home-sub">Here is where your challenges stand.</p>
+    <div class="stats" id="home-stats"></div>
+    <div class="exam" id="home-exam"></div>
+    <div id="home-today"></div>
+    <div class="btns">
+      <button class="btn" data-act="view" data-v="create">New challenge</button>
+      <button class="btn sec" data-act="view" data-v="join">Join with code</button>
+    </div>
+    <div id="home-list"></div>
+  </section>
+
+  <section class="view" id="view-challenge">
+    <div id="ch-head"></div>
+    <div class="seg" id="seg" hidden>
+      <button data-act="pane" data-p="today" aria-pressed="true">Today</button>
+      <button data-act="pane" data-p="board" aria-pressed="false">Board</button>
+      <button data-act="pane" data-p="me" aria-pressed="false">Me</button>
+    </div>
+    <div class="pane on" id="pane-today"></div>
+    <div class="pane" id="pane-board"></div>
+    <div class="pane" id="pane-me">
+      <div id="me-top"></div>
+      <div class="lbl">Journal</div>
+      <textarea id="j-text" maxlength="500" aria-label="Note for today" placeholder="What went well? What got in the way?"></textarea>
+      <button class="btn" style="margin-top:10px" data-act="save-note">Save note</button>
+      <p class="sub" style="margin-top:8px">Friends in this challenge can read your journal notes.</p>
+      <div class="group" id="journal-hist" style="margin-top:12px"></div>
+      <div class="lbl">Mistakes to revisit</div>
+      <div class="row"><select id="m-subj" aria-label="Subject" style="width:auto"></select><input id="m-text" maxlength="100" aria-label="Mistake" placeholder="Sign error in projectile Q" autocomplete="off"><button class="btn sec sm" data-act="add-mistake">Add</button></div>
+      <p class="sub" style="margin-top:8px">Only you can see this list. It is saved on this device.</p>
+      <div class="group" id="m-list" style="margin-top:10px"></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-activity">
+    <h1>Activity</h1><p class="sub" id="act-sub"></p>
+    <div id="act-body"></div>
+  </section>
+
+  <section class="view" id="view-ai">
+    <h1>AI and backup</h1><p class="sub">Plan challenges with an AI helper, and keep a copy of everything.</p>
+    <div class="group" style="margin-top:16px">
+      <button class="li" data-act="view" data-v="ai-make"><span class="grow"><b>Make a challenge with AI</b><span class="meta">Two ready-made prompts: one to plan with an AI, one to turn the plan into a challenge.</span></span><svg class="i chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+      <button class="li" data-act="view" data-v="backup"><span class="grow"><b>Backup and restore</b><span class="meta">Save everything to a .json file on your device, or load one back.</span></span><svg class="i chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>
+  </section>
+
+  <section class="view" id="view-ai-make">
+    <h1>Make a challenge with AI</h1><p class="sub">Use any AI chat, such as ChatGPT, Claude or Gemini. Copy a prompt, paste it there, then bring the answer back here.</p>
+    <div class="step"><span class="n">1</span>Tell it about your goal</div>
+    <label for="ai-goal">Your goal</label>
+    <textarea id="ai-goal" maxlength="400" placeholder="JEE Main in January. Weak in electrostatics and integration. About 3 hours a day."></textarea>
+    <label for="ai-days">Challenge length in days</label>
+    <input id="ai-days" type="number" inputmode="numeric" min="1" max="365" value="14">
+    <div class="step"><span class="n">2</span>Plan it with the AI</div>
+    <p class="sub" style="margin-top:6px">Paste this first. The AI asks you a few questions, then suggests a plan.</p>
+    <textarea id="ai-p1" readonly aria-label="Prompt 1" style="min-height:180px;margin-top:8px"></textarea>
+    <button class="btn sec" style="margin-top:8px" data-act="copy-p" data-k="1">Copy prompt 1</button>
+    <div class="step"><span class="n">3</span>Turn the plan into data</div>
+    <p class="sub" style="margin-top:6px">When you like the plan, paste this next. The AI replies with JSON only.</p>
+    <textarea id="ai-p2" readonly aria-label="Prompt 2" style="min-height:180px;margin-top:8px"></textarea>
+    <button class="btn sec" style="margin-top:8px" data-act="copy-p" data-k="2">Copy prompt 2</button>
+    <div class="step"><span class="n">4</span>Paste the AI's answer</div>
+    <p class="sub" style="margin-top:6px">Upload the answer as a file, or paste it below.</p>
+    <input type="file" id="ai-file" accept=".json,.txt,application/json,text/plain" aria-label="Upload the AI's answer as a file" style="margin-top:8px">
+    <textarea id="ai-json" aria-label="JSON from the AI" placeholder="Or paste the JSON here" style="margin-top:8px"></textarea>
+    <button class="btn" style="margin-top:8px" data-act="ai-check">Check and preview</button>
+    <div id="ai-out"></div>
+  </section>
+
+  <section class="view" id="view-backup">
+    <h1>Backup and restore</h1><p class="sub">One file with your name, challenges, progress, journal notes and mistakes log.</p>
+    <div class="group" style="padding:14px;margin-top:16px">
+      <b>Save a backup</b><div class="meta">A .json file saved on your device. Keep it somewhere safe, like Google Drive or WhatsApp to yourself.</div>
+      <div class="btns"><button class="btn" data-act="export">Download backup</button><button class="btn sec" data-act="export-copy">Copy as text</button></div>
+    </div>
+    <div class="lbl">Restore from a backup</div>
+    <input type="file" id="bk-file" accept=".json,application/json" aria-label="Backup file">
+    <textarea id="bk-text" aria-label="Backup text" placeholder="Or paste the backup text here" style="margin-top:8px"></textarea>
+    <button class="btn" style="margin-top:8px" data-act="restore">Restore</button>
+    <p class="sub" style="margin-top:8px">Restore keeps everything on this device. Nothing is sent to the server and nothing you have now is deleted. Your challenges from the file appear below as read-only copies, and your mistakes log and exam date come back too.</p>
+    <div id="arch-wrap" hidden><div class="lbl">Saved on this device</div><div class="group" id="arch-list"></div></div>
+  </section>
+
+  <section class="view" id="view-archive"><div id="arch-body"></div></section>
+
+  <section class="view" id="view-challenges">
+    <h1>Challenges</h1><p class="sub">Find something new, or open the challenges you are in.</p>
+    <div class="hub">
+      <button class="hub-btn" data-act="view" data-v="market">
+        <svg class="i" viewBox="0 0 24 24"><path d="M4 9l1.5-5h13L20 9M4 9v11h16V9M4 9h16M9 20v-6h6v6"/></svg>
+        <b>Challenge market</b><span>Public challenges and ready-made JEE plans</span></button>
+      <button class="hub-btn" data-act="view" data-v="mine">
+        <svg class="i" viewBox="0 0 24 24"><path d="M5 21V4m0 0h11l-2 4 2 4H5"/></svg>
+        <b>My challenges</b><span id="hub-n"></span></button>
+    </div>
+  </section>
+
+  <section class="view" id="view-mine">
+    <h1>My challenges</h1><p class="sub" id="mine-sub"></p>
+    <div id="mine-list" style="margin-top:14px"></div>
+  </section>
+
+  <section class="view" id="view-market">
+    <h1>Challenge market</h1><p class="sub">Join a public challenge, start from a ready-made plan, or make your own.</p>
+    <div class="btns">
+      <button class="btn" data-act="view" data-v="create">New challenge</button>
+      <button class="btn sec" data-act="view" data-v="join">Join with code</button>
+    </div>
+    <div class="lbl">Ready-made plans</div>
+    <div class="group" id="tpl-list"></div>
+    <div class="lbl">Public challenges</div>
+    <div id="pub-list"></div>
+  </section>
+
+  <section class="view" id="view-hall">
+    <h1>Hall of fame</h1><p class="sub">Winners and finishers of challenges that have ended. Finished means you completed 80% or more of the plan.</p>
+    <div id="hall-body"></div>
+  </section>
+
+  <section class="view" id="view-peer"><div id="peer-body"></div></section>
+
+  <section class="view" id="view-profile">
+    <div class="row" style="gap:14px"><div class="avatar me lg" id="p-av">?</div>
+      <div class="grow"><h1 id="p-name-h">Profile</h1><p class="sub" id="p-id"></p></div></div>
+    <div class="lbl">Display name</div>
+    <div class="row"><input id="p-name" maxlength="20" aria-label="Display name" autocomplete="off"><button class="btn sm" data-act="profile-save">Save</button></div>
+    <div class="lbl">Summary</div>
+    <div class="group" id="p-stats"></div>
+    <div class="lbl">Settings</div>
+    <div class="group">
+      <div class="li"><div class="grow"><b>Install on your phone</b><div class="meta">Open this page in your browser menu and choose Add to Home Screen.</div></div></div>
+      <div class="li" id="p-acct"></div>
+      <div class="li"><div class="grow"><b>Version</b><div class="meta">Challenge Room 1.2</div></div></div>
+    </div>
+    <div class="btns"><button class="btn bad" id="p-out" data-act="clear-data">Clear data on this device</button></div>
+  </section>
+
+  <section class="view" id="view-join">
+    <h1>Join a challenge</h1><p class="sub">Enter the 6-character code your friend shared.</p>
+    <label for="join-code">Challenge code</label>
+    <input id="join-code" maxlength="6" autocapitalize="characters" autocomplete="off" placeholder="K7M2QX">
+    <button class="btn" style="margin-top:14px" data-act="join">Join challenge</button>
+  </section>
+
+  <section class="view" id="view-create">
+    <h1>New challenge</h1><p class="sub">Set your targets, go live, and share the code.</p>
+    <label for="c-title">Title</label><input id="c-title" maxlength="60" placeholder="14 days of Physics">
+    <label for="c-desc">Description (optional)</label><input id="c-desc" maxlength="140" placeholder="Rules, prize, anything friends should know">
+    <div class="row"><div class="grow"><label for="c-start">Starts</label><input id="c-start" type="date"></div>
+      <div class="grow"><label for="c-end">Ends</label><input id="c-end" type="date"></div></div>
+    <div id="mega" hidden>
+      <div class="lbl">Mega challenge</div>
+      <p class="sub" style="margin-bottom:8px">Combine your existing challenges into one plan. Tap one to copy all its tasks in, then add more below.</p>
+      <div class="group" id="import-list"></div>
+    </div>
+    <div class="lbl">Build your plan</div>
+    <div class="chips" aria-label="Ready-made plans">
+      <button class="chip" data-act="preset" data-k="jee">+ P/C/M daily pack</button>
+      <button class="chip" data-act="preset" data-k="pyq">+ PYQ practice</button>
+      <button class="chip" data-act="preset" data-k="mock">+ Weekly mock</button>
+    </div>
+    <div class="step"><span class="n">1</span>Subject</div>
+    <div class="chips" id="b-subj"></div>
+    <input id="b-other" maxlength="20" aria-label="Subject name" placeholder="Subject name, e.g. English" style="margin-top:8px" hidden>
+    <div class="step"><span class="n">2</span>Topics <span id="b-count" style="font-weight:600"></span>
+      <button class="x" style="margin-left:auto;color:var(--acc)" data-act="topics-all">Select all</button><button class="x" style="margin-left:0" data-act="topics-none">Clear</button></div>
+    <div class="chips" id="b-topics"></div>
+    <div class="row" style="margin-top:8px"><input id="b-topic" class="grow" maxlength="80" aria-label="Add your own topics" placeholder="Add your own, separated by commas" autocomplete="off"><button class="btn sec sm" data-act="topic-add">Add</button></div>
+    <div class="step"><span class="n">3</span>Tasks for the selected topics</div>
+    <p class="sub" id="b-hint" style="margin-top:6px"></p>
+    <div class="chips" aria-label="Quick tasks">
+      <button class="chip" data-act="quick" data-i="0">+ Solve 30 problems</button>
+      <button class="chip" data-act="quick" data-i="1">+ Revise theory</button>
+      <button class="chip" data-act="quick" data-i="2">+ PYQ set (20 Qs)</button>
+      <button class="chip" data-act="quick" data-i="3">+ Formula sheet</button>
+      <button class="chip" data-act="quick" data-i="4">+ Chapter test</button>
+    </div>
+    <input id="t-text" style="margin-top:10px" maxlength="80" aria-label="Task" placeholder="Or write your own task">
+    <div class="row" style="margin-top:8px"><select id="t-type" class="grow" aria-label="Task type"><option value="daily">Daily</option><option value="once">One time</option></select>
+      <input id="t-qs" type="number" inputmode="numeric" min="0" max="500" aria-label="Questions (optional)" placeholder="Qs" style="width:84px">
+      <button class="btn sec sm" data-act="add-target">Add</button></div>
+    <div class="lbl">Your plan</div>
+    <div id="draft-list"></div>
+    <label class="chk"><input type="checkbox" id="c-public"><span>Show in the Challenge market so anyone can find and join it</span></label>
+    <button class="btn" style="margin-top:16px" data-act="create">Create and go live</button>
+    <div class="group" id="created-box" style="margin-top:16px;padding:14px" hidden></div>
+  </section>
+</main>
+
+<nav aria-label="Main"><div>
+  <button data-act="view" data-v="home"><svg class="i" viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</button>
+  <button data-act="view" data-v="challenges"><svg class="i" viewBox="0 0 24 24"><path d="M5 21V4m0 0h11l-2 4 2 4H5"/></svg>Challenge</button>
+  <button data-act="view" data-v="activity"><svg class="i" viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>Activity</button>
+  <button data-act="view" data-v="ai"><svg class="i" viewBox="0 0 24 24"><path d="M10 4l1.6 4.4L16 10l-4.4 1.6L10 16l-1.6-4.4L4 10l4.4-1.6z"/><path d="M18 14l.8 2.2L21 17l-2.2.8L18 20l-.8-2.2L15 17l2.2-.8z"/></svg>AI</button>
+  <button data-act="view" data-v="profile"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Profile</button>
+</div></nav>
+
+<div id="gate" role="dialog" aria-modal="true" aria-labelledby="g-h" hidden><div class="gate-in">
+  <div class="g-hero"><img src="icon.svg" alt="" width="72" height="72">
+    <h1 id="g-h">Challenge Room</h1>
+    <p class="sub">Study challenges with friends. Tick your targets, keep your streak, climb the board.</p></div>
+  <ul class="g-feats"><li>Daily quests by subject and topic</li><li>Weekly league and friendly nudges</li><li>Built for JEE preparation</li></ul>
+  <p class="note" id="g-invite" hidden></p>
+  <button class="btn" id="g-google" type="button" data-act="google">
+    <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.9 2.4 30.4 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7c-.5-1.5-.8-3-.8-4.7s.3-3.2.8-4.7l-7.9-6.1C.9 16.4 0 20.1 0 24s.9 7.6 2.6 10.8l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>
+    Continue with Google</button>
+  <p class="sub g-fine" style="margin:10px 0 0">Keeps your progress safe if you change phones.</p>
+  <div class="or"><span>or continue as a guest</span></div>
+  <form id="g-form" novalidate>
+    <label for="name-input" style="margin-top:0">What should friends call you?</label>
+    <input id="name-input" maxlength="20" autocomplete="nickname" autocapitalize="words" enterkeyhint="go" placeholder="Your name" aria-describedby="g-err">
+    <p class="g-err" id="g-err" role="alert" hidden></p>
+    <button class="btn sec" id="g-go" type="submit" style="margin-top:12px">Continue as guest</button>
+  </form>
+  <p class="sub g-fine" id="g-file" hidden>This page is open from a file, so sign-in cannot work here. Open it from the hosted website instead.</p>
+  <p class="sub g-fine">Guests keep their progress on this device only. You can save it with Google later from Profile.</p>
+</div></div>
+<div id="toast" role="status"></div>
+
+<script type="module">
+const firebaseConfig = {
+  apiKey: "AIzaSyB5xdHV3mG140tTTZY264WkAPYpKwoXIQU",
+  authDomain: "llenge.firebaseapp.com",
+  projectId: "llenge",
+  storageBucket: "llenge.firebasestorage.app",
+  messagingSenderId: "642859354088",
+  appId: "1:642859354088:web:05bbb2c25ec4c8a4d0465d"
+};
+let auth, db, GoogleAuthProvider, signInWithPopup, linkWithPopup, signInWithCredential, signOut, signInAnonymously, onAuthStateChanged, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, serverTimestamp, query, where, getDocs, limit;
+
+/* ---------- helpers ---------- */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ls = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } },
+  del(k) { try { localStorage.removeItem(k); } catch {} }
+};
+const ymd = d => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+const today = () => ymd(new Date());
+const dayOff = n => { const d = new Date(); d.setDate(d.getDate() + n); return ymd(d); };
+const fmt = d => new Date(d + 'T00:00').toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+const fmtLong = d => d === today() ? 'Today' : d === dayOff(-1) ? 'Yesterday' : new Date(d + 'T00:00').toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'short' });
+const link = code => `${location.origin}${location.pathname}?c=${code}`;
+const genCode = () => Array.from({ length: 6 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random() * 32)]).join('');
+const ini = n => (String(n || '?').trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2) || '?').toUpperCase();
+let toastT;
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2600); }
+async function copy(text, ok) { try { await navigator.clipboard.writeText(text); toast(ok); } catch { prompt('Copy this:', text); } }
+
+/* ---------- state ---------- */
+const S = {
+  uid: null, name: ls.get('cr_name', ''), mine: ls.get('cr_mine', []), active: ls.get('cr_active', ''),
+  chal: null, me: null, members: [], nudges: [], imported: new Set(), reqIn: [], reqOut: [], backOf: {}, peerId: '', market: null, hof: null, hofBusy: false, bTopics: [], bExtra: {}, unsubs: [], draft: [], view: 'home', pane: 'today', menu: false, openPl: '', bSubj: 'Physics', meta: {},
+  pendingCode: new URLSearchParams(location.search).get('c')
+};
+const status = c => { if (!c.live) return 'paused'; const t = today(); return t < c.startDate ? 'upcoming' : t > c.endDate ? 'ended' : 'live'; };
+const ptsOf = (c, k) => c.targets.find(x => x.id === k.split('@')[0])?.points || 0;
+const qsOf = (c, k) => c.targets.find(x => x.id === k.split('@')[0])?.qs || 0;
+// Plan tree: Subject > Topic > Tasks, built from the flat targets list (older challenges land under "General").
+const SUBJ_COL = { Physics: '#5B8DEF', Chemistry: '#34D399', Maths: '#F5B14C' };
+const subjCol = s => SUBJ_COL[s] || '#9AA7C2';
+const subjOf = g => g.subj || 'General';
+function buildTree(targets) {
+  const tree = [];
+  targets.forEach(g => {
+    const sn = subjOf(g), tn = g.topic || '';
+    let s = tree.find(x => x.name === sn); if (!s) tree.push(s = { name: sn, topics: [] });
+    let t = s.topics.find(x => x.name === tn); if (!t) s.topics.push(t = { name: tn, tasks: [] });
+    t.tasks.push(g);
+  });
+  return tree;
+}
+const TOPICS = {
+  Physics: ['Units and measurement', 'Kinematics', 'Laws of motion', 'Work, energy and power', 'Rotational motion', 'Gravitation', 'Properties of matter', 'Thermodynamics', 'Oscillations and waves', 'Electrostatics', 'Current electricity', 'Magnetism', 'Electromagnetic induction', 'Alternating current', 'Ray optics', 'Wave optics', 'Modern physics', 'Semiconductors'],
+  Chemistry: ['Mole concept', 'Atomic structure', 'Chemical bonding', 'Thermodynamics', 'Chemical equilibrium', 'Ionic equilibrium', 'Electrochemistry', 'Chemical kinetics', 'Periodic table', 'p-block elements', 'd and f block', 'Coordination compounds', 'General organic chemistry', 'Hydrocarbons', 'Haloalkanes and haloarenes', 'Alcohols, phenols, ethers', 'Aldehydes and ketones', 'Amines', 'Biomolecules'],
+  Maths: ['Sets and relations', 'Complex numbers', 'Quadratic equations', 'Sequences and series', 'Permutations and combinations', 'Binomial theorem', 'Matrices and determinants', 'Trigonometry', 'Straight lines', 'Circles', 'Conic sections', 'Limits and continuity', 'Differentiation', 'Application of derivatives', 'Integration', 'Differential equations', 'Vectors and 3D geometry', 'Probability', 'Statistics']
+};
+const calcPoints = (c, done) => Object.keys(done).reduce((s, k) => s + ptsOf(c, k), 0);
+function streak(done) {
+  const days = new Set(Object.values(done)); const d = new Date();
+  if (!days.has(ymd(d))) d.setDate(d.getDate() - 1);
+  let n = 0; while (days.has(ymd(d))) { n++; d.setDate(d.getDate() - 1); }
+  return n;
+}
+const sorted = () => [...S.members].sort((a, b) => (b.points || 0) - (a.points || 0) || String(a.name).localeCompare(String(b.name)));
+
+// Summary of one challenge for Home and Profile, including my own progress in it (me may be null).
+const metaOf = (c, me) => ({ title: c.title, startDate: c.startDate, endDate: c.endDate, live: c.live, n: c.targets.length, owner: c.ownerUid,
+  daily: c.targets.filter(t => t.daily).map(t => t.id), done: me?.done || {}, points: me?.points || 0,
+  qs: Object.keys(me?.done || {}).reduce((a, k) => a + qsOf(c, k), 0) });
+
+/* ---------- boot ---------- */
+async function loadFirebase() {
+  if (auth) return;
+  const V = 'https://www.gstatic.com/firebasejs/10.12.2/';
+  const [a, b, c] = await Promise.all([import(V + 'firebase-app.js'), import(V + 'firebase-auth.js'), import(V + 'firebase-firestore.js')]);
+  ({ signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, linkWithPopup, signInWithCredential, signOut } = b);
+  ({ doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, serverTimestamp, query, where, getDocs, limit } = c);
+  const app = a.initializeApp(firebaseConfig); auth = b.getAuth(app); db = c.getFirestore(app);
+}
+// Resolves with the signed-in user. Reuses the saved account if there is one, so a returning
+// visitor keeps the same uid; only signs in anonymously when there is none. Safe to call again after a failure.
+let signing = null;
+function connect() {
+  signing ??= (async () => {
+    await loadFirebase();
+    const saved = await new Promise((res, rej) => { const off = onAuthStateChanged(auth, u => { off(); res(u); }, rej); });
+    return saved || (await signInAnonymously(auth)).user;
+  })().catch(e => { signing = null; throw e; });
+  return signing;
+}
+const authMsg = e => e?.code === 'auth/operation-not-allowed' ? 'This sign-in method is turned off. The host needs to enable it in Firebase > Authentication > Sign-in method.'
+  : e?.code === 'auth/popup-blocked' ? 'Your browser blocked the Google window. Allow pop-ups for this site and try again.'
+  : e?.code === 'auth/unauthorized-domain' ? 'This website is not allowed in Firebase yet. Add it under Authentication > Settings > Authorized domains.'
+  : e?.code === 'auth/too-many-requests' ? 'Too many attempts. Wait a minute and try again.'
+  : 'Could not reach the server. Check your connection and try again.';
+const cancelled = e => ['auth/popup-closed-by-user', 'auth/cancelled-popup-request'].includes(e?.code);
+const acctOf = u => ({ anon: u.isAnonymous, email: u.email || '', name: u.displayName || '' });
+const firstName = u => (u.displayName || u.email || 'Student').split(/[\s@]/)[0].slice(0, 20);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+// Account data that should follow a signed-in user to another phone: name and the list of challenges.
+// The server copy wins when it exists; otherwise this device's copy is uploaded.
+async function syncUser() {
+  if (!S.uid || !db) return;
+  const ref = doc(db, 'users', S.uid);
+  try {
+    const snap = await getDoc(ref), d = snap.exists() ? snap.data() : null;
+    if (d?.mine) { S.mine = d.mine; ls.set('cr_mine', S.mine); }
+    if (d?.name) { S.name = d.name; ls.set('cr_name', d.name); }
+    if (!S.mine.some(m => m.code === S.active)) { S.active = S.mine[0]?.code || ''; ls.set('cr_active', S.active); }
+    await setDoc(ref, { name: S.name, mine: S.mine, updatedAt: serverTimestamp() }, { merge: true });
+  } catch { /* rules not published yet, or offline: the app keeps working from this device's copy */ }
+}
+function saveUser() {
+  if (!S.uid || !db) return;
+  setDoc(doc(db, 'users', S.uid), { name: S.name, mine: S.mine, updatedAt: serverTimestamp() }, { merge: true }).catch(() => {});
+}
+// Used on the welcome screen: signs in (or signs up) with Google and goes straight in.
+async function googleGate() {
+  const btn = $('g-google'); btn.disabled = true; setGate('idle');
+  try {
+    await loadFirebase();
+    const { user } = await signInWithPopup(auth, new GoogleAuthProvider());
+    signing = Promise.resolve(user); S.uid = user.uid; S.acct = acctOf(user);
+    if (!S.name) { S.name = firstName(user); ls.set('cr_name', S.name); }
+    await Promise.race([syncUser(), sleep(4000)]);
+    closeGate(); afterName();
+  } catch (e) { if (!cancelled(e)) setGate('fail', authMsg(e)); }
+  finally { btn.disabled = false; }
+}
+// Used from Profile: ties the current guest account to Google, keeping the same uid and all progress.
+async function linkGoogle() {
+  const u = auth?.currentUser; if (!u) return toast('Still signing in. One moment.');
+  try {
+    const { user } = await linkWithPopup(u, new GoogleAuthProvider());
+    S.acct = acctOf(user); await syncUser(); renderAll(); toast('Saved. Your progress is now on your Google account.');
+  } catch (e) {
+    if (e?.code === 'auth/credential-already-in-use') {
+      const cred = GoogleAuthProvider.credentialFromError(e);
+      if (cred && confirm('That Google account already has its own progress. Switch to it?\n\nWhat you did as a guest on this device will not carry over.')) {
+        try { const { user } = await signInWithCredential(auth, cred); wipeLocal(); ls.set('cr_name', firstName(user)); location.reload(); }
+        catch (e2) { toast(authMsg(e2)); }
+      }
+    } else if (!cancelled(e)) toast(authMsg(e));
+  }
+}
+const wipeLocal = () => { try { Object.keys(localStorage).filter(k => k.startsWith('cr_')).forEach(k => ls.del(k)); } catch {} };
+async function leaveDevice() {
+  const guest = S.acct?.anon;
+  const msg = guest ? 'You are a guest, so your progress lives only on this device. Clearing it deletes your account for good.\n\nTip: tap Save with Google first. Clear anyway?'
+    : 'Sign out on this device? Your progress stays on your Google account.';
+  if (msg && !confirm(msg)) return;
+  try { if (auth) await signOut(auth); } catch {}
+  wipeLocal(); location.reload();
+}
+async function start() {
+  $('c-start').value = today(); $('c-end').value = dayOff(13);
+  renderBuilder(); renderDraft(); renderPrompts(); renderAll();
+  // ?login always shows the welcome screen, even for someone who is already signed in.
+  const forceGate = new URLSearchParams(location.search).has('login');
+  if (S.name && !forceGate) return enter();
+  openGate();
+  loadFirebase().catch(() => {}); // warm up while they choose; errors surface when they continue
+}
+// Needs a name (saved or typed) and a signed-in user; the gate stays up until both are in place.
+async function enter() {
+  if (!S.uid) {
+    setGate('busy');
+    try { const u = await connect(); S.uid = u.uid; S.acct = acctOf(u); }
+    catch (e) { openGate(); return setGate('fail', authMsg(e)); }
+    await Promise.race([syncUser(), sleep(4000)]);
+  }
+  closeGate(); afterName();
+}
+let booted = false;
+function afterName() {
+  if (booted) return; booted = true;
+  renderAll(); watchRequests();
+  if (S.active) watch(S.active);
+  if (S.pendingCode) {
+    const code = S.pendingCode.toUpperCase().slice(0, 6);
+    $('join-code').value = code;
+    history.replaceState(null, '', location.pathname); S.pendingCode = null;
+    setView('join'); join(code);
+  } else setView('home');
+}
+
+/* ---------- firebase watching ---------- */
+function unwatch() {
+  if (S.chal) S.meta[S.chal.id] = metaOf(S.chal, S.me); // keep Home current for the challenge we are leaving
+  S.unsubs.forEach(f => f()); S.unsubs = []; S.chal = null; S.me = null; S.members = []; S.nudges = []; }
+function watch(code) {
+  unwatch(); S.active = code; ls.set('cr_active', code);
+  S.unsubs.push(onSnapshot(doc(db, 'challenges', code), s => {
+    if (!s.exists()) { toast('That challenge no longer exists.'); removeMine(code); return; }
+    S.chal = { id: s.id, ...s.data() }; renderAll();
+  }, () => toast('Could not load the challenge.')));
+  S.unsubs.push(onSnapshot(doc(db, 'challenges', code, 'members', S.uid), s => { S.me = s.exists() ? s.data() : null; renderAll(); }));
+  S.unsubs.push(onSnapshot(collection(db, 'challenges', code, 'members'), s => { S.members = s.docs.map(d => ({ id: d.id, ...d.data() })); renderAll(); }));
+  // Nudges addressed to me. Needs the nudges rule from the README; without it this listener just stays empty.
+  S.unsubs.push(onSnapshot(query(collection(db, 'challenges', code, 'nudges'), where('to', '==', S.uid)), s => { S.nudges = s.docs.map(d => d.data()); renderActivity(); }, () => {}));
+  renderAll();
+}
+function addMine(code, title) { S.mine = [{ code, title }, ...S.mine.filter(m => m.code !== code)]; ls.set('cr_mine', S.mine); saveUser(); }
+function removeMine(code) {
+  S.mine = S.mine.filter(m => m.code !== code); ls.set('cr_mine', S.mine); saveUser();
+  if (S.active === code) { unwatch(); S.active = S.mine[0]?.code || ''; ls.set('cr_active', S.active); if (S.active) watch(S.active); }
+  delete S.meta[code];
+  renderAll();
+}
+// Two reads per challenge, so Home refetches at most once a minute; the open challenge is always live via its snapshots.
+let metaAt = 0;
+async function loadMeta(force) {
+  if (!S.uid || (!force && Date.now() - metaAt < 60000)) return;
+  metaAt = Date.now();
+  await Promise.all(S.mine.map(async m => {
+    try {
+      const [s, me] = await Promise.all([getDoc(doc(db, 'challenges', m.code)), getDoc(doc(db, 'challenges', m.code, 'members', S.uid))]);
+      S.meta[m.code] = s.exists() ? metaOf(s.data(), me.exists() ? me.data() : null) : { gone: true };
+    } catch { S.meta[m.code] ??= { failed: true }; }
+  }));
+  renderHome();
+}
+
+/* ---------- actions ---------- */
+async function ensureMember(code) {
+  const ref = doc(db, 'challenges', code, 'members', S.uid);
+  if (!(await getDoc(ref)).exists()) await setDoc(ref, { name: S.name, points: 0, done: {}, notes: {}, joinedAt: serverTimestamp(), updatedAt: serverTimestamp() });
+}
+async function saveMe(fields) {
+  if (!S.me) await ensureMember(S.chal.id);
+  await updateDoc(doc(db, 'challenges', S.chal.id, 'members', S.uid), { ...fields, updatedAt: serverTimestamp() });
+}
+async function join(raw) {
+  const code = String(raw || '').trim().toUpperCase();
+  if (code.length !== 6) return toast('Codes have 6 characters.');
+  try {
+    const snap = await getDoc(doc(db, 'challenges', code));
+    if (!snap.exists()) return toast('No challenge with that code.');
+    const c = snap.data();
+    if (!c.live && c.ownerUid !== S.uid) return toast('This challenge is not live yet.');
+    await ensureMember(code); addMine(code, c.title); watch(code); S.pane = 'today'; setView('challenge'); toast('Joined ' + c.title);
+  } catch { toast('Could not join. Check your connection.'); }
+}
+async function toggle(tid) {
+  const c = S.chal; if (!c || status(c) !== 'live') return;
+  const t = c.targets.find(x => x.id === tid); if (!t) return;
+  const day = today(), key = t.daily ? `${tid}@${day}` : tid;
+  const done = { ...(S.me?.done || {}) };
+  if (done[key]) delete done[key]; else done[key] = day;
+  try { await saveMe({ name: S.name, done, points: calcPoints(c, done) }); } catch { toast('Could not save. Check your connection.'); }
+}
+async function saveNote() {
+  if (!S.chal) return toast('Open a challenge first.');
+  const notes = { ...(S.me?.notes || {}) }; const v = $('j-text').value.trim();
+  if (v) notes[today()] = v; else delete notes[today()];
+  try { await saveMe({ notes }); toast('Note saved'); } catch { toast('Could not save the note.'); }
+}
+async function toggleLive() {
+  const c = S.chal; if (!c || c.ownerUid !== S.uid) return;
+  try { await updateDoc(doc(db, 'challenges', c.id), { live: !c.live }); toast(c.live ? 'Challenge paused' : 'Challenge is live'); } catch { toast('Could not update.'); }
+}
+async function leave() {
+  const c = S.chal; if (!c || !confirm('Leave this challenge? Your points will be removed.')) return;
+  try { await deleteDoc(doc(db, 'challenges', c.id, 'members', S.uid)); } catch {}
+  removeMine(c.id); setView('home');
+}
+async function removeChallenge() {
+  const c = S.chal; if (!c || c.ownerUid !== S.uid || !confirm('Delete this challenge for everyone?')) return;
+  try { await deleteDoc(doc(db, 'challenges', c.id)); } catch { toast('Could not delete.'); }
+}
+async function createChallenge() {
+  const title = $('c-title').value.trim(), desc = $('c-desc').value.trim();
+  const startDate = $('c-start').value, endDate = $('c-end').value;
+  if (!title) return toast('Add a title.');
+  if (!S.draft.length) return toast('Add at least one target.');
+  if (!startDate || !endDate || endDate < startDate) return toast('Check the start and end dates.');
+  try {
+    let code;
+    for (let i = 0; i < 5; i++) { code = genCode(); if (!(await getDoc(doc(db, 'challenges', code))).exists()) break; }
+    await setDoc(doc(db, 'challenges', code), { title, desc, startDate, endDate, targets: S.draft, live: true, public: $('c-public').checked, ownerUid: S.uid, ownerName: S.name, createdAt: serverTimestamp() });
+    await ensureMember(code); addMine(code, title); watch(code);
+    S.draft = []; S.imported.clear(); renderDraft(); renderImport(); $('c-title').value = ''; $('c-desc').value = '';
+    const box = $('created-box'); box.hidden = false;
+    box.innerHTML = `<b>Your challenge is live</b><div class="codebox">${code}</div>
+      <div class="sub">Friends open the link, or enter this code under Join with code.</div>
+      <div class="btns"><button class="btn" data-act="share" data-code="${code}">Share</button><button class="btn sec" data-act="open" data-code="${code}">Open</button></div>`;
+  } catch { toast('Could not create. Check Firestore rules and your connection.'); }
+}
+const MAX_TASKS = 60;
+const PRESETS = {
+  jee: [['Physics', 'Daily practice', 'Solve 30 problems', 1, 30], ['Chemistry', 'Daily practice', 'Revise 1 chapter', 1, 0], ['Maths', 'Daily practice', 'Solve 25 problems', 1, 25], ['Revision', 'Daily', "Review yesterday's mistakes", 1, 0]],
+  pyq: [['Physics', 'PYQs', 'PYQ set (20 Qs)', 1, 20], ['Chemistry', 'PYQs', 'PYQ set (20 Qs)', 1, 20], ['Maths', 'PYQs', 'PYQ set (20 Qs)', 1, 20]],
+  mock: [['Mock tests', 'Weekly', 'Full syllabus mock test', 0, 90], ['Mock tests', 'Weekly', 'Analyse the mock: list silly mistakes', 0, 0]]
+};
+const QUICK = [['Solve 30 problems', 1, 30], ['Revise theory', 1, 0], ['PYQ set (20 Qs)', 1, 20], ['Make a formula sheet', 0, 0], ['Chapter test', 0, 30]];
+let uid = 0;
+const newId = () => 't' + Date.now().toString(36) + (uid++).toString(36);
+// Returns false when it would exceed the limit or duplicates an existing task.
+function pushTask(subj, topic, text, daily, qs) {
+  if (S.draft.some(g => subjOf(g) === subj && (g.topic || '') === topic && g.text === text)) return false;
+  if (S.draft.length >= MAX_TASKS) { toast('Up to ' + MAX_TASKS + ' tasks.'); return false; }
+  S.draft.push({ id: newId(), subj, topic, text, daily: !!daily, points: 10, qs: qs || 0 });
+  return true;
+}
+function addPreset(k) {
+  const added = PRESETS[k].filter(p => pushTask(...p)).length;
+  if (!added) return toast('Already in your plan.');
+  renderDraft();
+}
+const topicPool = () => [...(TOPICS[S.bSubj] || []), ...(S.bExtra[S.bSubj] || [])];
+function toggleTopic(t) { const i = S.bTopics.indexOf(t); if (i < 0) S.bTopics.push(t); else S.bTopics.splice(i, 1); renderBuilder(); }
+function addTopics() {
+  const parts = $('b-topic').value.split(',').map(x => x.replace(/\s+/g, ' ').trim().slice(0, 40)).filter(Boolean);
+  if (!parts.length) return toast('Type a topic first.');
+  parts.forEach(p => {
+    let name = topicPool().find(t => t.toLowerCase() === p.toLowerCase());
+    if (!name) { (S.bExtra[S.bSubj] ||= []).push(p); name = p; }
+    if (!S.bTopics.includes(name)) S.bTopics.push(name);
+  });
+  $('b-topic').value = ''; renderBuilder();
+}
+// Subject (step 1) and the selected topics (step 2). Whatever task is added next goes into every selected topic.
+function branch() {
+  if ($('b-topic').value.trim()) addTopics();
+  const subj = S.bSubj === 'Other' ? $('b-other').value.trim() : S.bSubj;
+  if (!subj) { toast('Name the subject first.'); $('b-other').focus(); return null; }
+  if (!S.bTopics.length) { toast('Pick at least one topic first.'); return null; }
+  return { subj, topics: [...S.bTopics] };
+}
+function addToTopics(br, text, daily, qs) {
+  const added = br.topics.filter(t => pushTask(br.subj, t, text, daily, qs)).length;
+  if (!added) { toast('Already in those topics.'); return 0; }
+  renderDraft(); toast('Added to ' + plural(added, 'topic')); return added;
+}
+function quickTask(i) { const br = branch(); if (!br) return; const [text, daily, qs] = QUICK[i]; addToTopics(br, text, daily, qs); }
+function addTarget() {
+  const text = $('t-text').value.trim(); if (!text) return toast('Type a task first.');
+  const br = branch(); if (!br) return;
+  const qs = clamp(parseInt($('t-qs').value, 10) || 0, 0, 500);
+  if (addToTopics(br, text, $('t-type').value === 'daily', qs)) { $('t-text').value = ''; $('t-qs').value = ''; $('t-text').focus(); }
+}
+function renderImport() {
+  $('mega').hidden = !S.mine.length;
+  $('import-list').innerHTML = S.mine.map(m => { const on = S.imported.has(m.code);
+    return `<button class="li" data-act="import" data-code="${esc(m.code)}"><span class="grow"><b>${esc(m.title)}</b><span class="meta">${on ? 'Added to your plan' : 'Add all its tasks'}</span></span>
+      <span class="badge ${on ? 'live' : ''}">${on ? 'added' : '+ add'}</span></button>`; }).join('');
+}
+async function importChallenge(code) {
+  let targets, title = S.mine.find(m => m.code === code)?.title || code;
+  try {
+    if (S.chal?.id === code) targets = S.chal.targets;
+    else { const snap = await getDoc(doc(db, 'challenges', code)); if (!snap.exists()) return toast('That challenge no longer exists.'); targets = snap.data().targets; title = snap.data().title; }
+  } catch { return toast('Could not load that challenge.'); }
+  // Tasks keep their subject and topic; plans made before subjects existed go under the challenge title.
+  const added = targets.filter(g => pushTask(g.subj || title, g.topic || '', g.text, g.daily, g.qs)).length;
+  S.imported.add(code); renderDraft(); renderImport();
+  toast(added ? `Added ${plural(added, 'task')} from ${title}` : 'Those tasks are already in your plan.');
+}
+function renderBuilder() {
+  renderImport();
+  $('b-subj').innerHTML = ['Physics', 'Chemistry', 'Maths', 'Other'].map(x => `<button class="chip" data-act="subj" data-s="${x}" aria-pressed="${x === S.bSubj}">${x}</button>`).join('');
+  $('b-other').hidden = S.bSubj !== 'Other';
+  $('b-topics').innerHTML = topicPool().map(t => `<button class="chip" data-act="topic" data-t="${esc(t)}" aria-pressed="${S.bTopics.includes(t)}">${esc(t)}</button>`).join('') || '<span class="sub" style="margin:0">Type your topics below.</span>';
+  $('b-count').textContent = S.bTopics.length ? `(${S.bTopics.length} selected)` : '';
+  $('b-hint').textContent = S.bTopics.length ? `Each task you add goes into ${plural(S.bTopics.length, 'topic')}: ${S.bTopics.slice(0, 3).join(', ')}${S.bTopics.length > 3 ? ' and ' + (S.bTopics.length - 3) + ' more' : ''}.` : 'Select one or more topics above first.';
+}
+async function share(code) {
+  const url = link(code), text = `Join my challenge on Challenge Room. Code: ${code}`;
+  if (navigator.share) { try { await navigator.share({ title: 'Challenge Room', text, url }); } catch {} return; }
+  copy(url, 'Link copied');
+}
+function openChallenge(code) {
+  if (S.meta[code]?.gone) { removeMine(code); return toast('Removed. The host deleted that challenge.'); }
+  if (code !== S.active || !S.chal) watch(code); S.pane = 'today'; setView('challenge'); }
+
+/* ---------- name ---------- */
+const BEHIND = ['.top', 'main', 'nav'];
+function openGate() {
+  const inv = $('g-invite'), code = S.pendingCode && S.pendingCode.toUpperCase().slice(0, 6);
+  inv.hidden = !code; if (code) inv.textContent = `You have been invited to challenge ${code}. Sign in and you will join right away.`;
+  $('name-input').value = S.name;
+  $('g-file').hidden = location.protocol !== 'file:';
+  BEHIND.forEach(s => document.querySelector(s).inert = true);
+  $('gate').hidden = false; setTimeout(() => $('name-input').focus(), 50);
+}
+function closeGate() { $('gate').hidden = true; BEHIND.forEach(s => document.querySelector(s).inert = false); }
+function setGate(state, msg = '') {
+  const go = $('g-go'), err = $('g-err');
+  go.disabled = state === 'busy'; go.textContent = state === 'busy' ? 'Signing in…' : state === 'fail' ? 'Try again' : 'Continue as guest';
+  err.hidden = !msg; err.textContent = msg;
+  $('name-input').setAttribute('aria-invalid', String(state === 'invalid'));
+}
+function applyName(v) {
+  S.name = v; ls.set('cr_name', v); saveUser();
+  if (S.uid) S.mine.forEach(m => updateDoc(doc(db, 'challenges', m.code, 'members', S.uid), { name: v }).catch(() => {}));
+  renderAll();
+}
+function saveName() {
+  if ($('g-go').disabled) return;
+  const v = $('name-input').value.trim();
+  if (!v) { setGate('invalid', 'Enter a name so friends know who you are.'); return $('name-input').focus(); }
+  if (v !== S.name) { S.name = v; ls.set('cr_name', v); }
+  enter();
+}
+function saveProfile() { const v = $('p-name').value.trim(); if (!v) return toast('Enter a name.'); applyName(v); toast('Name saved'); }
+
+/* ---------- views ---------- */
+const TAB = { home: 'home', challenges: 'challenges', market: 'challenges', mine: 'challenges', challenge: 'challenges', activity: 'activity', peer: 'activity', profile: 'profile', ai: 'ai', 'ai-make': 'ai', backup: 'ai', archive: 'ai' };
+const FIXED_BACK = { market: 'challenges', mine: 'challenges', 'ai-make': 'ai', backup: 'ai', archive: 'backup', peer: 'activity' };
+const FOLLOW_PREV = new Set(['create', 'join', 'challenge', 'hall']); // these go back to wherever they were opened from
+// A view never goes back to the screen that merely led to it (for example Open after creating, or returning from the hall).
+const NOT_BACK = { challenge: ['create', 'join', 'hall'], create: ['join', 'hall', 'challenge'], join: ['create', 'hall', 'challenge'], hall: [] };
+const VIEW_NAME = { home: 'Home', challenges: 'Challenges', market: 'Market', mine: 'My challenges', activity: 'Activity', profile: 'Profile', ai: 'AI', backup: 'Backup', challenge: 'Challenge' };
+function setView(v) {
+  const prev = S.view;
+  if (FOLLOW_PREV.has(v) && prev !== v && !(NOT_BACK[v] || []).includes(prev)) S.backOf[v] = prev;
+  S.view = v;
+  const back = FIXED_BACK[v] || (FOLLOW_PREV.has(v) ? S.backOf[v] || (v === 'challenge' ? 'mine' : 'home') : null);
+  const tab = TAB[v] || TAB[S.backOf[v] || 'home'];
+  document.querySelectorAll('.view').forEach(el => el.classList.toggle('on', el.id === 'view-' + v));
+  document.querySelectorAll('nav button').forEach(b => b.dataset.v === tab ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'));
+  $('back').dataset.v = back || 'home'; $('back-t').textContent = back ? VIEW_NAME[back] || 'Back' : 'Home';
+  $('back').classList.toggle('on', !!back);
+  if (v === 'home' || v === 'mine') loadMeta();
+  if (v === 'market') loadMarket();
+  if (v === 'hall') loadHall();
+  if (v === 'create') renderImport();
+  if (v === 'ai-make') renderPrompts();
+  if (v === 'backup') renderArchiveList();
+  renderAll(); window.scrollTo(0, 0);
+}
+function setPane(p) {
+  S.pane = p;
+  document.querySelectorAll('.pane').forEach(el => el.classList.toggle('on', el.id === 'pane-' + p));
+  document.querySelectorAll('#seg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.p === p)));
+}
+const empty = (h, p) => `<div class="empty"><b>${h}</b>${p}</div>`;
+function renderAll() { renderTop(); renderHome(); renderHub(); renderMine(); renderMarket(); renderHall(); renderChallenge(); renderActivity(); renderPeer(); renderNavDot(); renderProfile(); setPane(S.pane); }
+function renderTop() { $('top-av').textContent = ini(S.name); }
+
+// Summary for a code: the open challenge comes from its live snapshots, the rest from loadMeta.
+const infoOf = code => code === S.chal?.id ? metaOf(S.chal, S.me) : S.meta[code];
+const usable = x => x && !x.gone && !x.failed;
+const doneToday = x => x.daily.filter(id => x.done[`${id}@${today()}`]).length;
+const ORDER = { live: 0, upcoming: 1, paused: 2, ended: 3 };
+// Exam countdown. Default is the NTA calendar's tentative JEE Main 2027 Session 1 start; students can set their own date.
+const daysTo = d => Math.round((new Date(d + 'T00:00') - new Date(today() + 'T00:00')) / 864e5);
+function renderExam() {
+  const d = ls.get('cr_exam', '2027-01-22'), n = daysTo(d);
+  $('home-exam').innerHTML = `<div class="big">${n > 0 ? n : n === 0 ? '0' : '-'}</div><div class="grow"><b>${n > 0 ? 'days to your exam' : n === 0 ? 'Exam day. All the best!' : 'Set your next exam date'}</b>
+    <div class="meta">${n > 0 ? `${Math.ceil(n / 7)} weeks left. JEE Main 2027 Session 1 is tentatively ${fmt('2027-01-22')}.` : 'Pick the date below.'}</div>
+    <input type="date" id="exam-date" value="${esc(d)}" aria-label="Exam date"></div>`;
+}
+const startsIn = d => { const n = daysTo(d); return n <= 0 ? 'Starts today' : n === 1 ? 'Starts tomorrow' : `Starts in ${n} days`; };
+// Tick today's quests right on Home (for the challenge you have open).
+function renderToday() {
+  const c = S.chal, el = $('home-today');
+  if (!c || status(c) !== 'live') { el.innerHTML = ''; return; }
+  const daily = c.targets.filter(g => g.daily); if (!daily.length) { el.innerHTML = ''; return; }
+  const done = S.me?.done || {}, t = today();
+  el.innerHTML = `<div class="lbl">Today in ${esc(c.title)}</div><div class="group">${daily.map(g => { const on = !!done[`${g.id}@${t}`];
+    return `<button class="li quest ${on ? 'on' : ''}" data-act="toggle" data-id="${esc(g.id)}"><span class="box"></span><span class="t">${esc(g.text)}</span><span class="p">+${g.points}</span></button>`; }).join('')}</div>`;
+}
+const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+function renderHome() {
+  if (document.activeElement?.id !== 'exam-date') renderExam();
+  renderToday();
+  const h =new Date().getHours(), hi = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  $('home-h').textContent = S.name ? `${hi}, ${S.name}` : hi;
+  const rows = S.mine.map(m => { const x = infoOf(m.code); return { m, x, st: usable(x) ? status(x) : null }; });
+  const live = rows.filter(r => r.st === 'live');
+  const left = live.reduce((s, r) => s + r.x.daily.length - doneToday(r.x), 0);
+  const points = rows.reduce((s, r) => s + (usable(r.x) ? r.x.points : 0), 0);
+  const allDone = {}; rows.forEach(r => usable(r.x) && Object.entries(r.x.done).forEach(([k, d]) => allDone[r.m.code + k] = d));
+  const loading = rows.some(r => !r.x);
+  $('home-sub').textContent = !S.mine.length ? 'Start a challenge or join one a friend shared.'
+    : loading ? 'Loading your challenges.'
+    : left ? `You have ${plural(left, 'quest')} left today.`
+    : live.some(r => r.x.daily.length) ? 'All daily quests done. Nice work.' : 'Here is where your challenges stand.';
+  $('home-stats').innerHTML = `<div class="stat"><b>${live.length}</b><span>Live right now</span></div>
+    <div class="stat"><b>${live.length ? left : '-'}</b><span>Quests left today</span></div>
+    <div class="stat"><b>${streak(allDone)}</b><span>Day streak</span></div>
+    <div class="stat"><b>${points}</b><span>Total points</span></div>`;
+  const el = $('home-list');
+  if (!S.mine.length) { el.innerHTML = `<div class="lbl">Your challenges</div><div class="group">${empty('No challenges yet', 'Create one above, or ask a friend for their 6-character code.')}</div>`; return; }
+  const rank = r => r.st ? ORDER[r.st] : r.x ? 4 : -1;
+  rows.sort((a, b) => rank(a) - rank(b));
+  const row = ({ m, x, st }) => {
+    const title = usable(x) ? x.title : m.title;
+    let info, pct = null;
+    if (!x) info = 'Loading';
+    else if (x.gone) info = 'Deleted by the host. Tap to remove.';
+    else if (x.failed) info = 'Could not load. Check your connection.';
+    else if (st === 'live') { const dn = doneToday(x); info = x.daily.length ? `${dn}/${x.daily.length} today, ${x.points} pts, ends ${fmt(x.endDate)}` : `${x.points} pts, ends ${fmt(x.endDate)}`; if (x.daily.length) pct = Math.round(dn / x.daily.length * 100); }
+    else if (st === 'upcoming') info = `${startsIn(x.startDate)}, ${plural(x.n, 'target')}`;
+    else if (st === 'paused') info = `Paused by the host, ${x.points} pts`;
+    else info = `Ended ${fmt(x.endDate)}, ${x.points} pts`;
+    return `<button class="li" data-act="open" data-code="${esc(m.code)}"><span class="grow"><b>${esc(title)}</b><span class="meta">${esc(info)}</span>${pct != null ? `<span class="mini" aria-hidden="true"><i style="width:${pct}%"></i></span>` : ''}</span>
+      ${st ? `<span class="badge ${st}">${st}</span>` : ''}<svg class="i chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>`;
+  };
+  const current = rows.filter(r => r.st !== 'ended' && !r.x?.gone), past = rows.filter(r => r.st === 'ended' || r.x?.gone);
+  el.innerHTML = (current.length ? `<div class="lbl">Your challenges</div><div class="group">${current.map(row).join('')}</div>` : '')
+    + (past.length ? `<div class="lbl">Past</div><div class="group">${past.map(row).join('')}</div>` : '');
+}
+
+function renderChallenge() {
+  const head = $('ch-head'), c = S.chal;
+  $('seg').hidden = !c;
+  if (!c) {
+    head.innerHTML = empty('No challenge open', 'Pick one from Home, or create a new one.') + `<div class="btns"><button class="btn" data-act="view" data-v="home">Go to Home</button></div>`;
+    ['today', 'board'].forEach(p => $('pane-' + p).innerHTML = '');
+    ['me-top', 'journal-hist', 'm-list'].forEach(id => $(id).innerHTML = ''); return;
+  }
+  const st = status(c), left = daysTo(c.endDate), owner = c.ownerUid === S.uid;
+  const msg = { live: left > 0 ? plural(left, 'day') + ' left' : 'Last day', upcoming: startsIn(c.startDate), ended: `Ended ${fmt(c.endDate)}`, paused: 'Paused by the host' }[st];
+  const dots = '<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="12" cy="19" r="1.2"/></svg>';
+  head.innerHTML = `<div class="hbar"><div class="grow"><h1>${esc(c.title)}</h1>
+      <div class="row" style="margin-top:6px;flex-wrap:wrap;gap:8px"><span class="badge ${st}">${st}</span><span class="sub" style="margin:0">${esc(msg)}, ${plural(S.members.length, 'player')}</span></div></div>
+      <button class="icon-btn" data-act="menu" aria-label="More options" aria-expanded="${S.menu}">${dots}</button></div>
+    ${c.desc ? `<p class="sub">${esc(c.desc)}</p>` : ''}
+    ${factsHtml(c, owner)}
+    ${st === 'ended' ? '<button class="btn sm" style="margin-top:12px" data-act="report">Download performance report</button>' : ''}
+    ${S.menu ? `<div class="group menu"><button class="li" data-act="share" data-code="${esc(c.id)}">Share code ${esc(c.id)}</button>
+      ${owner ? `<button class="li" data-act="toggle-public">${c.public ? 'Hide from the market' : 'Show in the market'}</button><button class="li" data-act="toggle-live">${c.live ? 'Pause challenge' : 'Go live'}</button><button class="li bad" data-act="delete">Delete for everyone</button>` : ''}
+      <button class="li bad" data-act="leave">Leave challenge</button></div>` : ''}`;
+  renderQuests(); renderBoard(); renderMe(); renderJournal(); renderMistakes();
+}
+
+function rankText() {
+  const list = sorted(), idx = list.findIndex(m => m.id === S.uid), me = list[idx];
+  if (idx < 0 || !me.points) return list.length > 1 ? 'Tick a quest to get on the board.' : 'Share the code so friends can join.';
+  if (idx === 0) return list.length > 1 ? `You lead by ${me.points - (list[1].points || 0)} pts.` : 'You are the only player so far.';
+  return `You are #${idx + 1}, ${(list[idx - 1].points || 0) - me.points} pts behind ${list[idx - 1].name || 'Player'}.`;
+}
+function renderQuests() {
+  const c = S.chal, st = status(c), t = today(), done = S.me?.done || {};
+  const isDone = g => g.daily ? !!done[`${g.id}@${t}`] : !!done[g.id];
+  const row = g => `<button class="li quest ${isDone(g) ? 'on' : ''}" data-act="toggle" data-id="${esc(g.id)}" ${st !== 'live' ? 'disabled' : ''}>
+    <span class="box"></span><span class="t">${esc(g.text)}${g.daily ? '' : '<span class="tag">one time</span>'}${g.qs ? `<span class="tag">${g.qs} Qs</span>` : ''}</span><span class="p">+${g.points}</span></button>`;
+  const daily = c.targets.filter(g => g.daily), dn = daily.filter(isDone).length, pct = daily.length ? Math.round(dn / daily.length * 100) : 0;
+  const tree = buildTree(c.targets);
+  $('pane-today').innerHTML = `<div class="rankline"><div class="row"><b class="grow">${daily.length ? `${dn} of ${daily.length} daily quests done` : 'No daily quests'}</b><span class="sub" style="margin:0">${pct}%</span></div>
+      <div class="bar" aria-hidden="true"><i style="width:${pct}%"></i></div><div class="sub" style="font-size:14px;margin-top:8px">${esc(rankText())}</div></div>` +
+    tree.map(sj => { const all = sj.topics.flatMap(x => x.tasks), n = all.filter(isDone).length;
+      return `<div class="sj"><span class="dot" style="background:${subjCol(sj.name)}"></span>${esc(sj.name)}<span class="meta">${n}/${all.length} done</span></div>` +
+        sj.topics.map(tp => `${tp.name ? `<div class="tp">${esc(tp.name)}</div>` : ''}<div class="group">${tp.tasks.map(row).join('')}</div>`).join(''); }).join('');
+}
+
+function series() {
+  const c = S.chal, last = [today(), c.endDate].sort()[0];
+  if (last < c.startDate) return null;
+  const days = []; for (let d = new Date(c.startDate + 'T00:00'); ymd(d) <= last; d.setDate(d.getDate() + 1)) days.push(ymd(d));
+  const use = days.slice(-30);
+  const lines = S.members.map(m => {
+    const per = {}; Object.entries(m.done || {}).forEach(([k, d]) => { const p = ptsOf(c, k); if (p) per[d] = (per[d] || 0) + p; });
+    let cum = Object.entries(per).filter(([d]) => d < use[0]).reduce((a, [, v]) => a + v, 0);
+    return { id: m.id, name: m.name || 'Player', vals: use.map(d => cum += per[d] || 0) };
+  });
+  return { days: use, lines };
+}
+function chartSvg(sr) {
+  const W = 340, H = 190, pl = 30, pr = 62, pt = 10, pb = 24, n = sr.days.length;
+  let lines = [...sr.lines].sort((a, b) => b.vals[n - 1] - a.vals[n - 1]);
+  const meL = lines.find(l => l.id === S.uid); lines = lines.slice(0, 5); if (meL && !lines.includes(meL)) lines[4] = meL;
+  const max = Math.max(10, ...lines.flatMap(l => l.vals));
+  const x = i => pl + (n === 1 ? 0 : i * (W - pl - pr) / (n - 1)), y = v => pt + (H - pt - pb) * (1 - v / max);
+  const greys = ['#9AA7C2', '#74829F', '#566480', '#46536D'];
+  let g = '', k = 0;
+  for (let i = 0; i <= 4; i++) { const v = max * i / 4, yy = y(v); g += `<line x1="${pl}" x2="${W - pr}" y1="${yy}" y2="${yy}" stroke="#25324F" stroke-width="1"/><text x="${pl - 6}" y="${yy + 4}" text-anchor="end" font-size="10" fill="#8D9AB5">${Math.round(v)}</text>`; }
+  const ordered = [...lines.filter(l => l.id !== S.uid), ...lines.filter(l => l.id === S.uid)];
+  const ends = ordered.map(l => ({ l, y: y(l.vals[n - 1]) })).sort((a, b) => a.y - b.y);
+  for (let i = 1; i < ends.length; i++) if (ends[i].y - ends[i - 1].y < 11) ends[i].y = ends[i - 1].y + 11;
+  let paths = '', labels = '';
+  ordered.forEach(l => {
+    const me = l.id === S.uid, col = me ? '#5B8DEF' : greys[k++ % greys.length];
+    const d = l.vals.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(' ');
+    paths += `<path d="${d}" fill="none" stroke="${col}" stroke-width="${me ? 2.6 : 1.6}" stroke-linejoin="round" stroke-linecap="round"/>`;
+    const e = ends.find(z => z.l === l);
+    labels += `<text x="${W - pr + 6}" y="${e.y + 4}" font-size="11" font-weight="${me ? 800 : 600}" fill="${me ? '#5B8DEF' : '#8D9AB5'}">${esc((me ? 'You' : l.name).slice(0, 8))}</text>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Cumulative points by day">${g}${paths}${labels}
+    <text x="${pl}" y="${H - 6}" font-size="10" fill="#8D9AB5">${fmt(sr.days[0])}</text><text x="${W - pr}" y="${H - 6}" text-anchor="end" font-size="10" fill="#8D9AB5">${fmt(sr.days[n - 1])}</text></svg>`;
+}
+const subjStats = (c, done) => {
+  const m = {}; Object.keys(done).forEach(k => { const g = c.targets.find(x => x.id === k.split('@')[0]); if (!g) return; const o = m[subjOf(g)] ||= { pts: 0, qs: 0, n: 0 }; o.pts += g.points || 0; o.qs += g.qs || 0; o.n++; });
+  return m;
+};
+function renderMe() {
+  const c = S.chal, done = S.me?.done || {}, list = sorted(), idx = list.findIndex(m => m.id === S.uid);
+  const qs = Object.keys(done).reduce((a, k) => a + qsOf(c, k), 0);
+  const d = c.targets.filter(g => g.daily);
+  const cells = []; for (let i = 13; i >= 0; i--) { const day = dayOff(-i), n = Object.values(done).filter(v => v === day).length, a = Math.min(1, n / Math.max(1, d.length));
+    cells.push(`<i style="${n ? `background:rgba(91,141,239,${(.25 + .75 * a).toFixed(2)})` : ''}" title="${fmt(day)}: ${n}"></i>`); }
+  // Share of the plan completed per subject so far: daily tasks count once per elapsed day, one-time tasks once.
+  const last = [today(), c.endDate].sort()[0], days = last < c.startDate ? 0 : Math.round((new Date(last + 'T00:00') - new Date(c.startDate + 'T00:00')) / 864e5) + 1;
+  const st = subjStats(c, done), tree = buildTree(c.targets);
+  const rows = tree.map(sj => { const all = sj.topics.flatMap(x => x.tasks), possible = all.reduce((a, g) => a + (g.daily ? days : 1), 0), o = st[sj.name] || { pts: 0, qs: 0, n: 0 };
+    return { name: sj.name, o, rate: possible ? Math.min(1, o.n / possible) : 0 }; });
+  const dailyRows = rows.filter((r, i) => tree[i].topics.some(x => x.tasks.some(g => g.daily))), topRate = Math.max(0, ...dailyRows.map(r => r.rate));
+  const lag = dailyRows.length > 1 && days > 0 && topRate > 0 ? dailyRows.reduce((a, r) => r.rate < a.rate ? r : a) : null;
+  $('me-top').innerHTML = `<div class="stats">
+      <div class="stat"><b>${S.me?.points || 0}</b><span>Your points</span></div>
+      <div class="stat"><b>${idx < 0 ? '-' : '#' + (idx + 1)}</b><span>Rank of ${list.length}</span></div>
+      <div class="stat"><b>${streak(done)}</b><span>Day streak</span></div>
+      <div class="stat"><b>${qs}</b><span>Questions solved</span></div></div>
+    <div class="lbl">Your last 14 days</div>
+    <div class="heat" aria-label="Quests cleared per day">${cells.join('')}</div>
+    <div class="heat-l"><span>${fmt(dayOff(-13))}</span><span>Today</span></div>
+    <div class="lbl">By subject</div>
+    <div class="group">${rows.map(r => `<div class="li"><span class="dot" style="background:${subjCol(r.name)}"></span><div class="grow"><b>${esc(r.name)}</b><div class="meta">${r.o.pts} pts, ${r.o.qs} Qs</div>
+      <div class="mini"><i style="width:${Math.round(r.rate * 100)}%;background:${subjCol(r.name)}"></i></div></div><b style="min-width:44px;text-align:right">${Math.round(r.rate * 100)}%</b></div>`).join('')}</div>
+    ${lag && lag.rate < topRate * .6 ? `<p class="sub" style="margin-top:8px">${esc(lag.name)} is lagging. Give it a little extra time this week.</p>` : ''}`;
+}
+function renderBoard() {
+  const c = S.chal, list = sorted(), top = Math.max(1, list[0]?.points || 0), sr = series();
+  const week = m => { const cells = []; for (let i = 6; i >= 0; i--) { const day = dayOff(-i), n = Object.values(m.done || {}).filter(v => v === day).length;
+    cells.push(`<div>${new Date(day + 'T00:00').toLocaleDateString(undefined, { weekday: 'narrow' })}<b>${n}</b></div>`); } return `<div class="pl-days" aria-label="Quests cleared in the last 7 days">${cells.join('')}</div>`; };
+  $('pane-board').innerHTML = `<div class="lbl" style="margin-top:14px">Standings</div>` + (list.length ? `<div class="group">` + list.map((m, i) => `<div class="pw"><button class="li ${i === 0 ? 'lead' : ''}" data-act="player" data-id="${esc(m.id)}" aria-expanded="${S.openPl === m.id}">
+    <div class="rk">${i + 1}</div><div class="avatar ${m.id === S.uid ? 'me' : ''}">${esc(ini(m.name))}</div>
+    <div class="grow"><b>${esc(m.name || 'Player')}${m.id === S.uid ? ' (you)' : ''}</b><div class="mini"><i style="width:${Math.round((m.points || 0) / top * 100)}%"></i></div></div>
+    <div class="pts">${m.points || 0}</div></button>${S.openPl === m.id ? week(m) : ''}</div>`).join('') + '</div>' : empty('No players yet', 'Share the code to get friends in.'))
+    + `<div class="lbl">Points over time</div>` + (sr ? `<div class="chart">${chartSvg(sr)}</div>` : '<div class="group">' + empty('Not started yet', 'The chart appears once the challenge begins.') + '</div>')
+    + `<div class="lbl">Invite friends</div><div class="group"><div class="li"><div class="grow"><b>Code ${esc(c.id)}</b><div class="meta">Friends enter this code or open your link.</div></div>
+      <button class="btn sm" data-act="share" data-code="${esc(c.id)}">Share</button></div></div>`;
+}
+function renderJournal() {
+  const hist = $('journal-hist'), ta = $('j-text'), notes = S.me?.notes || {}, done = S.me?.done || {};
+  if (document.activeElement !== ta) ta.value = notes[today()] || '';
+  const counts = {}; Object.values(done).forEach(d => counts[d] = (counts[d] || 0) + 1);
+  const days = [...new Set([...Object.keys(counts), ...Object.keys(notes)])].sort().reverse();
+  hist.hidden = !days.length;
+  hist.innerHTML = days.map(d => `<div class="li" style="align-items:flex-start"><div class="grow"><b>${fmt(d)}</b> <span class="meta">${plural(counts[d] || 0, 'quest')} cleared</span>${notes[d] ? `<div style="margin-top:4px;white-space:pre-wrap">${esc(notes[d])}</div>` : ''}</div></div>`).join('');
+}
+// Mistakes log: private, kept on this device only (other players can read the member document, so it is not stored there).
+const mkey = () => 'cr_mist_' + S.chal.id;
+const mistakes = () => ls.get(mkey(), []);
+function addMistake() {
+  if (!S.chal) return;
+  const text = $('m-text').value.trim(); if (!text) return toast('Describe the mistake first.');
+  const list = mistakes(); list.unshift({ id: newId(), subj: $('m-subj').value, text, day: today(), fixed: false });
+  ls.set(mkey(), list.slice(0, 100)); $('m-text').value = ''; renderMistakes();
+}
+function toggleMistake(id) { ls.set(mkey(), mistakes().map(m => m.id === id ? { ...m, fixed: !m.fixed } : m)); renderMistakes(); }
+function rmMistake(id) { ls.set(mkey(), mistakes().filter(m => m.id !== id)); renderMistakes(); }
+function renderMistakes() {
+  const c = S.chal, sel = $('m-subj'), names = buildTree(c.targets).map(x => x.name), k = names.join('|');
+  if (sel.dataset.k !== k) { const cur = sel.value; sel.innerHTML = names.map(n => `<option>${esc(n)}</option>`).join(''); sel.dataset.k = k; if (names.includes(cur)) sel.value = cur; }
+  const list = mistakes().sort((a, b) => a.fixed - b.fixed);
+  $('m-list').hidden = !list.length;
+  $('m-list').innerHTML = list.map(m => `<div class="li mist ${m.fixed ? 'fixed' : ''}"><button class="quest ${m.fixed ? 'on' : ''}" data-act="mist" data-id="${esc(m.id)}" aria-label="Mark as fixed" style="display:flex"><span class="box"></span></button>
+    <div class="grow"><span class="t">${esc(m.text)}</span><div class="meta"><span class="dot" style="background:${subjCol(m.subj)};width:8px;height:8px"></span> ${esc(m.subj)}, ${fmt(m.day)}</div></div>
+    <button class="x" data-act="rm-mist" data-id="${esc(m.id)}" aria-label="Delete">Delete</button></div>`).join('');
+}
+
+// Monday to Sunday, so the league resets every week.
+const weekStart = () => { const d = new Date(); d.setDate(d.getDate() - (d.getDay() + 6) % 7); return ymd(d); };
+const weekPts = (c, m, ws) => Object.entries(m.done || {}).reduce((a, [k, d]) => d >= ws ? a + ptsOf(c, k) : a, 0);
+const nudgedKey = to => `${S.chal.id}|${to}|${today()}`;
+const nudgedToday = () => ls.get('cr_nudged', []).filter(k => k.endsWith('|' + today()));
+async function nudge(to) {
+  const c = S.chal; if (!c || status(c) !== 'live') return;
+  const sent = nudgedToday(); if (sent.includes(nudgedKey(to))) return toast('You already nudged them today.');
+  const name = S.members.find(m => m.id === to)?.name || 'them';
+  try { await setDoc(doc(db, 'challenges', c.id, 'nudges', `${today()}_${S.uid}_${to}`), { from: S.uid, fromName: S.name, to, day: today(), at: serverTimestamp() }); }
+  catch { return toast('Could not send. Nudges need the updated Firestore rules from the README.'); }
+  ls.set('cr_nudged', [...sent, nudgedKey(to)]); toast('Nudged ' + name); renderActivity();
+}
+function renderActivity() {
+  const c = S.chal, el = $('act-body');
+  if (!c) { $('act-sub').textContent = ''; el.innerHTML = incomingHtml() + empty('No challenge open', 'Open a challenge to see what your friends are doing.') + sharedListHtml(); return; }
+  $('act-sub').textContent = c.title;
+  const t = today(), live = status(c) === 'live', daily = c.targets.filter(g => g.daily), sent = nudgedToday();
+  const prog = m => daily.filter(g => (m.done || {})[`${g.id}@${t}`]).length;
+  let out = '';
+
+  // 1. Nudges other players sent me today
+  const got = S.nudges.filter(n => n.day === t);
+  if (got.length && live) out += `<div class="note" style="color:var(--tx);margin-top:14px">${esc([...new Set(got.map(n => n.fromName || 'A friend'))].join(', '))} nudged you. Time to study!</div>`;
+
+  out += incomingHtml();
+  // 2. Who is studying today
+  if (live && daily.length && S.members.length) {
+    const rows = [...S.members].sort((a, b) => prog(b) - prog(a) || String(a.name).localeCompare(String(b.name)));
+    out += `<div class="lbl">Today</div><div class="group">` + rows.map(m => { const n = prog(m), me = m.id === S.uid, was = sent.includes(nudgedKey(m.id));
+      const act = me ? '' : n >= daily.length ? '<span class="badge live">done</span>'
+        : `<button class="btn sec sm" data-act="nudge" data-id="${esc(m.id)}" ${was ? 'disabled' : ''}>${was ? 'Nudged' : 'Nudge'}</button>`;
+      const left = `<div class="avatar ${me ? 'me' : ''}">${esc(ini(m.name))}</div><div class="grow"><b>${esc(m.name || 'Player')}${me ? ' (you)' : ''}</b>
+        <div class="meta">${n}/${daily.length} quests today</div><div class="mini" aria-hidden="true"><i style="width:${Math.round(n / daily.length * 100)}%"></i></div></div>`;
+      return me ? `<div class="li">${left}</div>` : `<div class="li"><button class="pr" data-act="peer" data-id="${esc(m.id)}" aria-label="View ${esc(m.name || 'player')}">${left}</button>${act}</div>`; }).join('') + '</div>';
+  }
+
+  // 3. Weekly league
+  const ws = weekStart(), resets = 7 - (new Date().getDay() + 6) % 7;
+  const league = S.members.map(m => ({ m, p: weekPts(c, m, ws) })).sort((a, b) => b.p - a.p || String(a.m.name).localeCompare(String(b.m.name))).slice(0, 5);
+  if (league.length) out += `<div class="lbl">Weekly league <span style="font-weight:600">(resets in ${plural(resets, 'day')})</span></div>` + (league[0].p
+    ? `<div class="group">` + league.map((r, i) => `<div class="li ${i === 0 ? 'lead' : ''}"><div class="rk">${i + 1}</div><div class="avatar ${r.m.id === S.uid ? 'me' : ''}">${esc(ini(r.m.name))}</div>
+        <div class="grow"><b>${esc(r.m.name || 'Player')}${r.m.id === S.uid ? ' (you)' : ''}</b></div><div class="pts">${r.p}</div></div>`).join('') + '</div>'
+    : '<div class="group">' + empty('Fresh week', 'Clear a quest to take the lead.') + '</div>');
+
+  // 4. Feed: per player, per day, per subject, plus streak milestones
+  const items = [];
+  S.members.forEach(m => {
+    const by = {}; Object.entries(m.done || {}).forEach(([k, d]) => { const g = c.targets.find(x => x.id === k.split('@')[0]); if (!g) return;
+      const o = by[d + '|' + subjOf(g)] ||= { d, subj: subjOf(g), n: 0, xp: 0, topics: new Set() }; o.n++; o.xp += g.points || 0; if (g.topic) o.topics.add(g.topic); });
+    const who = m.id === S.uid ? 'You' : (m.name || 'Player');
+    Object.values(by).forEach(v => { const tp = [...v.topics]; items.push({ d: v.d, who, m, subj: v.subj, xp: v.xp,
+      text: `cleared ${plural(v.n, 'task')} in ${v.subj}` + (tp.length ? ` (${tp.slice(0, 2).join(', ')}${tp.length > 2 ? ' +' + (tp.length - 2) : ''})` : '') }); });
+    const st = streak(m.done || {}); if ([7, 14, 21, 30, 50, 100].includes(st)) items.push({ d: t, who, m, text: `is on a ${st}-day streak`, xp: null, star: true });
+    let j = m.joinedAt; j = j && j.toDate ? j.toDate() : j instanceof Date ? j : null;
+    if (j) items.push({ d: ymd(j), who, m, text: 'joined the challenge', xp: null });
+  });
+  items.sort((a, b) => b.d.localeCompare(a.d) || (b.star ? 1 : 0) - (a.star ? 1 : 0) || (b.xp || 0) - (a.xp || 0));
+  out += '<div class="lbl">Recent</div>';
+  if (!items.length) out += '<div class="group">' + empty('Nothing yet', 'Clear a quest and it shows up here for everyone.') + '</div>';
+  else { let cur = '';
+    items.slice(0, 40).forEach(it => {
+      if (it.d !== cur) { if (cur) out += '</div>'; cur = it.d; out += `<div class="feed-d" style="margin-top:12px">${esc(fmtLong(it.d))}</div><div class="group">`; }
+      out += `<div class="li"><div class="avatar ${it.m.id === S.uid ? 'me' : ''}">${esc(ini(it.m.name))}</div>
+        <div class="grow">${it.subj ? `<span class="dot" style="background:${subjCol(it.subj)};width:8px;height:8px;margin-right:6px"></span>` : ''}${it.star ? '🔥 ' : ''}<b>${esc(it.who)}</b> ${esc(it.text)}</div>${it.xp ? `<span class="pts">+${it.xp}</span>` : ''}</div>`;
+    });
+    out += '</div>'; }
+  out += sharedListHtml();
+  el.innerHTML = out;
+}
+
+function renderProfile() {
+  $('p-av').textContent = ini(S.name); $('p-name-h').textContent = S.name || 'Profile';
+  const a = S.acct;
+  $('p-id').textContent = !a ? 'Signing in' : a.anon ? 'Guest account' : a.email;
+  $('p-acct').innerHTML = !a ? '<div class="grow"><b>Account</b><div class="meta">Signing in.</div></div>'
+    : a.anon ? '<div class="grow"><b>Guest account</b><div class="meta">Your progress lives only on this device. Save it with Google so you never lose it.</div></div><button class="btn sm" data-act="link-google">Save with Google</button>'
+    : `<div class="grow"><b>Signed in with Google</b><div class="meta">${esc(a.email)}. Your progress is safe on any device.</div></div>`;
+  $('p-out').textContent = a && !a.anon ? 'Sign out' : 'Clear data on this device';
+  if (document.activeElement !== $('p-name')) $('p-name').value = S.name;
+  const hosted = Object.values(S.meta).filter(x => x && x.owner === S.uid).length;
+  const row = (a, b) => `<div class="li"><div class="grow">${a}</div><b>${b}</b></div>`;
+  $('p-stats').innerHTML = row('Challenges joined', S.mine.length) + row('Challenges you host', hosted) + row('Points in current challenge', S.me?.points || 0) + row('Current streak', streak(S.me?.done || {}));
+}
+function renderDraft() {
+  const el = $('draft-list'), tree = buildTree(S.draft);
+  if (!tree.length) { el.innerHTML = '<div class="group">' + empty('Nothing here yet', 'Pick a subject and a topic, then add tasks.') + '</div>'; return; }
+  el.innerHTML = tree.map(s => `<div class="sj"><span class="dot" style="background:${subjCol(s.name)}"></span>${esc(s.name)}
+      <button class="x" data-act="rm-group" data-s="${esc(s.name)}" aria-label="Remove ${esc(s.name)}">Remove</button></div>` +
+    s.topics.map(t => `<div class="tp row">${esc(t.name || 'General')}<button class="x" data-act="rm-group" data-s="${esc(s.name)}" data-t="${esc(t.name)}" aria-label="Remove topic ${esc(t.name || 'General')}">Remove</button></div>
+      <div class="group">${t.tasks.map(g => `<div class="draft"><div class="grow"><b>${esc(g.text)}</b><div class="meta" style="font-size:13px">${g.daily ? 'Daily' : 'One time'}${g.qs ? ', ' + g.qs + ' Qs' : ''}</div></div>
+        <button class="x" data-act="rm-draft" data-id="${esc(g.id)}" aria-label="Remove task">Remove</button></div>`).join('')}</div>`).join('')).join('');
+}
+
+/* ---------- AI helper: prompts and plan import ---------- */
+const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
+const daysBetween = (a, b) => Math.round((new Date(b + 'T00:00') - new Date(a + 'T00:00')) / 864e5);
+function renderPrompts() {
+  const goal = $('ai-goal').value.trim(), days = clamp(parseInt($('ai-days').value, 10) || 14, 1, 365);
+  const exam = ls.get('cr_exam', '2027-01-22'), left = daysTo(exam);
+  $('ai-p1').value = `You are an expert JEE (Main and Advanced) coach. You are helping a student build a study challenge to do with friends in an app.
+
+About me: ${goal || '(I will describe my goal in my answers.)'}
+Today is ${today()}. My exam is on ${exam}${left > 0 ? ` (${left} days away)` : ''}. The challenge will run for ${days} days.
+
+First, ask me up to 5 short questions in one message about my current level, weak chapters, hours available per day, and how I like to revise. Wait for my answers.
+
+Then propose a plan as a tree: Subject > Topic > Tasks. For every task say whether it is a DAILY task (repeated every day) or a ONE-TIME task, and how many questions it involves (if any). Be realistic: at most 6 daily tasks per day and at most ${MAX_TASKS} tasks in total.
+
+Do not write any JSON yet. I will ask for it when I am happy with the plan.`;
+  $('ai-p2').value = `Now convert our final plan into JSON for my app. Reply with ONLY the JSON: no explanation and no code fences. Use exactly this shape:
+
+{
+  "title": "short challenge name, max 60 characters",
+  "desc": "one line about the rules, max 140 characters",
+  "days": ${days},
+  "tasks": [
+    { "subject": "Physics", "topic": "Kinematics", "text": "Solve 30 problems", "type": "daily", "qs": 30 },
+    { "subject": "Maths", "topic": "Integration", "text": "Chapter test", "type": "once", "qs": 30 }
+  ]
+}
+
+Rules:
+- "type" is "daily" or "once".
+- "qs" is the number of questions in the task (0 if none).
+- subject max 20 characters (use Physics, Chemistry and Maths where they apply), topic max 40, text max 80.
+- At most ${MAX_TASKS} tasks.`;
+}
+// Accepts the AI's reply even with stray text or code fences around it, and trims every field to what the app allows.
+function parsePlan(raw) {
+  const t = String(raw || '').replace(/```(?:json)?/gi, ''), a = t.indexOf('{'), b = t.lastIndexOf('}');
+  if (a < 0 || b < a) return { err: 'No JSON found. Paste the whole answer from the AI.' };
+  let o; try { o = JSON.parse(t.slice(a, b + 1)); } catch { return { err: 'That is not valid JSON. Ask the AI: "Reply with only valid JSON and nothing else."' }; }
+  const list = Array.isArray(o.tasks) ? o.tasks : Array.isArray(o.targets) ? o.targets : null;
+  if (!list?.length) return { err: 'No tasks found. The JSON needs a "tasks" list.' };
+  const str = (v, n) => String(v ?? '').replace(/\s+/g, ' ').trim().slice(0, n);
+  let skipped = Math.max(0, list.length - MAX_TASKS); const tasks = [];
+  list.slice(0, MAX_TASKS).forEach(g => {
+    const text = str(g?.text ?? g?.task, 80); if (!text) { skipped++; return; }
+    const type = String(g.type ?? (g.daily === false ? 'once' : 'daily')).toLowerCase().replace(/[^a-z]/g, '');
+    tasks.push({ subj: str(g.subject ?? g.subj, 20) || 'General', topic: str(g.topic, 40), text, daily: type !== 'once' && type !== 'onetime', qs: clamp(parseInt(g.qs ?? g.questions, 10) || 0, 0, 500) });
+  });
+  if (!tasks.length) return { err: 'Every task was empty. Check the "text" field of each task.' };
+  return { plan: { title: str(o.title, 60), desc: str(o.desc ?? o.description, 140), days: clamp(parseInt(o.days, 10) || 0, 0, 365), tasks }, skipped };
+}
+function aiCheck() {
+  const r = parsePlan($('ai-json').value), out = $('ai-out'); S.aiPlan = null;
+  if (r.err) { out.innerHTML = `<p class="g-err" role="alert">${esc(r.err)}</p>`; return; }
+  const p = r.plan, subs = {}; p.tasks.forEach(g => subs[g.subj] = (subs[g.subj] || 0) + 1);
+  S.aiPlan = p;
+  out.innerHTML = `<div class="lbl">Preview</div><div class="group">
+    <div class="li"><div class="grow"><b>${esc(p.title || 'Untitled challenge')}</b><div class="meta">${p.days ? plural(p.days, 'day') + ', ' : ''}${plural(p.tasks.length, 'task')}</div>${p.desc ? `<div class="meta">${esc(p.desc)}</div>` : ''}</div></div>
+    ${Object.entries(subs).map(([n, k]) => `<div class="li"><span class="dot" style="background:${subjCol(n)}"></span><div class="grow"><b>${esc(n)}</b></div><span class="meta">${plural(k, 'task')}</span></div>`).join('')}</div>
+    ${r.skipped ? `<p class="sub" style="margin-top:8px">${plural(r.skipped, 'task')} skipped (empty or over the ${MAX_TASKS} task limit).</p>` : ''}
+    <button class="btn" style="margin-top:14px" data-act="ai-load">Load into New challenge</button>
+    <p class="sub" style="margin-top:8px;text-align:center">You can still edit everything before you create it.</p>`;
+}
+function loadPlan() {
+  const p = S.aiPlan; if (!p) return;
+  if (p.title && !$('c-title').value.trim()) $('c-title').value = p.title;
+  if (p.desc && !$('c-desc').value.trim()) $('c-desc').value = p.desc;
+  if (p.days) { $('c-start').value = today(); $('c-end').value = dayOff(p.days - 1); }
+  const added = p.tasks.filter(g => pushTask(g.subj, g.topic, g.text, g.daily, g.qs)).length;
+  renderDraft(); setView('create'); toast(`Loaded ${plural(added, 'task')}. Check it and press Create.`);
+}
+
+/* ---------- backup and restore ---------- */
+function saveFile(name, text, type) {
+  const a = document.createElement('a'), url = URL.createObjectURL(new Blob([text], { type }));
+  a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+const pickChal = c => ({ title: c.title, desc: c.desc || '', startDate: c.startDate, endDate: c.endDate, targets: c.targets, live: c.live !== false });
+const pickMe = m => ({ done: m?.done || {}, notes: m?.notes || {} });
+const rankList = arr => arr.map(m => ({ name: m.name || 'Player', points: m.points || 0, me: !!m.me })).sort((a, b) => b.points - a.points || a.name.localeCompare(b.name));
+// Everything in the backup file is read from the app (Firestore is only read, never written) and saved on the person's device.
+async function buildBackup() {
+  const challenges = [];
+  for (const m of S.mine) {
+    try {
+      const [s, me, all] = await Promise.all([getDoc(doc(db, 'challenges', m.code)), getDoc(doc(db, 'challenges', m.code, 'members', S.uid)), getDocs(collection(db, 'challenges', m.code, 'members'))]);
+      if (s.exists()) challenges.push({ code: m.code, challenge: pickChal(s.data()), me: pickMe(me.exists() ? me.data() : null), standings: rankList(all.docs.map(d => ({ ...d.data(), me: d.id === S.uid }))) });
+    } catch { /* skip what cannot be read; the rest still gets backed up */ }
+  }
+  const mist = {}; S.mine.forEach(m => { const l = ls.get('cr_mist_' + m.code, []); if (l.length) mist[m.code] = l; });
+  return { app: 'challenge-room', version: 3, exportedAt: new Date().toISOString(), name: S.name, exam: ls.get('cr_exam', ''), mine: S.mine, mistakes: mist, challenges };
+}
+async function exportBackup(copyOnly) {
+  toast('Preparing backup');
+  const b = await buildBackup(), text = JSON.stringify(b, null, 2);
+  if (copyOnly) return copy(text, 'Backup copied');
+  saveFile(`challenge-room-backup-${today()}.json`, text, 'application/json');
+  toast(`Backup saved: ${plural(b.challenges.length, 'challenge')}`);
+}
+
+/* Restore is device-only: it writes to this browser's storage and nothing to Firestore.
+   Challenges from the file are kept as read-only copies ("Saved on this device") with their report. */
+const arch = () => ls.get('cr_archive', {});
+function renderArchiveList() {
+  const list = Object.entries(arch()).sort((a, b) => String(b[1].challenge.endDate).localeCompare(a[1].challenge.endDate));
+  $('arch-wrap').hidden = !list.length;
+  $('arch-list').innerHTML = list.map(([code, e]) => `<button class="li" data-act="arch-open" data-code="${esc(code)}"><span class="grow"><b>${esc(e.challenge.title)}</b><span class="meta">${esc(fmtY(e.challenge.startDate))} to ${esc(fmtY(e.challenge.endDate))}</span></span><svg class="i chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>`).join('');
+}
+function restoreBackup() {
+  let b; try { b = JSON.parse($('bk-text').value); } catch { return toast('That is not a valid backup. Choose the file or paste its full text.'); }
+  if (b?.app !== 'challenge-room' || !Array.isArray(b.challenges)) return toast('That file is not a Challenge Room backup.');
+  const valid = b.challenges.filter(e => /^[A-Z0-9]{6}$/.test(e?.code) && Array.isArray(e.challenge?.targets) && e.challenge.title && e.challenge.startDate && e.challenge.endDate);
+  if (!valid.length) return toast('No challenges found in that file.');
+  if (!confirm(`Load ${plural(valid.length, 'challenge')} from this backup onto this device? Nothing is sent to the server and nothing you have now is deleted.`)) return;
+  const a = arch(); valid.forEach(e => a[e.code] = { challenge: pickChal(e.challenge), me: pickMe(e.me), standings: Array.isArray(e.standings) ? rankList(e.standings.slice(0, 50)) : [], name: String(b.name || ''), savedAt: b.exportedAt || '' });
+  if (!ls.set('cr_archive', a)) return toast('Not enough space on this device to save that backup.');
+  Object.entries(b.mistakes || {}).forEach(([code, list]) => { if (!/^[A-Z0-9]{6}$/.test(code) || !Array.isArray(list)) return;
+    const have = ls.get('cr_mist_' + code, []), ids = new Set(have.map(m => m.id)); ls.set('cr_mist_' + code, [...have, ...list.filter(m => m && typeof m.text === 'string' && !ids.has(m.id))].slice(0, 100)); });
+  if (b.exam && !ls.get('cr_exam', '')) ls.set('cr_exam', b.exam);
+  $('bk-text').value = ''; $('bk-file').value = ''; renderArchiveList(); renderAll();
+  toast(`Loaded ${plural(valid.length, 'challenge')} onto this device.`);
+}
+let archCode = '';
+function openArchive(code) {
+  const e = arch()[code]; if (!e) return;
+  archCode = code; const c = e.challenge, done = e.me.done, known = Object.keys(done).filter(k => c.targets.some(g => g.id === k.split('@')[0]));
+  const idx = e.standings.findIndex(m => m.me), qs = known.reduce((s, k) => s + qsOf(c, k), 0), pts = known.reduce((s, k) => s + ptsOf(c, k), 0);
+  $('arch-body').innerHTML = `<h1>${esc(c.title)}</h1><p class="sub">${esc(fmtY(c.startDate))} to ${esc(fmtY(c.endDate))}. A read-only copy saved on this device.</p>
+    <div class="stats"><div class="stat"><b>${idx < 0 ? '-' : '#' + (idx + 1)}</b><span>Final rank${e.standings.length ? ' of ' + e.standings.length : ''}</span></div><div class="stat"><b>${pts}</b><span>Points</span></div>
+      <div class="stat"><b>${qs}</b><span>Questions solved</span></div><div class="stat"><b>${bestStreak(done)}</b><span>Best streak (days)</span></div></div>
+    <div class="btns"><button class="btn" data-act="arch-report">Download report</button><button class="btn bad" data-act="arch-remove">Remove from device</button></div>`;
+  setView('archive');
+}
+function removeArchive() {
+  if (!archCode || !confirm('Remove this saved copy from this device? Your backup file is not affected.')) return;
+  const a = arch(); delete a[archCode]; ls.set('cr_archive', a); archCode = ''; renderArchiveList(); setView('backup'); toast('Removed from this device');
+}
+
+/* ---------- performance report ---------- */
+const fmtY = d => new Date(d + 'T00:00').toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+function bestStreak(done) {
+  let best = 0, run = 0, prev = null;
+  [...new Set(Object.values(done))].sort().forEach(d => { run = prev && daysBetween(prev, d) === 1 ? run + 1 : 1; best = Math.max(best, run); prev = d; });
+  return best;
+}
+// x: { c: challenge, done, notes, name, list: [{ name, points, me }] sorted best first, mist: mistakes log }
+function reportHtml({ c, done, notes, name, list, mist }) {
+  const idx = list.findIndex(m => m.me), len = daysBetween(c.startDate, c.endDate) + 1;
+  const known = Object.keys(done).filter(k => c.targets.some(g => g.id === k.split('@')[0]));
+  const qs = known.reduce((a, k) => a + qsOf(c, k), 0), pts = known.reduce((a, k) => a + ptsOf(c, k), 0), days = new Set(known.map(k => done[k]));
+  const possible = g => g.daily ? len : 1, pct = (n, d) => d ? Math.round(Math.min(1, n / d) * 100) : 0;
+  const tree = buildTree(c.targets);
+  const bySubj = tree.map(sj => { const tasks = sj.topics.flatMap(x => x.tasks), mine = known.filter(k => tasks.some(g => g.id === k.split('@')[0]));
+    return { name: sj.name, pts: mine.reduce((a, k) => a + ptsOf(c, k), 0), qs: mine.reduce((a, k) => a + qsOf(c, k), 0), rate: pct(mine.length, tasks.reduce((a, g) => a + possible(g), 0)) }; });
+  const taskRows = tree.flatMap(sj => sj.topics.flatMap(tp => tp.tasks.map(g => { const n = known.filter(k => k.split('@')[0] === g.id).length;
+    return `<tr><td>${esc(sj.name)}</td><td>${esc(tp.name)}</td><td>${esc(g.text)}</td><td>${g.daily ? `${n} of ${len} days` : n ? 'Done' : 'Not done'}</td></tr>`; }))).join('');
+  const perDay = {}; known.forEach(k => { const d = done[k], o = perDay[d] ||= { n: 0, p: 0 }; o.n++; o.p += ptsOf(c, k); });
+  const noteHtml = Object.entries(notes || {}).sort().reverse().map(([d, t]) => `<p><b>${esc(fmtY(d))}</b><br>${esc(t)}</p>`).join('');
+  const mistHtml = (mist || []).map(m => `<li>${m.fixed ? '<s>' : ''}${esc(m.text)} <small>(${esc(m.subj)}, ${esc(fmtY(m.day))})</small>${m.fixed ? '</s>' : ''}</li>`).join('');
+  const card = (v, l) => `<div class="c"><b>${v}</b><span>${l}</span></div>`;
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${esc(c.title)} report</title><style>
+body{font:15px/1.5 system-ui,-apple-system,'Segoe UI',sans-serif;background:#fff;color:#17203a;max-width:760px;margin:0 auto;padding:28px 18px}
+h1{font-size:26px;margin:0}h2{font-size:17px;margin:30px 0 8px;border-bottom:2px solid #5B8DEF;padding-bottom:4px}.sub{color:#5a6685}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}.c{border:1px solid #d6dcee;border-radius:10px;padding:12px}.c b{display:block;font-size:24px}.c span{color:#5a6685;font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:6px 8px;border-bottom:1px solid #e3e8f4}th{background:#f1f4fb}
+.me td{font-weight:700;background:#eef3ff}small{color:#5a6685}@media print{body{padding:0}h2{break-after:avoid}tr{break-inside:avoid}}
+</style></head><body>
+<h1>${esc(c.title)}</h1><p class="sub">Performance report for ${esc(name || 'You')}. ${esc(fmtY(c.startDate))} to ${esc(fmtY(c.endDate))} (${plural(len, 'day')}).</p>
+${c.desc ? `<p class="sub">${esc(c.desc)}</p>` : ''}
+<div class="cards">${card(idx < 0 ? '-' : `#${idx + 1} of ${list.length}`, 'Final rank')}${card(pts, 'Points')}${card(qs, 'Questions solved')}${card(bestStreak(done), 'Best streak (days)')}${card(`${days.size} of ${len}`, 'Days active')}${card(pct(known.length, c.targets.reduce((a, g) => a + possible(g), 0)) + '%', 'Plan completed')}</div>
+<h2>By subject</h2><table><tr><th>Subject</th><th>Points</th><th>Questions</th><th>Plan completed</th></tr>${bySubj.map(r => `<tr><td>${esc(r.name)}</td><td>${r.pts}</td><td>${r.qs}</td><td>${r.rate}%</td></tr>`).join('')}</table>
+<h2>Every task</h2><table><tr><th>Subject</th><th>Topic</th><th>Task</th><th>Result</th></tr>${taskRows}</table>
+${list.length ? `<h2>Standings</h2><table><tr><th>#</th><th>Name</th><th>Points</th></tr>${list.map((m, i) => `<tr class="${m.me ? 'me' : ''}"><td>${i + 1}</td><td>${esc(m.name)}${m.me ? ' (you)' : ''}</td><td>${m.points}</td></tr>`).join('')}</table>` : ''}
+<h2>Day by day</h2>${Object.keys(perDay).length ? `<table><tr><th>Date</th><th>Quests cleared</th><th>Points</th></tr>${Object.keys(perDay).sort().map(d => `<tr><td>${esc(fmtY(d))}</td><td>${perDay[d].n}</td><td>${perDay[d].p}</td></tr>`).join('')}</table>` : '<p class="sub">No quests were cleared.</p>'}
+${noteHtml ? `<h2>Journal</h2>${noteHtml}` : ''}${mistHtml ? `<h2>Mistakes to revisit</h2><ul>${mistHtml}</ul>` : ''}
+<p class="sub" style="margin-top:30px">Made with Challenge Room on ${esc(fmtY(today()))}. Use Print and choose Save as PDF if you want a PDF.</p></body></html>`;
+}
+function saveReport(c, ctx) {
+  saveFile(`${c.title.replace(/[^\w]+/g, '-').replace(/^-|-$/g, '') || 'challenge'}-report.html`, reportHtml(ctx), 'text/html');
+  toast('Report downloaded');
+}
+function downloadReport() {
+  const c = S.chal; if (!c) return;
+  saveReport(c, { c, done: S.me?.done || {}, notes: S.me?.notes || {}, name: S.name, mist: mistakes(), list: rankList(S.members.map(m => ({ ...m, me: m.id === S.uid }))) });
+}
+function downloadArchiveReport() {
+  const e = arch()[archCode]; if (!e) return;
+  saveReport(e.challenge, { c: e.challenge, done: e.me.done, notes: e.me.notes, name: e.name || S.name, mist: ls.get('cr_mist_' + archCode, []), list: e.standings });
+}
+
+/* ---------- Challenges hub: market, my challenges ---------- */
+const TEMPLATES = [
+  { title: 'JEE 30-day grind', blurb: 'Daily P/C/M practice, mistake review and weekly mocks. 30 days.', days: 30, tasks: [
+    ['Physics', 'Mechanics', 'Solve 30 problems', 1, 30], ['Physics', 'Mechanics', 'Revise theory', 1, 0],
+    ['Chemistry', 'Physical chemistry', 'Solve 20 problems', 1, 20], ['Chemistry', 'Organic chemistry', 'Revise 1 chapter', 1, 0],
+    ['Maths', 'Calculus', 'Solve 25 problems', 1, 25], ['Revision', 'Daily', "Review yesterday's mistakes", 1, 0],
+    ['Mock tests', 'Weekly', 'Full syllabus mock test', 0, 90], ['Mock tests', 'Weekly', 'Analyse the mock: list silly mistakes', 0, 0]] },
+  { title: 'PYQ sprint', blurb: 'One PYQ set in each subject every day. 14 days.', days: 14, tasks: [
+    ['Physics', 'PYQs', 'PYQ set (20 Qs)', 1, 20], ['Chemistry', 'PYQs', 'PYQ set (20 Qs)', 1, 20], ['Maths', 'PYQs', 'PYQ set (20 Qs)', 1, 20],
+    ['Revision', 'Daily', 'Write down every wrong answer', 1, 0]] },
+  { title: 'Mock test month', blurb: 'Four full mocks, each with an analysis. 28 days.', days: 28, tasks: [1, 2, 3, 4].flatMap(n => [
+    ['Mock tests', 'Mock ' + n, 'Full syllabus mock test', 0, 90], ['Mock tests', 'Mock ' + n, 'Analyse the mock: list silly mistakes', 0, 0]]) },
+  { title: 'Weak topic rescue', blurb: 'Fix one weak topic per subject in a week. 7 days.', days: 7, tasks: ['Physics', 'Chemistry', 'Maths'].flatMap(s => [
+    [s, 'Weak topic', 'Revise theory', 1, 0], [s, 'Weak topic', 'Solve 30 problems', 1, 30], [s, 'Weak topic', 'Make a formula sheet', 0, 0]]) }
+];
+function useTemplate(i) {
+  const t = TEMPLATES[i]; if (!t) return;
+  S.aiPlan = { title: t.title, desc: '', days: t.days, tasks: t.tasks.map(([subj, topic, text, daily, qs]) => ({ subj, topic, text, daily: !!daily, qs })) };
+  loadPlan();
+}
+const chev = '<svg class="i chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>';
+function renderHub() { $('hub-n').textContent = S.mine.length ? plural(S.mine.length, 'challenge') + ' joined' : 'Nothing joined yet'; }
+function renderMine() {
+  const rows = S.mine.map(m => { const x = infoOf(m.code); return { m, x, st: usable(x) ? status(x) : null }; }).sort((a, b) => (a.st ? ORDER[a.st] : 4) - (b.st ? ORDER[b.st] : 4));
+  $('mine-sub').textContent = rows.length ? 'Tap a challenge to open it.' : '';
+  $('mine-list').innerHTML = rows.length
+    ? `<div class="group">${rows.map(r => `<button class="li" data-act="open" data-code="${esc(r.m.code)}"><span class="grow"><b>${esc(usable(r.x) ? r.x.title : r.m.title)}</b></span>${r.st ? `<span class="badge ${r.st}">${r.st}</span>` : r.x?.gone ? '<span class="badge">deleted</span>' : ''}${chev}</button>`).join('')}</div>`
+    : '<div class="group">' + empty('No challenges yet', 'Find one in the Challenge market, or create your own.') + '</div><div class="btns"><button class="btn" data-act="view" data-v="market">Open the market</button></div>';
+}
+let marketAt = 0;
+async function loadMarket(force) {
+  if (!force && Date.now() - marketAt < 60000 && S.market) return;
+  marketAt = Date.now();
+  if (!S.uid) return;
+  try {
+    const snap = await getDocs(query(collection(db, 'challenges'), where('public', '==', true), limit(30)));
+    S.market = snap.docs.map(d => ({ code: d.id, ...d.data() })).filter(c => c.live !== false && c.endDate >= today())
+      .sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0))
+      .map(c => ({ code: c.code, title: c.title, owner: c.ownerName || 'A friend', startDate: c.startDate, endDate: c.endDate, n: c.targets.length, subjects: [...new Set(c.targets.map(subjOf))] }));
+  } catch { S.market = 'fail'; }
+  renderMarket();
+}
+function renderMarket() {
+  $('tpl-list').innerHTML = TEMPLATES.map((t, i) => `<button class="li" data-act="tpl" data-i="${i}"><span class="grow"><b>${esc(t.title)}</b><span class="meta">${esc(t.blurb)}</span></span><span class="badge upcoming">use</span></button>`).join('');
+  const el = $('pub-list'), m = S.market;
+  if (!m) el.innerHTML = '<div class="group">' + empty('Loading', 'Looking for public challenges.') + '</div>';
+  else if (m === 'fail') el.innerHTML = '<div class="group">' + empty('Could not load', 'Check your connection, and that the Firestore rules from the README are published.') + '</div>';
+  else if (!m.length) el.innerHTML = '<div class="group">' + empty('No public challenges yet', 'Create one and switch on "Show in the Challenge market".') + '</div>';
+  else el.innerHTML = '<div class="group">' + m.map(c => { const mine = S.mine.some(x => x.code === c.code);
+    return `<div class="li"><div class="grow"><b>${esc(c.title)}</b><span class="meta" style="display:block">${esc(fmt(c.startDate))} to ${esc(fmt(c.endDate))}, ${plural(c.n, 'task')}, by ${esc(c.owner)}</span>
+      <span class="meta" style="display:block">${esc(c.subjects.slice(0, 4).join(', '))}</span></div>
+      ${mine ? '<span class="badge live">joined</span>' : `<button class="btn sm" data-act="join-pub" data-code="${esc(c.code)}">Join</button>`}</div>`; }).join('') + '</div>';
+}
+
+/* ---------- Hall of fame: who won and who finished past challenges ---------- */
+const HALL_PASS = .8;
+const planRate = (c, done) => {
+  const len = daysBetween(c.startDate, c.endDate) + 1, known = Object.keys(done || {}).filter(k => c.targets.some(g => g.id === k.split('@')[0])).length;
+  const possible = c.targets.reduce((a, g) => a + (g.daily ? len : 1), 0); return possible ? Math.min(1, known / possible) : 0;
+};
+const hallEntry = (c, members, meId) => ({ code: c.id, title: c.title, endDate: c.endDate,
+  rows: members.map(m => ({ name: m.name || 'Player', points: m.points || 0, rate: planRate(c, m.done), me: m.id === meId })).sort((a, b) => b.points - a.points || a.name.localeCompare(b.name)) });
+async function loadHall(force) {
+  if (S.hofBusy || (!force && S.hof && Date.now() - S.hof.at < 300000)) return;
+  S.hofBusy = true; renderHall();
+  try {
+    const list = [];
+    await loadMeta(true);
+    for (const m of S.mine) {
+      const x = S.meta[m.code]; if (!usable(x) || status(x) !== 'ended') continue;
+      try { const [s, all] = await Promise.all([getDoc(doc(db, 'challenges', m.code)), getDocs(collection(db, 'challenges', m.code, 'members'))]);
+        if (s.exists()) list.push(hallEntry({ id: m.code, ...s.data() }, all.docs.map(d => ({ id: d.id, ...d.data() })), S.uid)); } catch { /* skip this one */ }
+    }
+    S.hof = { at: Date.now(), list: list.sort((a, b) => b.endDate.localeCompare(a.endDate)) };
+  } catch { S.hof = { at: 0, list: [], fail: true }; }
+  S.hofBusy = false; renderHall();
+}
+const crown = '<svg class="i" viewBox="0 0 24 24" style="fill:#F5B14C;stroke:#F5B14C;width:20px;height:20px"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z"/></svg>';
+function renderHall() {
+  const el = $('hall-body'), h = S.hof;
+  if (!h) { el.innerHTML = '<div class="group">' + empty('Loading', 'Checking your past challenges.') + '</div>'; return; }
+  if (h.fail) { el.innerHTML = '<div class="group">' + empty('Could not load', 'Check your connection and try again.') + '</div>'; return; }
+  if (!h.list.length) { el.innerHTML = '<div class="group">' + empty('No past challenges yet', 'When a challenge you joined ends, its winner and finishers appear here.') + '</div>'; return; }
+  el.innerHTML = h.list.map(e => { const done = e.rows.filter(r => r.rate >= HALL_PASS);
+    return `<div class="lbl">${esc(e.title)} <span style="font-weight:600">ended ${esc(fmt(e.endDate))}</span></div><div class="group">` +
+      e.rows.slice(0, 3).map((r, i) => `<div class="li ${i === 0 ? 'lead' : ''}"><div class="rk">${i === 0 ? crown : i + 1}</div><div class="avatar ${r.me ? 'me' : ''}">${esc(ini(r.name))}</div>
+        <div class="grow"><b>${esc(r.name)}${r.me ? ' (you)' : ''}</b><div class="meta">${Math.round(r.rate * 100)}% of the plan</div></div><div class="pts">${r.points}</div></div>`).join('') +
+      `<div class="li"><div class="grow"><b>Finished the plan</b><div class="meta">${done.length ? esc(done.map(r => r.me ? 'You' : r.name).join(', ')) : 'Nobody reached 80% this time.'}</div></div></div></div>`; }).join('');
+}
+
+/* ---------- Progress requests: shared with consent, kept on the server only until the other phone picks it up ---------- */
+const peers = () => ls.get('cr_peers', {});
+const reqUnsubs = [], handled = new Set();
+const expired = r => { const t = r.expireAt?.toDate?.(); return t && t < new Date(); };
+async function onOutgoing(r) {
+  if (handled.has(r.id)) return;
+  const ref = doc(db, 'progressRequests', r.id);
+  if (r.status === 'shared' && r.data) {
+    handled.add(r.id); const p = peers(); p[r.to] = { name: r.toName, at: Date.now(), data: r.data }; ls.set('cr_peers', p);
+    toast(`${r.toName} shared their progress`);
+  } else if (r.status === 'declined') { handled.add(r.id); toast(`${r.toName} declined this time`); }
+  else if (!expired(r)) return;
+  deleteDoc(ref).catch(() => {}); // this is what keeps the server empty
+}
+function watchRequests() {
+  if (!S.uid || reqUnsubs.length) return;
+  const col = collection(db, 'progressRequests');
+  reqUnsubs.push(onSnapshot(query(col, where('to', '==', S.uid)), snap => {
+    const all = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    all.filter(r => r.status !== 'pending' && !handled.has('in' + r.id) || expired(r)).forEach(r => { handled.add('in' + r.id); deleteDoc(doc(db, 'progressRequests', r.id)).catch(() => {}); });
+    S.reqIn = all.filter(r => r.status === 'pending' && !expired(r)); renderActivity(); renderNavDot();
+  }, () => {}));
+  reqUnsubs.push(onSnapshot(query(col, where('from', '==', S.uid)), snap => {
+    const all = snap.docs.map(d => ({ id: d.id, ...d.data() })); all.forEach(onOutgoing);
+    S.reqOut = all.filter(r => r.status === 'pending' && !expired(r)); renderActivity(); renderPeer();
+  }, () => {}));
+}
+function renderNavDot() { document.querySelector('nav button[data-v="activity"]').classList.toggle('has-new', S.reqIn.length > 0); }
+// What I share when I say yes: totals and one line per challenge, nothing else.
+async function mySnapshot() {
+  await loadMeta(true);
+  const rows = S.mine.map(m => ({ m, x: infoOf(m.code) })).filter(r => usable(r.x)), all = {};
+  rows.forEach(r => Object.entries(r.x.done).forEach(([k, d]) => all[r.m.code + k] = d));
+  return { name: S.name, at: today(), streak: streak(all), points: rows.reduce((a, r) => a + r.x.points, 0), qs: rows.reduce((a, r) => a + (r.x.qs || 0), 0),
+    challenges: rows.slice(0, 20).map(({ x }) => { const st = status(x); return { title: x.title, status: st, points: x.points, qs: x.qs || 0, streak: streak(x.done), today: st === 'live' && x.daily.length ? `${doneToday(x)}/${x.daily.length}` : '' }; }) };
+}
+async function requestProgress(to) {
+  const m = S.members.find(x => x.id === to); if (!m || to === S.uid) return;
+  if (S.reqOut.some(r => r.to === to)) return toast('Still waiting for their answer.');
+  try {
+    await setDoc(doc(collection(db, 'progressRequests')), { from: S.uid, fromName: S.name, to, toName: m.name || 'Player', status: 'pending', createdAt: serverTimestamp(), expireAt: new Date(Date.now() + 864e5) });
+    toast('Request sent. They will see it in Activity.');
+  } catch { toast('Could not send. Progress requests need the updated Firestore rules from the README.'); }
+}
+async function answerRequest(id, allow) {
+  const r = S.reqIn.find(x => x.id === id); if (!r) return;
+  try {
+    if (allow) { toast('Sharing your progress'); await updateDoc(doc(db, 'progressRequests', id), { status: 'shared', data: await mySnapshot(), sharedAt: serverTimestamp() }); toast('Shared. It is deleted from the server once ' + r.fromName + ' receives it.'); }
+    else await updateDoc(doc(db, 'progressRequests', id), { status: 'declined' });
+  } catch { toast('Could not answer. Check your connection.'); }
+}
+function incomingHtml() {
+  if (!S.reqIn.length) return '';
+  return S.reqIn.map(r => `<div class="note" style="color:var(--tx);margin-top:14px"><b>${esc(r.fromName || 'A friend')}</b> wants to see your progress.
+    <div style="color:var(--mut);margin-top:4px">If you allow, they get your points, streak and today's quests for each challenge. It is deleted from the server as soon as their phone receives it.</div>
+    <div class="btns" style="margin-top:10px"><button class="btn sm" data-act="allow" data-id="${esc(r.id)}">Allow</button><button class="btn sec sm" data-act="decline" data-id="${esc(r.id)}">Decline</button></div></div>`).join('');
+}
+function sharedListHtml() {
+  const list = Object.entries(peers()); if (!list.length) return '';
+  return '<div class="lbl">Progress shared with you</div><div class="group">' + list.sort((a, b) => b[1].at - a[1].at).map(([id, p]) =>
+    `<button class="li" data-act="peer" data-id="${esc(id)}"><div class="avatar">${esc(ini(p.name))}</div><span class="grow"><b>${esc(p.name)}</b><span class="meta" style="display:block">${esc(fmtLong(p.data.at))}</span></span>${chev}</button>`).join('') + '</div>';
+}
+function renderPeer() {
+  const el = $('peer-body'); if (!S.peerId) { el.innerHTML = ''; return; }
+  const m = S.members.find(x => x.id === S.peerId), p = peers()[S.peerId], name = m?.name || p?.name || 'Player', d = p?.data;
+  const waiting = S.reqOut.some(r => r.to === S.peerId);
+  el.innerHTML = `<div class="row" style="gap:14px"><div class="avatar lg">${esc(ini(name))}</div><div class="grow"><h1>${esc(name)}</h1><p class="sub">${d ? 'Shared ' + esc(fmtLong(d.at)).toLowerCase() : 'Nothing shared yet'}</p></div></div>` +
+    (d ? `<div class="stats"><div class="stat"><b>${d.points}</b><span>Total points</span></div><div class="stat"><b>${d.streak}</b><span>Day streak</span></div><div class="stat"><b>${d.qs}</b><span>Questions solved</span></div><div class="stat"><b>${d.challenges.length}</b><span>Challenges</span></div></div>
+      <div class="lbl">By challenge</div><div class="group">${d.challenges.map(c => `<div class="li"><div class="grow"><b>${esc(c.title)}</b><div class="meta">${esc(c.status)}${c.today ? ', ' + esc(c.today) + ' today' : ''}, streak ${c.streak}</div></div><div class="pts">${c.points}</div></div>`).join('')}</div>`
+      : '<div class="group" style="margin-top:16px">' + empty('Nothing shared yet', 'Ask ' + esc(name) + ' to share their progress. They choose whether to allow it.') + '</div>') +
+    `<div class="btns"><button class="btn" data-act="req" data-id="${esc(S.peerId)}" ${waiting ? 'disabled' : ''}>${waiting ? 'Waiting for their answer' : d ? 'Ask for fresh progress' : 'Request progress'}</button>${d ? `<button class="btn bad" data-act="peer-forget" data-id="${esc(S.peerId)}">Remove saved copy</button>` : ''}</div>
+    <p class="sub" style="margin-top:12px">They can allow or decline. If they allow, the data sits on the server only until your phone receives it, then it is deleted. The copy you see is saved on this device only.</p>`;
+}
+
+function factsHtml(c, owner) {
+  return `<div class="facts"><div><span>Host</span><b>${esc(c.ownerName || (owner ? S.name : 'Host'))}</b></div><div><span>Dates</span><b>${esc(fmt(c.startDate))} to ${esc(fmt(c.endDate))}</b></div>
+    <div><span>Players</span><b>${S.members.length}</b></div><div><span>Plan</span><b>${plural(c.targets.length, 'task')}, ${plural(new Set(c.targets.map(subjOf)).size, 'subject')}</b></div></div>`;
+}
+async function togglePublic() {
+  const c = S.chal; if (!c || c.ownerUid !== S.uid) return;
+  try { await updateDoc(doc(db, 'challenges', c.id), { public: !c.public }); toast(c.public ? 'Hidden from the market' : 'Now in the Challenge market'); } catch { toast('Could not update.'); }
+}
+
+/* ---------- events ---------- */
+const NEEDS_AUTH = new Set(['open', 'toggle', 'join', 'create', 'save-note', 'toggle-live', 'delete', 'leave', 'import', 'nudge', 'export', 'export-copy', 'join-pub', 'req', 'allow', 'decline', 'toggle-public']);
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const a = b.dataset.act;
+  if (S.menu && a !== 'menu') { S.menu = false; renderChallenge(); }
+  if (!S.uid && NEEDS_AUTH.has(a)) return toast('Still signing in. One moment.');
+  if (a === 'view') setView(b.dataset.v);
+  else if (a === 'pane') setPane(b.dataset.p);
+  else if (a === 'open') openChallenge(b.dataset.code);
+  else if (a === 'toggle') toggle(b.dataset.id);
+  else if (a === 'join') join($('join-code').value);
+  else if (a === 'add-target') addTarget();
+  else if (a === 'preset') addPreset(b.dataset.k);
+  else if (a === 'rm-draft') { S.draft = S.draft.filter(g => g.id !== b.dataset.id); renderDraft(); }
+  else if (a === 'rm-group') { const { s: sj, t } = b.dataset; S.draft = S.draft.filter(g => !(subjOf(g) === sj && (t === undefined || (g.topic || '') === t))); renderDraft(); }
+  else if (a === 'subj') { S.bSubj = b.dataset.s; S.bTopics = []; renderBuilder(); }
+  else if (a === 'topic') toggleTopic(b.dataset.t);
+  else if (a === 'topic-add') addTopics();
+  else if (a === 'topics-all') { S.bTopics = [...topicPool()]; renderBuilder(); }
+  else if (a === 'topics-none') { S.bTopics = []; renderBuilder(); }
+  else if (a === 'tpl') useTemplate(+b.dataset.i);
+  else if (a === 'join-pub') join(b.dataset.code);
+  else if (a === 'toggle-public') togglePublic();
+  else if (a === 'peer') { S.peerId = b.dataset.id; setView('peer'); }
+  else if (a === 'req') requestProgress(b.dataset.id);
+  else if (a === 'allow') answerRequest(b.dataset.id, true);
+  else if (a === 'decline') answerRequest(b.dataset.id, false);
+  else if (a === 'peer-forget') { const p = peers(); delete p[b.dataset.id]; ls.set('cr_peers', p); renderPeer(); renderActivity(); }
+  else if (a === 'quick') quickTask(+b.dataset.i);
+  else if (a === 'import') importChallenge(b.dataset.code);
+  else if (a === 'nudge') nudge(b.dataset.id);
+  else if (a === 'menu') { S.menu = !S.menu; renderChallenge(); }
+  else if (a === 'player') { S.openPl = S.openPl === b.dataset.id ? '' : b.dataset.id; renderBoard(); }
+  else if (a === 'add-mistake') addMistake();
+  else if (a === 'mist') toggleMistake(b.dataset.id);
+  else if (a === 'rm-mist') rmMistake(b.dataset.id);
+  else if (a === 'create') createChallenge();
+  else if (a === 'share') share(b.dataset.code);
+  else if (a === 'save-note') saveNote();
+  else if (a === 'toggle-live') toggleLive();
+  else if (a === 'delete') removeChallenge();
+  else if (a === 'leave') leave();
+  else if (a === 'profile-save') saveProfile();
+  else if (a === 'clear-data') leaveDevice();
+  else if (a === 'google') googleGate();
+  else if (a === 'copy-p') copy($('ai-p' + b.dataset.k).value, 'Prompt copied');
+  else if (a === 'ai-check') aiCheck();
+  else if (a === 'ai-load') loadPlan();
+  else if (a === 'export') exportBackup(false);
+  else if (a === 'export-copy') exportBackup(true);
+  else if (a === 'restore') restoreBackup();
+  else if (a === 'report') downloadReport();
+  else if (a === 'arch-open') openArchive(b.dataset.code);
+  else if (a === 'arch-report') downloadArchiveReport();
+  else if (a === 'arch-remove') removeArchive();
+  else if (a === 'link-google') linkGoogle();
+});
+document.addEventListener('change', e => {
+  if (e.target.id === 'exam-date' && e.target.value) { ls.set('cr_exam', e.target.value); e.target.blur(); renderExam(); }
+});
+$('b-topic').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addTopics(); } });
+$('t-text').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addTarget(); } });
+$('join-code').addEventListener('keydown', e => { if (e.key === 'Enter') join($('join-code').value); });
+['ai-goal', 'ai-days'].forEach(id => $(id).addEventListener('input', renderPrompts));
+// Both file pickers read the chosen file into the box beside them, so a file and pasted text behave the same.
+async function readPicked(input, box, max) {
+  const f = input.files[0]; if (!f) return false;
+  if (f.size > max) { input.value = ''; toast('That file is too big. Choose a smaller one.'); return false; }
+  try { box.value = await f.text(); return true; } catch { toast('Could not read that file.'); return false; }
+}
+$('ai-file').addEventListener('change', async e => { if (await readPicked(e.target, $('ai-json'), 1e6)) aiCheck(); });
+$('bk-file').addEventListener('change', async e => { if (await readPicked(e.target, $('bk-text'), 2e7)) toast('File loaded. Press Restore to continue.'); });
+$('g-form').addEventListener('submit', e => { e.preventDefault(); saveName(); });
+$('name-input').addEventListener('input', () => { if (!$('g-err').hidden && !$('g-go').disabled) setGate('idle'); });
+$('p-name').addEventListener('keydown', e => { if (e.key === 'Enter') saveProfile(); });
+
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+setView('home');
+start();
+</script>
+</body>
+</html>
