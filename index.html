@@ -10,6 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Challenge Room</title>
 <link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,7 +28,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .brand{font-weight:800;font-size:18px;letter-spacing:-.01em;flex:1}
 .back{display:none;align-items:center;gap:4px;color:var(--mut);font-weight:700}
 .back.on{display:flex}.back.on~.brand{display:none}
-.avatar{width:34px;height:34px;border-radius:50%;background:var(--s2);border:1px solid var(--line);display:grid;place-items:center;font-weight:800;font-size:13px;flex:none}
+.avatar{width:34px;height:34px;border-radius:50%;overflow:hidden;position:relative;background:var(--s2);border:1px solid var(--line);display:grid;place-items:center;font-weight:800;font-size:13px;flex:none}.avatar img{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit}
 .avatar.me{background:var(--acc);border-color:var(--acc);color:#0B1020}
 .avatar.lg{width:64px;height:64px;font-size:22px}
 .app{max-width:520px;margin:0 auto;padding:18px 16px calc(96px + env(safe-area-inset-bottom))}
@@ -83,11 +84,12 @@ textarea{min-height:96px;resize:vertical}
 .empty b{display:block;color:var(--tx);font-size:17px;margin-bottom:4px}
 .draft{display:flex;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid var(--line)}
 .draft:first-child{border-top:0}
+.hub-actions{display:grid;grid-template-columns:1fr;gap:12px;margin:20px 0}.hub-card{display:flex;align-items:center;gap:14px;padding:18px;border:1px solid var(--line);border-radius:14px;background:var(--s1);width:100%;min-height:88px}.hub-card .hub-icon{width:44px;height:44px;display:grid;place-items:center;background:var(--s2);border-radius:12px;color:var(--acc);font-size:24px;flex:none}.hub-card b{display:block;font-size:17px}.hub-card small{display:block;color:var(--mut);font-size:13px;margin-top:3px}.tree-branch{border-left:2px solid var(--line);margin:8px 0 12px 8px;padding-left:12px}.tree-sub{color:var(--mut);font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;margin:14px 0 6px}.topic-head{font-size:14px;font-weight:800;margin:10px 0 5px}.market-card{padding:14px;border-top:1px solid var(--line)}.market-card:first-child{border-top:0}.market-card p{font-size:13px;color:var(--mut);margin:4px 0 10px}.checkline{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-top:1px solid var(--line)}.checkline input{width:auto;margin-top:4px}
 .x{margin-left:auto;color:var(--bad);font-weight:700;font-size:14px;padding:4px 6px}
 .feed-d{font-size:13px;font-weight:700;color:var(--mut);margin:20px 0 8px}
 nav{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:6}
-nav div{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
-nav button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 9px;font-size:12px;font-weight:700;color:var(--mut);border-top:2px solid transparent;margin-top:-1px;text-align:center}
+nav div{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}
+nav button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0 8px;font-size:11px;font-weight:700;color:var(--mut);border-top:2px solid transparent;margin-top:-1px;text-align:center}
 nav button[aria-current="page"]{color:var(--acc);border-top-color:var(--acc)}
 #toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--tx);color:#0B1020;font-weight:700;font-size:14px;padding:10px 16px;border-radius:10px;z-index:30;max-width:90%;opacity:0;pointer-events:none;transition:opacity .2s}
 #toast.show{opacity:1}
@@ -117,7 +119,8 @@ body.auth-required .view:not(#view-login){display:none!important}
       <p class="sub">Sign in with Google to create challenges, team up with friends, and keep your progress connected to your account.</p>
       <div class="login-card">
         <button class="btn google-btn" data-act="google-login"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5Z" transform="translate(0 5)"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.74 7.18l7.64 5.92c4.46-4.12 7.14-10.18 7.14-17.57Z"/><path fill="#FBBC05" d="M10.53 28.59A14.4 14.4 0 0 1 9.75 24c0-1.59.27-3.13.76-4.59l-7.98-6.19A23.9 23.9 0 0 0 0 24c0 3.87.93 7.53 2.56 10.78l7.97-6.19Z" transform="translate(0 0)"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.9-5.88l-7.64-5.92c-2.12 1.42-4.84 2.26-8.26 2.26-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48Z"/></svg>Continue with Google</button>
-        <p class="sub" style="font-size:13px;margin-top:12px">Google is the only sign-in method. If you have an existing guest session, signing in will try to link it first so its challenge ownership is preserved.</p>
+        <p class="sub" style="font-size:13px;margin-top:12px">Google is the recommended sign-in method. Guest mode lets you start without Google; link a Google account later to preserve the same account ID.</p>
+        <button class="btn sec" style="margin-top:12px" data-act="guest-login">Continue as guest</button>
       </div>
       <a class="tracker-link" href="https://water17-ved.github.io/jee-battle-2027-new/" target="_blank" rel="noopener noreferrer" aria-label="Visit JEE Tracker">
         <svg class="tracker-logo" viewBox="0 0 64 64" role="img" aria-label="JEE Tracker logo"><defs><linearGradient id="jtg" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse"><stop stop-color="#5B8DEF"/><stop offset="1" stop-color="#22D3EE"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="17" fill="url(#jtg)"/><path d="M18 18h28v6H35v22h-7V24H18z" fill="#081326"/><path d="m42 31 6 6-6 6" fill="none" stroke="#081326" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -128,6 +131,24 @@ body.auth-required .view:not(#view-login){display:none!important}
     </div>
   </section>
   <div class="note" id="demo-note" hidden>Demo mode with sample data. Nothing is saved.</div>
+
+  <section class="view" id="view-challenge-hub">
+    <h1>Challenge</h1><p class="sub">Discover challenges or manage the ones you joined.</p>
+    <div class="hub-actions">
+      <button class="hub-card" data-act="view" data-v="challenge-market"><span class="hub-icon">⌕</span><span class="grow"><b>Challenge Market</b><small>Discover public challenges and join a study mission.</small></span><span>›</span></button>
+      <button class="hub-card" data-act="view" data-v="challenge-mine"><span class="hub-icon">⚑</span><span class="grow"><b>My Challenges</b><small>Open your challenges, create a new one, or build a mega challenge.</small></span><span>›</span></button>
+    </div>
+  </section>
+  <section class="view" id="view-challenge-market">
+    <h1>Challenge Market</h1><p class="sub">Public challenges created in Challenge Room. New challenges are discoverable in the market by default.</p>
+    <div class="btns"><button class="btn sec" data-act="market-refresh">Refresh market</button><button class="btn" data-act="view" data-v="challenge-mine">My Challenges</button></div>
+    <div id="market-list" class="group" style="margin-top:16px"></div>
+  </section>
+  <section class="view" id="view-challenge-mine">
+    <h1>My Challenges</h1><p class="sub">Your joined challenges and challenge collections.</p>
+    <div class="btns"><button class="btn" data-act="view" data-v="create">＋ Create challenge</button><button class="btn" data-act="view" data-v="create-mega">✦ Create mega challenge</button></div><div class="btns"><button class="btn sec" data-act="view" data-v="join">Join with code</button></div>
+    <div id="mine-list" style="margin-top:16px"></div>
+  </section>
 
   <section class="view" id="view-home">
     <h1 id="home-h">Hello</h1>
@@ -162,6 +183,31 @@ body.auth-required .view:not(#view-login){display:none!important}
     </div>
   </section>
 
+  <section class="view" id="view-ai">
+    <h1>AI & Memory</h1><p class="sub">Plan with an AI chat, turn its final output into a challenge, and keep local JSON backups.</p>
+    <div class="lbl">AI Plan</div>
+    <div class="group" style="padding:14px">
+      <b>1. Start-of-conversation prompt</b><p class="sub">Copy this into a fresh AI conversation to plan your challenge interactively.</p>
+      <button class="btn sec" style="margin-top:10px" data-act="copy-ai-start">Copy starting prompt</button>
+      <div class="lbl">2. End-of-conversation prompt</div><p class="sub">When planning is finished, send this prompt. It asks the AI for import-ready JSON.</p>
+      <button class="btn sec" style="margin-top:10px" data-act="copy-ai-final">Copy final JSON prompt</button>
+    </div>
+    <div class="lbl">Create challenge from AI output</div>
+    <p class="sub">Paste the AI's final JSON or structured text below. Review it, then create the challenge in this site.</p>
+    <label for="ai-output">AI response</label><textarea id="ai-output" rows="9" placeholder='Paste JSON with title, description, dates, and tasks here…'></textarea>
+    <button class="btn sec" style="margin-top:10px" data-act="preview-ai">Preview / parse output</button>
+    <div class="group" id="ai-preview" style="margin-top:12px;padding:14px" hidden></div>
+    <button class="btn" style="margin-top:10px" data-act="create-ai-challenge" id="ai-create-btn" disabled>Create challenge from output</button>
+    <div class="lbl">Memory & local backups</div>
+    <div class="group" style="padding:14px">
+      <p class="sub" style="margin-top:0">Export a JSON backup of your profile, joined challenge references, challenge definitions you can access, and your progress. Import a backup to restore profile settings and recover owned challenges as new copies where possible.</p>
+      <button class="btn sec" style="margin-top:12px" data-act="export-backup">Export memory backup (.json)</button>
+      <label for="backup-file">Import memory backup</label><input id="backup-file" type="file" accept=".json,application/json">
+      <button class="btn sec" style="margin-top:10px" data-act="import-backup">Import selected JSON backup</button>
+      <p class="sub" style="margin-top:10px;font-size:13px">Backups are files you control. Keep them somewhere safe; imported owned challenges are recreated with new codes to avoid overwriting live challenges.</p>
+    </div>
+  </section>
+
   <section class="view" id="view-activity">
     <h1>Activity</h1><p class="sub" id="act-sub"></p>
     <div id="act-body"></div>
@@ -171,7 +217,7 @@ body.auth-required .view:not(#view-login){display:none!important}
     <div class="row" style="gap:14px"><div class="avatar me lg" id="p-av">?</div>
       <div class="grow"><h1 id="p-name-h">Profile</h1><p class="sub" id="p-id"></p>
       <button class="btn sec sm" style="margin-top:8px" data-act="pick-photo">Change photo</button>
-      <input id="p-photo-file" type="file" accept="image/*" hidden aria-label="Choose profile picture"></div></div>
+      <input id="p-photo-file" type="file" accept="image/*,.jpg,.jpeg,.png,.webp,.gif,.bmp,.avif,.svg,.tif,.tiff,.heic,.heif" hidden aria-label="Choose profile picture"></div></div>
     <label for="p-about">About</label>
     <textarea id="p-about" maxlength="160" placeholder="A short intro about you (160 characters max)"></textarea>
     <button class="btn sec" style="margin-top:8px" data-act="profile-about-save">Save about</button>
@@ -181,13 +227,14 @@ body.auth-required .view:not(#view-login){display:none!important}
     <div class="group" id="p-stats"></div>
     <div class="lbl">Settings</div>
     <div class="group">
-      <div class="li"><div class="grow"><b>Install on your phone</b><div class="meta">Open this page in your browser menu and choose Add to Home Screen.</div></div></div>
+      <div class="li"><div class="grow"><b>Install on your phone</b><div class="meta" id="install-status">Install Challenge Room as an app.</div></div><button class="btn sec sm" data-act="install-app">Install</button></div>
       <div class="li"><div class="grow"><b>Account</b><div class="meta" id="account-status">Loading account status…</div></div></div>
       <div class="li"><div class="grow"><b>Version</b><div class="meta">Challenge Room 1.3</div></div></div>
     </div>
     <div class="lbl">Google account</div>
     <div class="note">Challenge Room uses Google authentication only. Existing guest sessions can be linked to Google when possible, preserving the same account ID.</div>
     <div class="btns"><button class="btn sec" data-act="google-login">Continue with Google</button></div>
+    <div class="btns"><button class="btn sec" data-act="view" data-v="ai">AI Plan & Memory</button></div>
     <div class="btns"><button class="btn sec" data-act="download-data">Download my data</button></div>
     <div class="btns"><button class="btn bad" data-act="logout">Log out</button></div>
     <div class="btns"><button class="btn bad" data-act="clear-data">Clear data on this device</button></div>
@@ -208,20 +255,55 @@ body.auth-required .view:not(#view-login){display:none!important}
     <label for="c-desc">Description (optional)</label><input id="c-desc" maxlength="140" placeholder="Rules, prize, anything friends should know">
     <div class="row"><div class="grow"><label for="c-start">Starts</label><input id="c-start" type="date"></div>
       <div class="grow"><label for="c-end">Ends</label><input id="c-end" type="date"></div></div>
-    <div class="lbl">Targets</div>
-    <input id="t-text" maxlength="80" aria-label="Target" placeholder="Solve 30 problems">
-    <div class="row" style="margin-top:8px"><select id="t-type" class="grow" aria-label="Target type"><option value="daily">Daily quest</option><option value="once">Side quest (one time)</option></select>
-      <button class="btn sec sm" data-act="add-target">Add</button></div>
+    <div class="lbl">Challenge structure</div>
+    <p class="sub" style="margin-bottom:8px">Build a tree: Subject → Chapter → Topic → Task. Add as many topic/task branches as needed.</p>
+    <label for="t-subject">Subject</label><select id="t-subject"><option>Physics</option><option>Chemistry</option><option>Mathematics</option><option>Biology</option><option>General</option></select>
+    <label for="t-chapter">Chapter / branch</label><input id="t-chapter" maxlength="80" placeholder="e.g. Chemical Bonding">
+    <label for="t-topic">Topic / sub-branch</label><input id="t-topic" maxlength="80" placeholder="e.g. VSEPR Theory">
+    <label for="t-text">Task</label><input id="t-text" maxlength="100" aria-label="Task" placeholder="e.g. Solve 20 PYQs on molecular geometry">
+    <div class="row" style="margin-top:8px"><select id="t-type" class="grow" aria-label="Task frequency"><option value="daily">Daily task</option><option value="once">One-time task</option></select><button class="btn sec sm" data-act="add-target">Add task</button></div>
     <div class="group" id="draft-list" style="margin-top:10px" hidden></div>
     <button class="btn" style="margin-top:16px" data-act="create">Create and go live</button>
     <div class="group" id="created-box" style="margin-top:16px;padding:14px" hidden></div>
+  </section>
+
+  <section class="view" id="view-edit">
+    <h1>Edit challenge</h1><p class="sub">Update the challenge details, add or remove tasks, and change each task's subject, chapter, topic, text, or frequency. Changes are saved for everyone in this challenge.</p>
+    <label for="e-title">Title</label><input id="e-title" maxlength="60" placeholder="Challenge title">
+    <label for="e-desc">Description (optional)</label><input id="e-desc" maxlength="140" placeholder="Rules or goal">
+    <div class="row"><div class="grow"><label for="e-start">Starts</label><input id="e-start" type="date"></div><div class="grow"><label for="e-end">Ends</label><input id="e-end" type="date"></div></div>
+    <div class="lbl">Tasks</div><p class="sub">Daily tasks can be completed each day. One-time tasks count as complete once for the whole challenge. Changing a task's frequency may change how its existing completion history is counted.</p>
+    <div id="edit-task-list" class="group" style="margin-top:10px"></div>
+    <div class="lbl">Add a task</div>
+    <label for="et-subject">Subject / field</label><input id="et-subject" maxlength="80" placeholder="Physics, Chemistry, General…">
+    <label for="et-chapter">Chapter / branch</label><input id="et-chapter" maxlength="80" placeholder="Chapter or category">
+    <label for="et-topic">Topic / sub-branch</label><input id="et-topic" maxlength="80" placeholder="Topic (optional)">
+    <label for="et-text">Task</label><input id="et-text" maxlength="100" placeholder="Describe the task">
+    <label for="et-type">Frequency</label><select id="et-type"><option value="daily">Daily task</option><option value="once">One-time task</option></select>
+    <button class="btn sec" style="margin-top:10px" data-act="edit-add-task">Add task</button>
+    <div id="edit-mega-children" hidden><div class="lbl">Mega challenge branches</div><p class="sub">Choose which of your standard challenges belong to this mega challenge.</p><div id="mega-picks-edit" class="group" style="margin-top:10px"></div></div>
+    <div class="btns"><button class="btn" data-act="save-edit">Save changes</button><button class="btn sec" data-act="view" data-v="challenge">Cancel</button></div>
+  </section>
+
+  <section class="view" id="view-create-mega">
+    <h1>Create mega challenge</h1>
+    <p class="sub">Combine smaller challenges into one larger mission. Each selected challenge remains independent and becomes a branch of this mega challenge.</p>
+    <label for="mc-title">Mega challenge title</label><input id="mc-title" maxlength="60" placeholder="JEE Complete Revision Mega Challenge">
+    <label for="mc-desc">Description (optional)</label><input id="mc-desc" maxlength="140" placeholder="Overall goal, rules, or completion criteria">
+    <div class="row"><div class="grow"><label for="mc-start">Starts</label><input id="mc-start" type="date"></div><div class="grow"><label for="mc-end">Ends</label><input id="mc-end" type="date"></div></div>
+    <div class="lbl">Choose smaller challenges</div><p class="sub">Select at least one of your existing standard challenges. Create subject-specific challenges first if you haven't made any yet.</p>
+    <div id="mega-picks-create" class="group" style="margin-top:10px"></div>
+    <button class="btn" style="margin-top:16px" data-act="create-mega">Create mega challenge</button>
+    <div class="group" id="mega-created-box" style="margin-top:16px;padding:14px" hidden></div>
+    <button class="btn sec" style="margin-top:12px" data-act="view" data-v="challenge-mine">Back to My Challenges</button>
   </section>
 </main>
 
 <nav aria-label="Main"><div>
   <button data-act="view" data-v="home"><svg class="i" viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</button>
-  <button data-act="view" data-v="challenge"><svg class="i" viewBox="0 0 24 24"><path d="M5 21V4m0 0h11l-2 4 2 4H5"/></svg>Challenge</button>
+  <button data-act="view" data-v="challenge-hub"><svg class="i" viewBox="0 0 24 24"><path d="M5 21V4m0 0h11l-2 4 2 4H5"/></svg>Challenge</button>
   <button data-act="view" data-v="activity"><svg class="i" viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>Activity</button>
+  <button data-act="view" data-v="ai"><svg class="i" viewBox="0 0 24 24"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1m-8.6 8.6-2.1 2.1"/><circle cx="12" cy="12" r="4"/></svg>AI</button>
   <button data-act="view" data-v="profile"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Profile</button>
 </div></nav>
 
@@ -242,7 +324,9 @@ const firebaseConfig = {
   appId: "1:642859354088:web:05bbb2c25ec4c8a4d0465d"
 };
 let DEMO = new URLSearchParams(location.search).has('demo') || location.protocol === 'file:';
-let auth, db, onAuthStateChanged, setPersistence, browserLocalPersistence, GoogleAuthProvider, signInWithPopup, linkWithPopup, signOut, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, serverTimestamp;
+let auth, db, onAuthStateChanged, setPersistence, browserLocalPersistence, GoogleAuthProvider, signInWithPopup, linkWithPopup, signInAnonymously, signOut, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, serverTimestamp, getDocs, query, where;
+let deferredInstallPrompt = null;
+let parsedAIPlan = null;
 
 /* ---------- helpers ---------- */
 const $ = id => document.getElementById(id);
@@ -267,7 +351,7 @@ async function copy(text, ok) { try { await navigator.clipboard.writeText(text);
 /* ---------- state ---------- */
 const S = {
   uid: null, name: ls.get('cr_name', ''), mine: ls.get('cr_mine', []), active: ls.get('cr_active', ''),
-  chal: null, me: null, members: [], unsubs: [], draft: [], view: 'home', pane: 'quests', meta: {},
+  chal: null, me: null, members: [], unsubs: [], draft: [], editTargets: [], editCode: '', view: 'home', pane: 'quests', meta: {},
   pendingCode: new URLSearchParams(location.search).get('c'),
   photo: ls.get('cr_photo', ''), about: ls.get('cr_about', '')
 };
@@ -328,19 +412,19 @@ function demoSync() {
   S.members = [...d.others, { id: 'me', ...S.me }]; renderAll();
 }
 const demoMsg = () => toast('Demo mode. Open the hosted site to do this.');
-const metaOf = c => ({ title: c.title, startDate: c.startDate, endDate: c.endDate, live: c.live, n: c.targets.length, owner: c.ownerUid });
+const metaOf = c => ({ title: c.title, startDate: c.startDate, endDate: c.endDate, live: c.live, n: (c.targets || []).length, owner: c.ownerUid, challengeType: c.challengeType || 'standard', childChallenges: c.childChallenges || [], desc: c.desc || '' });
 
 /* ---------- boot ---------- */
 async function loadFirebase() {
   const V = 'https://www.gstatic.com/firebasejs/10.12.2/';
   const [a, b, c] = await Promise.all([import(V + 'firebase-app.js'), import(V + 'firebase-auth.js'), import(V + 'firebase-firestore.js')]);
-  ({ onAuthStateChanged, setPersistence, browserLocalPersistence, GoogleAuthProvider, signInWithPopup, linkWithPopup, signOut } = b);
-  ({ doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, serverTimestamp } = c);
+  ({ onAuthStateChanged, setPersistence, browserLocalPersistence, GoogleAuthProvider, signInWithPopup, linkWithPopup, signInAnonymously, signOut } = b);
+  ({ doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, serverTimestamp, getDocs, query, where } = c);
   const app = a.initializeApp(firebaseConfig); auth = b.getAuth(app); db = c.getFirestore(app);
   await setPersistence(auth, browserLocalPersistence);
 }
 async function start() {
-  $('c-start').value = today(); $('c-end').value = dayOff(13);
+  $('c-start').value = today(); $('c-end').value = dayOff(13); $('mc-start').value = today(); $('mc-end').value = dayOff(13);
   renderAll();
   if (!DEMO) { try { await loadFirebase(); } catch { DEMO = true; toast('Offline: showing demo mode.'); } }
   if (DEMO) { document.body.classList.remove('auth-required','auth-pending'); loadDemo(); setView('home'); return; }
@@ -349,14 +433,20 @@ async function start() {
     document.body.classList.remove('auth-pending');
     if (!u) { document.body.classList.add('auth-required'); setView('login'); return; }
     if (u.isAnonymous) {
-      S.uid = u.uid;
-      document.body.classList.add('auth-required');
-      $('login-status').textContent = 'Guest session found. Continue with Google to link it and keep its challenge ownership.';
-      setView('login');
+      document.body.classList.remove('auth-required');
+      const previousUid = lastUid || ls.get('cr_last_uid', null);
+      if (previousUid && previousUid !== u.uid) {
+        ls.set('cr_mine_' + previousUid, S.mine); ls.set('cr_active_' + previousUid, S.active);
+        S.mine = ls.get('cr_mine_' + u.uid, []); S.active = ls.get('cr_active_' + u.uid, S.mine[0]?.code || '');
+        ls.set('cr_mine', S.mine); ls.set('cr_active', S.active);
+      }
+      S.uid = u.uid; lastUid = u.uid; ls.set('cr_last_uid', u.uid);
+      $('account-status').textContent = 'Guest session (this browser)';
+      if (!S.name) openName(); else afterName();
       return;
     }
     document.body.classList.remove('auth-required');
-    if (lastUid === u.uid) return;
+    if (lastUid === u.uid) { $('account-status').textContent = u.isAnonymous ? 'Guest session (this browser)' : 'Google account connected: ' + (u.email || u.displayName || 'signed in'); return; }
     const previousUid = lastUid || ls.get('cr_last_uid', null);
     if (previousUid && previousUid !== u.uid) {
       ls.set('cr_mine_' + previousUid, S.mine);
@@ -367,7 +457,7 @@ async function start() {
       ls.set('cr_mine', S.mine); ls.set('cr_active', S.active);
     }
     lastUid = u.uid; S.uid = u.uid; ls.set('cr_last_uid', u.uid);
-    $('account-status').textContent = 'Google account connected: ' + (u.email || u.displayName || 'signed in');
+    $('account-status').textContent = u.isAnonymous ? 'Guest session (this browser)' : 'Google account connected: ' + (u.email || u.displayName || 'signed in');
     if (!S.name) openName(); else afterName();
   });
   // Wait for onAuthStateChanged before choosing the login or app screen. This avoids a login-screen flash on reload.
@@ -465,25 +555,110 @@ async function createChallenge() {
   const title = $('c-title').value.trim(), desc = $('c-desc').value.trim();
   const startDate = $('c-start').value, endDate = $('c-end').value;
   if (!title) return toast('Add a title.');
-  if (!S.draft.length) return toast('Add at least one target.');
+  if (!S.draft.length) return toast('Add at least one task to your challenge.');
   if (!startDate || !endDate || endDate < startDate) return toast('Check the start and end dates.');
   try {
     let code;
     for (let i = 0; i < 5; i++) { code = genCode(); if (!(await getDoc(doc(db, 'challenges', code))).exists()) break; }
-    await setDoc(doc(db, 'challenges', code), { title, desc, startDate, endDate, targets: S.draft, live: true, ownerUid: S.uid, ownerName: S.name, createdAt: serverTimestamp() });
+    await setDoc(doc(db, 'challenges', code), { title, desc, startDate, endDate, targets: S.draft, childChallenges: [], challengeType: 'standard', discoverable: true, live: true, ownerUid: S.uid, ownerName: S.name, createdAt: serverTimestamp() });
     await ensureMember(code); addMine(code, title); watch(code);
-    S.draft = []; renderDraft(); $('c-title').value = ''; $('c-desc').value = '';
+    S.draft = []; renderDraft(); $('c-title').value = ''; $('c-desc').value = ''; $('t-chapter').value = ''; $('t-topic').value = ''; $('t-text').value = ''; $('created-box').hidden = false;
     const box = $('created-box'); box.hidden = false;
     box.innerHTML = `<b>Your challenge is live</b><div class="codebox">${code}</div>
       <div class="sub">Friends open the link, or enter this code under Join with code.</div>
       <div class="btns"><button class="btn" data-act="share" data-code="${code}">Share</button><button class="btn sec" data-act="open" data-code="${code}">Open</button></div>`;
   } catch { toast('Could not create. Check Firestore rules and your connection.'); }
 }
+function beginEditChallenge() {
+  const c = S.chal;
+  if (!c || c.ownerUid !== S.uid) return toast('Only the challenge owner can edit it.');
+  if (DEMO) return demoMsg();
+  S.editCode = c.id;
+  S.editTargets = (c.targets || []).map((t, i) => ({ id: t.id || `t${Date.now().toString(36)}${i}`, text: t.text || '', subject: t.subject || 'General', chapter: t.chapter || 'General', topic: t.topic || 'General', daily: !!t.daily, points: Number(t.points) || 10 }));
+  $('e-title').value = c.title || ''; $('e-desc').value = c.desc || '';
+  $('e-start').value = c.startDate || today(); $('e-end').value = c.endDate || today();
+  const mega = c.challengeType === 'mega';
+  $('edit-mega-children').hidden = !mega;
+  ['et-subject','et-chapter','et-topic','et-text','et-type'].forEach(id => { $(id).disabled = mega; });
+  $('edit-task-list').hidden = mega;
+  renderEditTasks();
+  if (mega) renderMegaPicksEdit(c.childChallenges || []);
+  setView('edit');
+}
+function renderEditTasks() {
+  const el = $('edit-task-list'); if (!el) return;
+  if (!S.editTargets.length) { el.innerHTML = '<div class="empty"><b>No tasks yet</b>Add a task below to start building this challenge.</div>'; return; }
+  el.innerHTML = S.editTargets.map((t,i) => `<div class="market-card edit-task" data-edit-index="${i}">
+    <label>Task</label><input maxlength="100" data-edit-field="text" value="${esc(t.text)}" aria-label="Task text ${i+1}">
+    <div class="row"><div class="grow"><label>Subject / field</label><input maxlength="80" data-edit-field="subject" value="${esc(t.subject)}"></div><div class="grow"><label>Chapter / branch</label><input maxlength="80" data-edit-field="chapter" value="${esc(t.chapter)}"></div></div>
+    <label>Topic / sub-branch</label><input maxlength="80" data-edit-field="topic" value="${esc(t.topic)}">
+    <div class="row" style="margin-top:10px"><select data-edit-field="daily" aria-label="Task frequency"><option value="daily" ${t.daily?'selected':''}>Daily task</option><option value="once" ${!t.daily?'selected':''}>One-time task</option></select><button class="btn bad sm" data-act="edit-remove-task" data-i="${i}">Remove</button></div>
+  </div>`).join('');
+}
+function renderMegaPicksEdit(current) {
+  const el = $('mega-picks-edit'); if (!el) return;
+  const selected = new Set((current || []).map(x => x.code));
+  const candidates = S.mine.filter(m => m.code !== S.editCode && (S.meta[m.code]?.challengeType || 'standard') !== 'mega' && !S.meta[m.code]?.gone);
+  el.innerHTML = candidates.length ? candidates.map(m => `<label class="checkline"><input type="checkbox" data-mega-edit-code="${esc(m.code)}" data-mega-edit-title="${esc(m.title)}" ${selected.has(m.code)?'checked':''}><span><b>${esc(m.title)}</b><div class="meta">Code ${esc(m.code)}</div></span></label>`).join('') : '<div class="empty"><b>No standard challenges available</b>Create or join standard challenges to add branches.</div>';
+}
+function addEditTask() {
+  if (!S.editCode || S.chal?.challengeType === 'mega') return;
+  const text = $('et-text').value.trim(); if (!text) return toast('Enter a task first.');
+  if (S.editTargets.length >= 100) return toast('Up to 100 tasks per challenge.');
+  S.editTargets.push({ id: 't' + Date.now().toString(36) + Math.random().toString(36).slice(2,5), text, subject: $('et-subject').value.trim() || 'General', chapter: $('et-chapter').value.trim() || 'General', topic: $('et-topic').value.trim() || 'General', daily: $('et-type').value === 'daily', points: 10 });
+  $('et-text').value = ''; renderEditTasks(); toast('Task added to the edit list. Save changes to publish it.');
+}
+async function saveEditChallenge() {
+  if (DEMO) return demoMsg();
+  const c = S.chal; if (!c || c.id !== S.editCode || c.ownerUid !== S.uid) return toast('You can only edit a challenge you own.');
+  const title = $('e-title').value.trim(), desc = $('e-desc').value.trim(), startDate = $('e-start').value, endDate = $('e-end').value;
+  if (!title) return toast('Add a title.');
+  if (!startDate || !endDate || endDate < startDate) return toast('Check the start and end dates.');
+  const fields = { title, desc, startDate, endDate, updatedAt: serverTimestamp() };
+  if (c.challengeType === 'mega') {
+    const childChallenges = [...document.querySelectorAll('[data-mega-edit-code]:checked')].map(x => ({ code:x.dataset.megaEditCode, title:x.dataset.megaEditTitle }));
+    if (!childChallenges.length) return toast('Select at least one smaller challenge.');
+    fields.childChallenges = childChallenges;
+  } else {
+    const targets = S.editTargets.map(t => ({ ...t, text:String(t.text||'').trim(), subject:String(t.subject||'').trim() || 'General', chapter:String(t.chapter||'').trim() || 'General', topic:String(t.topic||'').trim() || 'General', daily:!!t.daily, points:Number(t.points)||10 }));
+    if (!targets.length) return toast('Add at least one task.');
+    if (targets.some(t => !t.text)) return toast('Every task needs task text.');
+    fields.targets = targets;
+  }
+  try {
+    await updateDoc(doc(db, 'challenges', c.id), fields);
+    addMine(c.id, title); S.chal = { ...c, ...fields }; S.meta[c.id] = metaOf(S.chal); renderAll(); setView('challenge');
+    toast('Challenge changes saved.');
+  } catch { toast('Could not save changes. Check your connection and Firestore rules.'); }
+}
+
+async function createMegaChallenge() {
+  if (DEMO) return demoMsg();
+  const title = $('mc-title').value.trim(), desc = $('mc-desc').value.trim();
+  const startDate = $('mc-start').value, endDate = $('mc-end').value;
+  const childChallenges = [...document.querySelectorAll('[data-mega-create-code]:checked')].map(x => ({ code: x.dataset.megaCreateCode, title: x.dataset.megaCreateTitle }));
+  if (!title) return toast('Add a title for your mega challenge.');
+  if (!childChallenges.length) return toast('Select at least one smaller challenge.');
+  if (!startDate || !endDate || endDate < startDate) return toast('Check the start and end dates.');
+  try {
+    let code;
+    for (let i = 0; i < 5; i++) { code = genCode(); if (!(await getDoc(doc(db, 'challenges', code))).exists()) break; }
+    await setDoc(doc(db, 'challenges', code), { title, desc, startDate, endDate, targets: [], childChallenges, challengeType: 'mega', discoverable: true, live: true, ownerUid: S.uid, ownerName: S.name, createdAt: serverTimestamp() });
+    await ensureMember(code); addMine(code, title); watch(code); await loadMeta();
+    $('mc-title').value = ''; $('mc-desc').value = '';
+    document.querySelectorAll('[data-mega-create-code]').forEach(x => { x.checked = false; });
+    const box = $('mega-created-box'); box.hidden = false;
+    box.innerHTML = `<b>Mega challenge created!</b><div class="codebox">${code}</div><div class="sub">Your smaller challenges are linked as branches. Share the code with friends.</div><div class="btns"><button class="btn" data-act="share" data-code="${code}">Share</button><button class="btn sec" data-act="open" data-code="${code}">Open</button></div>`;
+    toast('Mega challenge created');
+  } catch { toast('Could not create mega challenge. Check Firestore rules and your connection.'); }
+}
+
 function addTarget() {
   const text = $('t-text').value.trim();
   if (!text) return toast('Type a target first.');
-  if (S.draft.length >= 20) return toast('Up to 20 targets.');
-  S.draft.push({ id: 't' + Date.now().toString(36) + S.draft.length, text, daily: $('t-type').value === 'daily', points: 10 });
+  if (S.draft.length >= 100) return toast('Up to 100 tasks per challenge.');
+  const subject = $('t-subject').value, chapter = $('t-chapter').value.trim() || 'General', topic = $('t-topic').value.trim() || 'General';
+  S.draft.push({ id: 't' + Date.now().toString(36) + S.draft.length, text, subject, chapter, topic, daily: $('t-type').value === 'daily', points: 10 });
   $('t-text').value = ''; renderDraft(); $('t-text').focus();
 }
 async function share(code) {
@@ -515,7 +690,8 @@ async function saveProfileFields(fields) {
   renderAll();
 }
 function photoMarkup(photo, name, cls='') {
-  return photo ? `<div class="avatar ${cls}" style="overflow:hidden;padding:0"><img src="${esc(photo)}" alt="${esc(name || 'Profile picture')}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>` : `<div class="avatar ${cls}">${esc(ini(name))}</div>`;
+  const fallback = esc(ini(name));
+  return photo ? `<div class="avatar ${cls}" style="padding:0"><img src="${esc(photo)}" alt="${esc(name || 'Profile picture')}" onerror="this.remove();this.parentElement.textContent='${fallback}'"></div>` : `<div class="avatar ${cls}">${fallback}</div>`;
 }
 async function choosePhoto(file) {
   if (!file) return;
@@ -535,7 +711,7 @@ async function choosePhoto(file) {
       try {
         const img = await new Promise((resolve, reject) => {
           const image = new Image(); image.onload = () => resolve(image);
-          image.onerror = () => reject(new Error('Unsupported image format. Try JPG or PNG.'));
+          image.onerror = () => reject(new Error('This browser cannot decode this image format. Try saving it as JPG, PNG, or WebP.'));
           image.src = url;
         });
         width = img.naturalWidth; height = img.naturalHeight;
@@ -548,13 +724,13 @@ async function choosePhoto(file) {
     canvas.width = Math.max(1, Math.round(width * scale)); canvas.height = Math.max(1, Math.round(height * scale));
     const ctx = canvas.getContext('2d'); if (!ctx) throw new Error('Canvas unavailable');
     draw(ctx, canvas.width, canvas.height);
-    const data = canvas.toDataURL('image/jpeg', .72);
+    const data = canvas.toDataURL('image/jpeg', .82);
     if (!data || data === 'data:,') throw new Error('Image conversion failed');
     if (bitmap?.close) bitmap.close();
     await saveProfileFields({ photo: data }); toast('Profile picture saved.');
   } catch (err) {
     console.warn('Profile picture processing failed:', err);
-    toast(err?.message?.includes('Unsupported') ? 'This image format is not supported. Try JPG or PNG.' : 'Could not process that picture. Try a JPG or PNG image.');
+    toast(err?.message?.includes('cannot decode') ? 'This format is not supported by your browser. Try JPG, PNG, or WebP.' : 'Could not process that picture. Try another image file.');
   }
 }
 async function logout() {
@@ -571,14 +747,7 @@ async function saveAbout() {
   const about = $('p-about').value.trim().slice(0,160);
   await saveProfileFields({ about }); toast('About saved.');
 }
-function downloadData() {
-  const payload = { app: 'Challenge Room', exportedAt: new Date().toISOString(), profile: { name:S.name, about:S.about, photo:S.photo }, challenges:S.mine, activeChallenge:S.active };
-  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob), a = document.createElement('a');
-  a.href = url; a.download = 'challenge-room-data.json'; a.rel = 'noopener';
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1500);
-}
+function downloadData() { exportMemoryBackup(); }
 function authErrorMessage(err) {
   const code = err?.code || '';
   const messages = {
@@ -592,6 +761,21 @@ function authErrorMessage(err) {
   };
   return messages[code] || err?.message || 'Google sign-in failed. Check Firebase settings and try again.';
 }
+async function guestLogin() {
+  if (DEMO) { loadDemo(); setView('home'); return; }
+  $('login-status').textContent = 'Starting a guest session…';
+  try {
+    if (auth.currentUser?.isAnonymous) { document.body.classList.remove('auth-required'); afterName(); return; }
+    await signInAnonymously(auth);
+    $('login-status').textContent = 'Guest session ready.';
+  } catch (err) {
+    const msg = err?.code === 'auth/operation-not-allowed'
+      ? 'Guest access is not enabled yet. In Firebase Console, open Authentication → Sign-in method and enable Anonymous.'
+      : authErrorMessage(err);
+    $('login-status').textContent = msg; toast(msg);
+  }
+}
+
 async function googleLogin() {
   if (DEMO) return demoMsg();
   $('login-status').textContent = 'Connecting to Google…';
@@ -639,13 +823,15 @@ function saveName() {
 function saveProfile() { const v = $('p-name').value.trim(); if (!v) return toast('Enter a name.'); applyName(v); toast('Name saved'); }
 
 /* ---------- views ---------- */
-const TAB = { home: 'home', join: 'home', create: 'home', challenge: 'challenge', activity: 'activity', profile: 'profile' };
+const TAB = { home: 'home', join: 'home', create: 'challenge', edit: 'challenge', 'create-mega': 'challenge', 'challenge-hub': 'challenge', 'challenge-market': 'challenge', 'challenge-mine': 'challenge', challenge: 'challenge', activity: 'activity', ai: 'ai', profile: 'profile' };
 function setView(v) {
   S.view = v;
   document.querySelectorAll('.view').forEach(el => el.classList.toggle('on', el.id === 'view-' + v));
   document.querySelectorAll('nav button').forEach(b => b.dataset.v === TAB[v] ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'));
-  $('back').classList.toggle('on', v === 'join' || v === 'create');
-  if (v === 'home') loadMeta();
+  $('back').classList.toggle('on', v === 'join' || v === 'create' || v === 'create-mega' || v === 'edit');
+  if (v === 'home' || v === 'challenge-mine' || v === 'create-mega') loadMeta();
+  if (v === 'create-mega') renderMegaPicksCreate();
+  if (v === 'challenge-market') loadMarket();
   renderAll(); window.scrollTo(0, 0);
 }
 function setPane(p) {
@@ -655,7 +841,7 @@ function setPane(p) {
 }
 const empty = (h, p) => `<div class="empty"><b>${h}</b>${p}</div>`;
 function renderAll() { renderTop(); renderHome(); renderChallenge(); renderActivity(); renderProfile(); setPane(S.pane); }
-function renderTop() { const a = $('top-av'); a.innerHTML = S.photo ? `<img src="${esc(S.photo)}" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%">` : esc(ini(S.name)); }
+function renderTop() { const a = $('top-av'); a.innerHTML = S.photo ? `<img src="${esc(S.photo)}" alt="Profile" onerror="this.remove();this.parentElement.textContent='${esc(ini(S.name))}'">` : esc(ini(S.name)); }
 
 function renderHome() {
   $('home-h').textContent = S.name ? `Hello, ${S.name}` : 'Hello';
@@ -667,13 +853,15 @@ function renderHome() {
     <div class="stat"><b>${todayTxt}</b><span>Daily quests done today</span></div>
     <div class="stat"><b>${S.me?.points || 0}</b><span>Points in current challenge</span></div>`;
   const el = $('home-list');
-  if (!S.mine.length) { el.innerHTML = empty('No challenges yet', 'Create one or join with a code.'); return; }
-  el.innerHTML = '<div class="group">' + S.mine.map(m => {
+  if (!S.mine.length) { el.innerHTML = empty('No challenges yet', 'Create one or join with a code.'); $('mine-list').innerHTML = el.innerHTML; renderMegaPicksCreate(); return; }
+  const cards = S.mine.map(m => {
     const x = S.meta[m.code]; const st = x && !x.gone ? status(x) : null;
     const info = !x ? 'Loading' : x.gone ? 'No longer available' : `${fmt(x.startDate)} to ${fmt(x.endDate)}, ${x.n} ${x.n === 1 ? 'target' : 'targets'}`;
-    return `<button class="li" data-act="open" data-code="${esc(m.code)}"><div class="grow"><b>${esc(m.title)}</b><div class="meta">${esc(info)}</div></div>
+    return `<button class="li" data-act="open" data-code="${esc(m.code)}"><div class="grow"><b>${esc(m.title)}</b><div class="meta">${esc(info)}${x?.challengeType === 'mega' ? ' · Mega challenge' : ''}</div></div>
       ${st ? `<span class="badge ${st}">${st}</span>` : ''}<svg class="i chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>`;
-  }).join('') + '</div>';
+  }).join('');
+  el.innerHTML = '<div class="group">' + cards + '</div>';
+  $('mine-list').innerHTML = '<div class="group">' + cards + '</div>'; renderMegaPicksCreate();
 }
 
 function renderChallenge() {
@@ -698,18 +886,20 @@ function renderQuests() {
   const isDone = g => g.daily ? !!done[`${g.id}@${t}`] : !!done[g.id];
   const row = g => `<button class="li quest ${isDone(g) ? 'on' : ''}" data-act="toggle" data-id="${esc(g.id)}" ${st !== 'live' ? 'disabled' : ''}>
     <span class="box"></span><span class="t">${esc(g.text)}</span><span class="p">+${g.points}</span></button>`;
-  const daily = c.targets.filter(g => g.daily), once = c.targets.filter(g => !g.daily);
+  const targets = c.targets || [], daily = targets.filter(g => g.daily), once = targets.filter(g => !g.daily);
   const dn = daily.filter(isDone).length, pct = daily.length ? Math.round(dn / daily.length * 100) : 0;
   const owner = c.ownerUid === S.uid;
+  const tree = (list, heading) => { const subjects = {}; list.forEach(g => { const su=g.subject||'General', ch=g.chapter||'General', to=g.topic||'General'; (((subjects[su] ||= {})[ch] ||= {})[to] ||= []).push(g); }); return Object.entries(subjects).map(([su, chapters]) => `<div class="tree-sub">${esc(heading)} · ${esc(su)}</div>${Object.entries(chapters).map(([ch, topics]) => `<div class="tree-branch"><b>${esc(ch)}</b>${Object.entries(topics).map(([to, tasks]) => `<div class="topic-head">${esc(to)}</div><div class="group">${tasks.map(row).join('')}</div>`).join('')}</div>`).join('')}`).join(''); };
+  const children = c.childChallenges || [];
   $('pane-quests').innerHTML = `
-    ${daily.length ? `<div class="lbl">Daily quests</div><div class="group">${daily.map(row).join('')}</div>
-      <div class="bar" aria-hidden="true"><i style="width:${pct}%"></i></div><div class="sub" style="font-size:13px;margin-top:6px">${dn} of ${daily.length} done today</div>` : ''}
-    ${once.length ? `<div class="lbl">Side quests</div><div class="group">${once.map(row).join('')}</div>` : ''}
+    ${daily.length ? tree(daily, 'Daily tasks') + `<div class="bar" aria-hidden="true"><i style="width:${pct}%"></i></div><div class="sub" style="font-size:13px;margin-top:6px">${dn} of ${daily.length} daily tasks done today</div>` : ''}
+    ${once.length ? tree(once, 'One-time tasks') : ''}
+    ${children.length ? `<div class="lbl">Mega challenge branches</div><div class="group">${children.map(ch => `<button class="li" data-act="mega-branch" data-code="${esc(ch.code)}"><div class="grow"><b>${esc(ch.title)}</b><div class="meta">${S.mine.some(m => m.code === ch.code) ? 'Open linked challenge branch' : 'Join this challenge branch'}</div></div><span>›</span></button>`).join('')}</div>` : ''}
     <div class="lbl">Invite friends</div>
     <div class="group"><div class="li"><div class="grow"><b>Code ${esc(c.id)}</b><div class="meta">Friends enter this code or open your link.</div></div>
       <button class="btn sm" data-act="share" data-code="${esc(c.id)}">Share</button></div></div>
-    <div class="btns">${owner ? `<button class="btn sec" data-act="toggle-live">${c.live ? 'Pause challenge' : 'Go live'}</button><button class="btn bad" data-act="delete">Delete</button>` : ''}
-      <button class="btn bad" data-act="leave">Leave</button></div>`;
+    ${owner ? `<div class="btns"><button class="btn sec" data-act="edit-challenge">Edit challenge</button></div><div class="btns"><button class="btn sec" data-act="toggle-live">${c.live ? 'Pause challenge' : 'Go live'}</button><button class="btn bad" data-act="delete">Delete</button></div>` : ''}
+    <div class="btns"><button class="btn bad" data-act="leave">Leave</button></div>`;
 }
 
 function series() {
@@ -767,7 +957,7 @@ function renderProgress() {
 function renderBoard() {
   const list = sorted(), top = Math.max(1, list[0]?.points || 0);
   $('pane-board').innerHTML = `<div class="lbl">Standings</div>` + (list.length ? `<div class="group">` + list.map((m, i) => `<div class="li ${i === 0 ? 'lead' : ''}">
-    <div class="rk">${i + 1}</div>${m.photo ? `<div class="avatar ${m.id === S.uid ? 'me' : ''}" style="overflow:hidden;padding:0"><img src="${esc(m.photo)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>` : `<div class="avatar ${m.id === S.uid ? 'me' : ''}">${esc(ini(m.name))}</div>`}
+    <div class="rk">${i + 1}</div>${m.photo ? `<div class="avatar ${m.id === S.uid ? 'me' : ''}" style="padding:0"><img src="${esc(m.photo)}" alt="" onerror="this.remove()"></div>` : `<div class="avatar ${m.id === S.uid ? 'me' : ''}">${esc(ini(m.name))}</div>`}
     <div class="grow"><b>${esc(m.name || 'Player')}${m.id === S.uid ? ' (you)' : ''}</b>${m.about ? `<div class="meta">${esc(m.about)}</div>` : ''}<div class="mini"><i style="width:${Math.round((m.points || 0) / top * 100)}%"></i></div></div>
     <div class="pts">${m.points || 0}</div></div>`).join('') + '</div>' : empty('No players yet', 'Share the code to get friends in.'));
 }
@@ -804,7 +994,7 @@ function renderActivity() {
 }
 
 function renderProfile() {
-  const av = $('p-av'); av.innerHTML = S.photo ? `<img src="${esc(S.photo)}" alt="Profile picture" style="width:100%;height:100%;object-fit:cover;border-radius:50%">` : esc(ini(S.name));
+  const av = $('p-av'); av.innerHTML = S.photo ? `<img src="${esc(S.photo)}" alt="Profile picture" onerror="this.remove();this.parentElement.textContent='${esc(ini(S.name))}'">` : esc(ini(S.name));
   $('p-name-h').textContent = S.name || 'Profile';
   const currentUser = auth?.currentUser;
   $('p-id').textContent = currentUser?.email ? currentUser.email : (S.uid ? 'Guest account · ' + String(S.uid).slice(0, 6) : 'Signing in');
@@ -816,10 +1006,142 @@ function renderProfile() {
   const row = (a, b) => `<div class="li"><div class="grow">${a}</div><b>${b}</b></div>`;
   $('p-stats').innerHTML = row('Challenges joined', S.mine.length) + row('Challenges you host', hosted) + row('Points in current challenge', S.me?.points || 0) + row('Current streak', streak(S.me?.done || {}));
 }
+async function loadMarket() {
+  const el = $('market-list'); if (!el) return;
+  if (DEMO) { el.innerHTML = empty('Market preview', 'Public challenge discovery appears here on the live site.'); return; }
+  el.innerHTML = empty('Loading market…', 'Looking for public challenges.');
+  try {
+    const snap = await getDocs(query(collection(db, 'challenges'), where('discoverable', '==', true)));
+    const items = snap.docs.map(d => ({ code:d.id, ...d.data() })).filter(c => c.live && c.ownerUid !== S.uid && !S.mine.some(m => m.code === c.code));
+    if (!items.length) { el.innerHTML = empty('No public challenges yet', 'Create a challenge and make it discoverable so other students can find it.'); return; }
+    el.innerHTML = items.map(c => `<div class="market-card"><b>${esc(c.title || 'Untitled challenge')}</b><p>${esc(c.desc || 'No description added.')}</p><div class="meta">${esc(c.challengeType === 'mega' ? 'Mega challenge' : 'Study challenge')} · ${(c.targets||[]).length} tasks · By ${esc(c.ownerName || 'Student')}</div><button class="btn" style="margin-top:10px" data-act="market-join" data-code="${esc(c.code)}">Join challenge</button></div>`).join('');
+  } catch { el.innerHTML = empty('Market unavailable', 'Firestore rules must allow signed-in users to read discoverable challenges. You can still join using a challenge code.'); }
+}
+function renderMegaPicksCreate() {
+  const el = $('mega-picks-create'); if (!el) return;
+  const candidates = S.mine.filter(m => (S.meta[m.code]?.challengeType || 'standard') !== 'mega' && !S.meta[m.code]?.gone);
+  if (!candidates.length) { el.innerHTML = '<div class="li"><div class="grow"><b>No smaller challenges available</b><div class="meta">Create or join standard challenges first, then return here to combine them.</div></div></div>'; return; }
+  el.innerHTML = candidates.map(m => `<label class="checkline"><input type="checkbox" data-mega-create-code="${esc(m.code)}" data-mega-create-title="${esc(m.title)}"><span><b>${esc(m.title)}</b><div class="meta">Code ${esc(m.code)}${S.meta[m.code]?.n != null ? ` · ${S.meta[m.code].n} tasks` : ''}</div></span></label>`).join('');
+}
+
 function renderDraft() {
   const el = $('draft-list'); el.hidden = !S.draft.length;
-  el.innerHTML = S.draft.map((g, i) => `<div class="draft"><div><b>${esc(g.text)}</b><div class="meta sub" style="margin:0;font-size:14px">${g.daily ? 'Daily quest' : 'Side quest'}</div></div>
-    <button class="x" data-act="rm-draft" data-i="${i}" aria-label="Remove target">Remove</button></div>`).join('');
+  el.innerHTML = S.draft.map((g, i) => `<div class="draft"><div class="grow"><b>${esc(g.text)}</b><div class="meta sub" style="margin:0;font-size:13px">${esc(g.subject||'General')} → ${esc(g.chapter||'General')} → ${esc(g.topic||'General')} · ${g.daily ? 'Daily' : 'One-time'} · 10 pts</div></div>
+    <button class="x" data-act="rm-draft" data-i="${i}" aria-label="Remove task">Remove</button></div>`).join('');
+}
+
+/* ---------- AI Plan + local memory backups ---------- */
+const AI_START_PROMPT = `You are my Challenge Room planning assistant. Help me design a practical challenge by asking one clear question at a time. Establish the goal, timeframe, daily available time, subjects/fields, chapters/topics, task difficulty, and which tasks should be Daily versus One-time. Keep the plan realistic and structured as Subject → Chapter → Topic → Task. Do not output the final JSON yet. Summarize the agreed plan and wait until I send my final conversion prompt.`;
+const AI_FINAL_PROMPT = `Convert the challenge plan from this conversation into a valid JSON object ONLY (no Markdown fences or commentary), ready to import into Challenge Room. Use this schema: {"title":"Challenge title","description":"Short description","startDate":"YYYY-MM-DD","endDate":"YYYY-MM-DD","tasks":[{"text":"Task text","subject":"Physics","chapter":"Chapter","topic":"Topic","frequency":"daily","points":10}]}. Each task's frequency must be exactly "daily" or "once". Use "once" for one-time tasks. Include every agreed task, do not invent tasks, use today's date for startDate only if no date was agreed, and make endDate on or after startDate. Keep each task concise. Return a single JSON object only.`;
+function parseAIPlan(raw) {
+  const text = String(raw || '').trim(); if (!text) throw new Error('Paste the AI response first.');
+  let obj;
+  const cleaned = text.replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'').trim();
+  try { obj = JSON.parse(cleaned); } catch {
+    const first = cleaned.indexOf('{'), last = cleaned.lastIndexOf('}');
+    if (first >= 0 && last > first) { try { obj = JSON.parse(cleaned.slice(first,last+1)); } catch {} }
+  }
+  if (obj && typeof obj === 'object') {
+    const title = String(obj.title || obj.name || 'AI planned challenge').trim();
+    const description = String(obj.description || obj.desc || '').trim();
+    const tasksRaw = Array.isArray(obj.tasks) ? obj.tasks : Array.isArray(obj.targets) ? obj.targets : [];
+    const tasks = tasksRaw.map((t,i) => ({ id:'ai'+Date.now().toString(36)+i, text:String(t.text || t.task || t.title || '').trim(), subject:String(t.subject || t.field || 'General').trim(), chapter:String(t.chapter || t.branch || 'General').trim(), topic:String(t.topic || t.subtopic || 'General').trim(), daily: String(t.frequency || (t.daily ? 'daily' : 'once')).toLowerCase() === 'daily' || t.daily === true, points:Number(t.points)||10 })).filter(t=>t.text);
+    if (!tasks.length) throw new Error('JSON found, but no tasks were recognized. Include a tasks array with text fields.');
+    const startDate = /^\d{4}-\d{2}-\d{2}$/.test(obj.startDate || obj.start_date || '') ? (obj.startDate || obj.start_date) : today();
+    const endDate = /^\d{4}-\d{2}-\d{2}$/.test(obj.endDate || obj.end_date || '') ? (obj.endDate || obj.end_date) : dayOff(13);
+    if (endDate < startDate) throw new Error('The end date is earlier than the start date.');
+    return {title, desc:description, startDate, endDate, targets:tasks};
+  }
+  // Friendly fallback for structured text: one task per non-empty line, optionally Task | Subject | Chapter | Topic | daily/once.
+  const lines = cleaned.split(/\r?\n/).map(x=>x.replace(/^\s*(?:[-*•]|\d+[.)])\s*/,'').trim()).filter(Boolean);
+  const tasks = [];
+  for (const line of lines) {
+    if (/^(title|description|start date|end date|tasks?)\s*:/i.test(line)) continue;
+    const parts = line.split(/\s*\|\s*/);
+    if (parts.length >= 2) tasks.push({id:'ai'+Date.now().toString(36)+tasks.length,text:parts[0],subject:parts[1]||'General',chapter:parts[2]||'General',topic:parts[3]||'General',daily:/^daily$/i.test(parts[4]||''),points:10});
+  }
+  if (!tasks.length) throw new Error('Could not parse this output. Use the final prompt to ask the AI for JSON, or format each task as Task | Subject | Chapter | Topic | daily/once.');
+  const titleMatch = cleaned.match(/^title\s*:\s*(.+)$/im);
+  return {title:titleMatch?.[1]?.trim()||'AI planned challenge',desc:'Imported from structured AI text',startDate:today(),endDate:dayOff(13),targets:tasks};
+}
+function previewAIOutput() {
+  try {
+    parsedAIPlan = parseAIPlan($('ai-output').value);
+    $('ai-preview').hidden = false;
+    $('ai-preview').innerHTML = `<b>${esc(parsedAIPlan.title)}</b><p class="sub">${esc(parsedAIPlan.desc || 'No description')}</p><div class="meta">${esc(parsedAIPlan.startDate)} → ${esc(parsedAIPlan.endDate)} · ${parsedAIPlan.targets.length} tasks · ${parsedAIPlan.targets.filter(t=>t.daily).length} daily · ${parsedAIPlan.targets.filter(t=>!t.daily).length} one-time</div><div class="tree-branch">${parsedAIPlan.targets.map(t=>`<div style="padding:6px 0;border-bottom:1px solid var(--line)"><b>${esc(t.text)}</b><div class="meta">${esc(t.subject)} → ${esc(t.chapter)} → ${esc(t.topic)} · ${t.daily?'Daily':'One-time'}</div></div>`).join('')}</div>`;
+    $('ai-create-btn').disabled = false; toast('AI output parsed. Review before creating.');
+  } catch (e) { parsedAIPlan = null; $('ai-preview').hidden = false; $('ai-preview').innerHTML = `<b>Could not parse output</b><p class="sub">${esc(e.message)}</p>`; $('ai-create-btn').disabled = true; }
+}
+async function createChallengeFromAI() {
+  if (!parsedAIPlan) return toast('Preview valid AI output first.');
+  if (DEMO) return toast('AI challenge creation needs an authenticated or guest Firebase session.');
+  const plan = parsedAIPlan; if (!S.uid) return toast('Sign in or continue as guest first.');
+  try {
+    let code;
+    for (let i=0;i<6;i++) { code=genCode(); if (!(await getDoc(doc(db,'challenges',code))).exists()) break; }
+    await setDoc(doc(db,'challenges',code), {title:plan.title.slice(0,60),desc:plan.desc.slice(0,140),startDate:plan.startDate,endDate:plan.endDate,targets:plan.targets.map((t,i)=>({...t,id:'t'+Date.now().toString(36)+i})),childChallenges:[],challengeType:'standard',discoverable:true,live:true,ownerUid:S.uid,ownerName:S.name||'Guest',createdAt:serverTimestamp()});
+    await ensureMember(code); addMine(code,plan.title); await loadMeta(); watch(code); parsedAIPlan=null; $('ai-create-btn').disabled=true; $('ai-output').value=''; $('ai-preview').hidden=true; toast('Challenge created from AI plan.'); openChallenge(code);
+  } catch { toast('Could not create the challenge. Check Firebase permissions and connection.'); }
+}
+function downloadJSON(payload, filename) {
+  const blob = new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}), url=URL.createObjectURL(blob), a=document.createElement('a');
+  a.href=url; a.download=filename; a.rel='noopener'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),2000);
+}
+async function exportMemoryBackup() {
+  const backup={format:'challenge-room-memory',version:1,exportedAt:new Date().toISOString(),originalUid:S.uid,profile:{name:S.name,about:S.about,photo:S.photo},local:{mine:S.mine,active:S.active},challenges:[]};
+  if (!DEMO && db && S.uid) {
+    for (const m of S.mine) {
+      try {
+        const snap=await getDoc(doc(db,'challenges',m.code)); if (!snap.exists()) continue;
+        const challenge={code:m.code,...snap.data()};
+        try { const ms=await getDoc(doc(db,'challenges',m.code,'members',S.uid)); if(ms.exists()) challenge.myMembership=ms.data(); } catch {}
+        backup.challenges.push(challenge);
+      } catch {}
+    }
+  }
+  backup.localStorage={};
+  for (const k of ['cr_name','cr_mine','cr_active','cr_photo','cr_about']) { try { const v=localStorage.getItem(k); if(v!==null) backup.localStorage[k]=JSON.parse(v); } catch {} }
+  downloadJSON(backup,'challenge-room-memory-backup.json'); toast('Memory backup exported.');
+}
+async function importMemoryBackup() {
+  const file=$('backup-file').files?.[0]; if(!file) return toast('Choose a JSON backup file first.');
+  let data; try { data=JSON.parse(await file.text()); } catch { return toast('That file is not valid JSON.'); }
+  if (!data || typeof data!=='object') return toast('Unsupported backup file.');
+  if (Array.isArray(data.tasks) || Array.isArray(data.targets)) { $('ai-output').value=JSON.stringify(data,null,2); setView('ai'); previewAIOutput(); return toast('AI plan loaded for preview.'); }
+  if (!data.profile && !data.localStorage && !Array.isArray(data.challenges)) return toast('This JSON is not a recognized Challenge Room backup.');
+  const profile=data.profile||{};
+  if(profile.name){S.name=String(profile.name).slice(0,20);ls.set('cr_name',S.name)}
+  if(typeof profile.about==='string'){S.about=profile.about;ls.set('cr_about',S.about)}
+  if(typeof profile.photo==='string' && profile.photo.length<500000){S.photo=profile.photo;ls.set('cr_photo',S.photo)}
+  if(data.localStorage && typeof data.localStorage==='object') for(const [k,v] of Object.entries(data.localStorage)) if(['cr_name','cr_photo','cr_about'].includes(k)) ls.set(k,v);
+  const docs=Array.isArray(data.challenges)?data.challenges:[];
+  if(!DEMO && db && S.uid) {
+    const owned=docs.filter(c=>c.ownerUid===S.uid || c.ownerUid===data.originalUid || c.ownerUid===data.uid || c.ownerUid===data.user?.uid);
+    const remap={};
+    for(const c of owned) { let code; for(let i=0;i<6;i++){code=genCode();if(!(await getDoc(doc(db,'challenges',code))).exists())break;} remap[c.code]=code; }
+    for(const c of owned) {
+      const code=remap[c.code], child=(c.childChallenges||[]).map(ch=>({...ch,code:remap[ch.code]||ch.code}));
+      const clean={title:String(c.title||'Restored challenge').slice(0,60),desc:String(c.desc||'').slice(0,140),startDate:c.startDate||today(),endDate:c.endDate||dayOff(13),targets:Array.isArray(c.targets)?c.targets:[],childChallenges:child,challengeType:c.challengeType||'standard',discoverable:c.discoverable!==false,live:c.live!==false,ownerUid:S.uid,ownerName:S.name||'Guest',createdAt:serverTimestamp()};
+      await setDoc(doc(db,'challenges',code),clean); await ensureMember(code); if(c.myMembership && typeof c.myMembership==='object') { const mm=c.myMembership; try { await updateDoc(doc(db,'challenges',code,'members',S.uid), {done:mm.done||{},notes:mm.notes||{},points:Number(mm.points)||0,name:S.name||mm.name||'Guest',photo:S.photo||'',about:S.about||''}); } catch {} } addMine(code,clean.title);
+    }
+    for(const c of docs.filter(c=>!owned.includes(c))) { if(c.code) { try { if((await getDoc(doc(db,'challenges',c.code))).exists()) addMine(c.code,c.title||'Challenge'); } catch {} } }
+    await loadMeta();
+  } else if(docs.length) {
+    return toast('Challenge definitions can be restored only after starting a Firebase guest or Google session. Your profile backup was loaded locally.');
+  }
+  renderAll(); toast(`Backup imported${docs.length?' · challenge restore attempted':''}.`);
+}
+async function installApp() {
+  if (deferredInstallPrompt) {
+    try { deferredInstallPrompt.prompt(); const choice=await deferredInstallPrompt.userChoice; deferredInstallPrompt=null; if(choice?.outcome==='accepted') toast('Install started.'); else toast('Install dismissed. You can install later from the browser menu.'); }
+    catch { toast('Install prompt unavailable. Use the browser menu → Install app / Add to Home screen.'); }
+  } else {
+    const standalone=window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    if(standalone) return toast('Challenge Room is already installed.');
+    const el=$('install-status');
+    if(el) el.textContent='If Chrome has no Install option, open the HTTPS site directly in Chrome, refresh once, then use ⋮ → Install app or Add to Home screen.';
+    toast('Use Chrome menu ⋮ → Install app / Add to Home screen.');
+  }
 }
 
 /* ---------- events ---------- */
@@ -834,6 +1156,14 @@ document.addEventListener('click', e => {
   else if (a === 'add-target') addTarget();
   else if (a === 'rm-draft') { S.draft.splice(+b.dataset.i, 1); renderDraft(); }
   else if (a === 'create') createChallenge();
+  else if (a === 'create-mega') createMegaChallenge();
+  else if (a === 'edit-challenge') beginEditChallenge();
+  else if (a === 'edit-add-task') addEditTask();
+  else if (a === 'edit-remove-task') { S.editTargets.splice(+b.dataset.i, 1); renderEditTasks(); }
+  else if (a === 'save-edit') saveEditChallenge();
+  else if (a === 'market-refresh') loadMarket();
+  else if (a === 'market-join') join(b.dataset.code);
+  else if (a === 'mega-branch') S.mine.some(m => m.code === b.dataset.code) ? openChallenge(b.dataset.code) : join(b.dataset.code);
   else if (a === 'share') share(b.dataset.code);
   else if (a === 'save-note') saveNote();
   else if (a === 'toggle-live') toggleLive();
@@ -846,17 +1176,33 @@ document.addEventListener('click', e => {
   else if (a === 'download-data') downloadData();
   else if (a === 'logout') logout();
   else if (a === 'google-login') googleLogin();
+  else if (a === 'guest-login') guestLogin();
+  else if (a === 'copy-ai-start') copy(AI_START_PROMPT, 'Starting prompt copied');
+  else if (a === 'copy-ai-final') copy(AI_FINAL_PROMPT, 'Final JSON prompt copied');
+  else if (a === 'preview-ai') previewAIOutput();
+  else if (a === 'create-ai-challenge') createChallengeFromAI();
+  else if (a === 'export-backup') exportMemoryBackup();
+  else if (a === 'import-backup') importMemoryBackup();
+  else if (a === 'install-app') installApp();
   else if (a === 'google-existing-login') googleExistingLogin();
   else if (a === 'clear-data') { if (confirm('Clear your name and saved challenges on this device?')) { ['cr_name', 'cr_mine', 'cr_active'].forEach(ls.del); location.reload(); } }
 });
-document.addEventListener('change', e => { if (e.target.id === 'switcher') watch(e.target.value); });
+document.addEventListener('change', e => {
+  if (e.target.id === 'switcher') watch(e.target.value);
+  const wrap = e.target.closest('.edit-task');
+  if (wrap && e.target.dataset.editField) { const i = +wrap.dataset.editIndex, field = e.target.dataset.editField; if (S.editTargets[i]) S.editTargets[i][field] = field === 'daily' ? e.target.value === 'daily' : e.target.value; }
+});
+document.addEventListener('input', e => { const wrap = e.target.closest('.edit-task'); if (wrap && e.target.dataset.editField) { const i = +wrap.dataset.editIndex, field = e.target.dataset.editField; if (S.editTargets[i]) S.editTargets[i][field] = e.target.value; } });
 $('t-text').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addTarget(); } });
 $('join-code').addEventListener('keydown', e => { if (e.key === 'Enter') join($('join-code').value); });
 $('name-input').addEventListener('keydown', e => { if (e.key === 'Enter') saveName(); });
 $('p-name').addEventListener('keydown', e => { if (e.key === 'Enter') saveProfile(); });
 $('p-photo-file').addEventListener('change', e => { choosePhoto(e.target.files?.[0]); e.target.value = ''; });
+$('backup-file').addEventListener('change', () => { parsedAIPlan = null; });
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstallPrompt = e; const el = $('install-status'); if (el) el.textContent = 'Ready to install. Tap Install.'; });
+window.addEventListener('appinstalled', () => { deferredInstallPrompt = null; const el = $('install-status'); if (el) el.textContent = 'Installed on this device.'; toast('Challenge Room installed.'); });
 
-if ('serviceWorker' in navigator && location.protocol.startsWith('http')) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js', {scope:'./'}).then(reg => { if (reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'}); }).catch(err => { console.warn('Service worker registration failed:', err); const el = $('install-status'); if (el) el.textContent = 'Install unavailable: service worker registration failed. Refresh the site and try again.'; }));
 document.body.classList.add('auth-pending');
 start();
 </script>
