@@ -98,7 +98,7 @@ nav button[aria-current="page"]{color:var(--acc);border-top-color:var(--acc)}
 #name-modal .sheet{background:var(--s1);border-top:1px solid var(--line);width:100%;max-width:520px;border-radius:16px 16px 0 0;padding:22px 16px calc(22px + env(safe-area-inset-bottom))}
 .note{background:var(--s1);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px;color:var(--mut);margin-bottom:14px}
 body.auth-pending .view{display:none!important}
-body.auth-required nav,body.auth-required #top-av{display:none!important}
+body.auth-required nav{display:none!important}
 body.auth-required .view:not(#view-login){display:none!important}
 .login-wrap{padding-top:min(12vh,72px)}.login-mark{width:64px;height:64px;border-radius:18px;background:linear-gradient(145deg,#5B8DEF,#7C5CFA);display:grid;place-items:center;margin:0 0 22px;box-shadow:0 12px 30px #0004}.login-mark svg{width:38px;height:38px}.google-btn{background:#fff;color:#202124;border-color:#dadce0;font-weight:800}.google-btn svg{width:20px;height:20px;flex:none}.login-card{margin-top:24px;background:var(--s1);border:1px solid var(--line);border-radius:16px;padding:18px}.tracker-link{display:flex;align-items:center;gap:12px;margin-top:18px;padding:14px;border:1px solid var(--line);border-radius:13px;background:var(--s1);text-decoration:none;color:var(--tx)}.tracker-logo{width:46px;height:46px;flex:none}.tracker-link .meta{font-size:13px;color:var(--mut);margin-top:2px}.tracker-link .arrow{margin-left:auto;color:var(--mut);font-size:22px}
 /* Responsive fit: keep the entire app within the phone viewport, even with long labels/cards. */
@@ -127,13 +127,15 @@ img,svg,video,canvas{max-width:100%;}
  .seg button{font-size:12px;}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* Compact monthly progress calendar */
+.month-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:14px 0 10px}.month-title{font-weight:750}.month-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}.month-day,.month-week{min-width:0;text-align:center}.month-week{font-size:11px;color:var(--muted);padding:4px 0}.month-day{border:1px solid var(--line);border-radius:9px;min-height:43px;padding:5px 1px;background:var(--card);color:var(--text);font-size:12px}.month-day.empty{visibility:hidden}.month-day.active{border-color:#5B8DEF;background:rgba(91,141,239,.18)}.month-day.today{box-shadow:inset 0 0 0 1px #5B8DEF}.month-day .day-count{display:block;font-size:10px;color:var(--muted);margin-top:2px}.month-day.active .day-count{color:var(--text)}
 </style>
 </head>
 <body>
 <header class="top"><div class="top-in">
   <button class="back" id="back" data-act="back" aria-label="Go back"><svg class="i" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Back</button>
   <div class="brand">Challenge Room</div>
-  <button class="avatar me" id="top-av" data-act="view" data-v="profile" aria-label="Open profile">?</button>
 </div></header>
 
 <main class="app">
@@ -382,7 +384,7 @@ const S = {
   uid: null, name: ls.get('cr_name', ''), mine: ls.get('cr_mine', []), active: ls.get('cr_active', ''),
   chal: null, me: null, members: [], unsubs: [], draft: [], editTargets: [], editCode: '', view: 'home', pane: 'quests', meta: {},
   pendingCode: new URLSearchParams(location.search).get('c'),
-  photo: ls.get('cr_photo', ''), about: ls.get('cr_about', '')
+  photo: ls.get('cr_photo', ''), about: ls.get('cr_about', ''), calendarMonth: new Date().getMonth(), calendarYear: new Date().getFullYear()
 };
 const status = c => { if (!c.live) return 'paused'; const t = today(); return t < c.startDate ? 'upcoming' : t > c.endDate ? 'ended' : 'live'; };
 const ptsOf = (c, k) => c.targets.find(x => x.id === k.split('@')[0])?.points || 0;
@@ -959,8 +961,7 @@ window.addEventListener('popstate', e => {
   }
 });
 const empty = (h, p) => `<div class="empty"><b>${h}</b>${p}</div>`;
-function renderAll() { renderTop(); renderHome(); renderChallenge(); renderActivity(); renderProfile(); setPane(S.pane); }
-function renderTop() { const a = $('top-av'); a.innerHTML = S.photo ? `<img src="${esc(S.photo)}" alt="Profile" onerror="this.remove();this.parentElement.textContent='${esc(ini(S.name))}'">` : esc(ini(S.name)); }
+function renderAll() { renderHome(); renderChallenge(); renderActivity(); renderProfile(); setPane(S.pane); }
 
 function renderHome() {
   $('home-h').textContent = S.name ? `Hello, ${S.name}` : 'Hello';
@@ -1071,8 +1072,29 @@ function renderProgress() {
     ${sr ? `<div class="chart">${chartSvg(sr)}</div>` : '<div class="group">' + empty('Not started yet', 'The chart appears once the challenge begins.') + '</div>'}
     <div class="lbl">Your last 14 days</div>
     <div class="heat" aria-label="Quests cleared per day">${cells.join('')}</div>
-    <div class="heat-l"><span>${fmt(dayOff(-13))}</span><span>Today</span></div>`;
+    <div class="heat-l"><span>${fmt(dayOff(-13))}</span><span>Today</span></div>
+    ${renderMonthCalendar(done, d)}
+    <p class="sub" style="margin-top:8px">Tap a day to see how many tasks you completed. Daily task history is based on saved completion dates.</p>`;
 }
+function renderMonthCalendar(done, dailyTasks) {
+  const year = S.calendarYear, month = S.calendarMonth;
+  const first = new Date(year, month, 1), offset = first.getDay(), days = new Date(year, month + 1, 0).getDate();
+  const counts = {};
+  Object.entries(done || {}).forEach(([key, date]) => { if (date && /^\d{4}-\d{2}-\d{2}$/.test(date)) counts[date] = (counts[date] || 0) + 1; });
+  const cells = Array.from({length: offset}, () => '<div class="month-day empty"></div>');
+  for (let n = 1; n <= days; n++) {
+    const date = `${year}-${String(month + 1).padStart(2,'0')}-${String(n).padStart(2,'0')}`, count = counts[date] || 0;
+    cells.push(`<button class="month-day ${count ? 'active' : ''} ${date === today() ? 'today' : ''}" data-act="calendar-day" data-date="${date}" aria-label="${fmtLong(date)}: ${count} completed tasks">${n}<span class="day-count">${count ? count + ' ✓' : '·'}</span></button>`);
+  }
+  return `<div class="month-head"><button class="btn sec sm" data-act="calendar-prev" aria-label="Previous month">‹</button><div class="month-title">${first.toLocaleDateString(undefined,{month:'long',year:'numeric'})}</div><button class="btn sec sm" data-act="calendar-next" aria-label="Next month">›</button></div><div class="month-grid">${['S','M','T','W','T','F','S'].map(x=>`<div class="month-week">${x}</div>`).join('')}${cells.join('')}</div><div id="calendar-day-detail" class="sub" style="margin-top:10px">Select a date to view completion details.</div>`;
+}
+function showCalendarDay(date) {
+  const done = S.me?.done || {}, c = S.chal; if (!c) return;
+  const completed = c.targets.filter(t => t.daily ? done[`${t.id}@${date}`] : done[t.id] === date || (done[t.id] && done[t.id] <= date));
+  const detail = $('calendar-day-detail'); if (!detail) return;
+  detail.innerHTML = `<b>${esc(fmtLong(date))}</b> · ${completed.length} completed ${completed.length === 1 ? 'task' : 'tasks'}${completed.length ? `<div class="group" style="margin-top:8px">${completed.map(t=>`<div class="li"><span class="grow">${esc(t.text)}</span><span class="p">+${t.points}</span></div>`).join('')}</div>` : '<div>No task completions recorded for this date.</div>'}`;
+}
+
 function renderBoard() {
   const list = sorted(), top = Math.max(1, list[0]?.points || 0);
   $('pane-board').innerHTML = `<div class="lbl">Standings</div>` + (list.length ? `<div class="group">` + list.map((m, i) => `<div class="li ${i === 0 ? 'lead' : ''}">
@@ -1272,6 +1294,8 @@ document.addEventListener('click', e => {
   else if (a === 'pane') setPane(b.dataset.p);
   else if (a === 'open') openChallenge(b.dataset.code);
   else if (a === 'toggle') toggle(b.dataset.id);
+  else if (a === 'calendar-prev' || a === 'calendar-next') { S.calendarMonth += a === 'calendar-prev' ? -1 : 1; if (S.calendarMonth < 0) { S.calendarMonth = 11; S.calendarYear--; } if (S.calendarMonth > 11) { S.calendarMonth = 0; S.calendarYear++; } renderProgress(); }
+  else if (a === 'calendar-day') showCalendarDay(b.dataset.date);
   else if (a === 'join') join($('join-code').value);
   else if (a === 'add-target') addTarget();
   else if (a === 'rm-draft') { S.draft.splice(+b.dataset.i, 1); renderDraft(); }
