@@ -1,0 +1,102 @@
+name: ChatGPT Repository Automation
+
+on:
+  # Allows you to trigger this workflow manually via the GitHub UI
+  workflow_dispatch:
+  # Alternately, triggers when a specific comment like "/gpt-fix" is made on a PR
+  issue_comment:
+    types: [created]
+
+# CRITICAL: Grant the GITHUB_TOKEN full write access to modify code, push branches, and manage PRs
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  ai-modify-code:
+    # Run only if triggered manually OR via a specific comment on a Pull Request
+    if: |
+      github.event_name == 'workflow_dispatch' || 
+      (github.event.issue.pull_request && contains(github.event.comment.body, '/gpt-fix'))
+    
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Check out the repository files into the environment
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetches full history for proper branch pushing
+
+      # 2. Set up a Python environment to run your API script
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      # 3. Install necessary dependencies (like OpenAI SDK)
+      - name: Install dependencies
+        run: |
+          pip install openai
+
+      # 4. Execute the script where ChatGPT analyzes and rewrites/modifies files
+      - name: Run ChatGPT Code Modification Script
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} # Set this in your Repo Settings -> Secrets
+        run: |
+          python -c "
+          import os
+          from openai import OpenAI
+
+          client = OpenAI(api_key=os.environ['OPENAI_API_KEY'])
+          
+          # Example task: Reading a file to let ChatGPT modify it
+          with open('src/app.js', 'r') as file:
+              current_code = file.read()
+
+          response = client.chat.completions.create(
+              model='gpt-4o',
+              messages=[
+                  {'role': 'system', 'content': 'You are an automated refactoring bot. Fix bugs or optimize the provided code.'},
+                  {'role': 'user', 'content': current_code}
+              ]
+          )
+          
+          # Overwriting the file with ChatGPT's modifications
+          new_code = response.choices[0].message.content
+          with open('src/app.js', 'w') as file:
+              file.write(new_code)
+          print('Code successfully modified by ChatGPT.')
+          "
+
+      # 5. Configure Git credentials so the action runner can push modifications
+      - name: Configure Git Credentials
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      # 6. Push modifications or pull request updates back to GitHub
+      - name: Commit and Push Changes
+        run: |
+          # Create a new unique branch for the AI changes
+          BRANCH_NAME="chatgpt-refactor-${{ github.run_id }}"
+          git checkout -b $BRANCH_NAME
+          
+          # Stage and commit the modifications
+          git add .
+          git commit -m "style: automated code optimization by ChatGPT"
+          
+          # Push the branch back to the repository using the default token
+          git push origin $BRANCH_NAME
+
+      # 7. (Optional) Create a Pull Request for human review using GitHub CLI
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --title "AI Optimization: Code Updates" \
+            --body "This pull request contains automated adjustments provided by ChatGPT." \
+            --base main \
+            --head "chatgpt-refactor-${{ github.run_id }}"
