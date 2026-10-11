@@ -1,5 +1,7 @@
 # Challenge Room — Google-only build
 
+- Android/browser back navigation: the device back button returns through the previous in-app screen or challenge pane instead of immediately leaving the site. The top-left Back control follows the same navigation history.
+
 ## Included fixes
 - Added a **Log out** button under Profile → Settings.
 - Waits for Firebase's authentication state on page load before showing either the app or the login screen, preventing the login page from flashing on reload for a signed-in user.
@@ -57,3 +59,11 @@ Challenge owners can open a challenge and choose **Edit challenge** to update it
 - The manifest now includes 192×192 and 512×512 PNG icons in addition to the SVG icon, and the service worker caches the app shell and icons.
 - The Profile → Settings → **Install** action invokes Chrome's install prompt when the browser offers it. If no prompt appears, open the HTTPS GitHub Pages URL directly in Chrome, refresh after deployment, and use Chrome ⋮ → **Install app** or **Add to Home screen**. Some browsers only offer Add to Home Screen and do not expose the install prompt event.
 - The app must be served over HTTPS (GitHub Pages is HTTPS). A local `file://` copy is not installable as a PWA. If Chrome still does not offer installation, inspect the page's manifest/service-worker status in Chrome DevTools → Application; check for failed manifest/icon requests and ensure the service worker has activated.
+
+## Temporary friend progress sharing (10-minute access)
+- In a challenge's **Board** pane, tap **Request progress** beside a friend. The friend can accept or decline from **Profile → Progress access requests**.
+- On acceptance, a snapshot of that one challenge's tasks, completion data, points, and journal notes is stored in `temporaryProgressShares` for 10 minutes. The requester can view it from their Profile panel while it remains valid. Expired snapshots are rejected by the app and clients attempt to delete expired documents when the panel is refreshed.
+- Requests are stored in `progressAccessRequests`; requests expire after 24 hours if unanswered.
+- **Firebase note:** client-side cleanup is best-effort; it cannot guarantee server deletion at exactly 10 minutes if nobody opens the app again. For automatic server cleanup, configure Firestore TTL on the numeric `expiresAt` field after changing it to a Firestore Timestamp, or use a scheduled Cloud Function. TTL deletion is asynchronous, so the app still enforces the expiration timestamp before showing data. If using numeric milliseconds as in this build, Firestore TTL will not work until `expiresAt` is stored as a Timestamp.
+- Firestore rules must explicitly restrict access to these collections so only the requester and target can read/write the matching request, and only the approved viewer and owner can read a temporary share. Do not use open/public rules. The app reports a permissions message if your current rules don't permit these operations.
+- This feature stores a temporary copy only for the selected challenge; it does not create a permanent friend data archive. Review shared journal notes before approving if you don't want them included.

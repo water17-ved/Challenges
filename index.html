@@ -101,12 +101,37 @@ body.auth-pending .view{display:none!important}
 body.auth-required nav,body.auth-required #top-av{display:none!important}
 body.auth-required .view:not(#view-login){display:none!important}
 .login-wrap{padding-top:min(12vh,72px)}.login-mark{width:64px;height:64px;border-radius:18px;background:linear-gradient(145deg,#5B8DEF,#7C5CFA);display:grid;place-items:center;margin:0 0 22px;box-shadow:0 12px 30px #0004}.login-mark svg{width:38px;height:38px}.google-btn{background:#fff;color:#202124;border-color:#dadce0;font-weight:800}.google-btn svg{width:20px;height:20px;flex:none}.login-card{margin-top:24px;background:var(--s1);border:1px solid var(--line);border-radius:16px;padding:18px}.tracker-link{display:flex;align-items:center;gap:12px;margin-top:18px;padding:14px;border:1px solid var(--line);border-radius:13px;background:var(--s1);text-decoration:none;color:var(--tx)}.tracker-logo{width:46px;height:46px;flex:none}.tracker-link .meta{font-size:13px;color:var(--mut);margin-top:2px}.tracker-link .arrow{margin-left:auto;color:var(--mut);font-size:22px}
+/* Responsive fit: keep the entire app within the phone viewport, even with long labels/cards. */
+html{width:100%;max-width:100%;overflow-x:hidden;}
+body{width:100%;max-width:100%;overflow-x:hidden;}
+.app,.top-in,main,section.view{width:100%;min-width:0;max-width:520px;}
+.view *,.pane *{min-width:0;}
+.stats{grid-template-columns:repeat(2,minmax(0,1fr));}
+.stat{min-width:0;padding:clamp(10px,3.5vw,14px);overflow-wrap:anywhere;}
+.stat b{font-size:clamp(24px,7vw,28px);}
+.stat span{display:block;line-height:1.35;overflow-wrap:anywhere;}
+.btns{min-width:0;}
+.btns>.btn{min-width:0;white-space:normal;overflow-wrap:anywhere;}
+.row{min-width:0;}
+.group,.hub-card,.market-card,.li{min-width:0;max-width:100%;}
+img,svg,video,canvas{max-width:100%;}
+@media(max-width:380px){
+ .app{padding-left:12px;padding-right:12px;}
+ .top-in{padding-left:12px;padding-right:12px;}
+ h1{font-size:23px;}
+ .stats{gap:8px;}
+ .stat{padding:10px;}
+ .stat span{font-size:12px;}
+ .btns{gap:8px;}
+ .btns .btn{padding:11px 8px;font-size:14px;}
+ .seg button{font-size:12px;}
+}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 <header class="top"><div class="top-in">
-  <button class="back" id="back" data-act="view" data-v="home" aria-label="Back to Home"><svg class="i" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Home</button>
+  <button class="back" id="back" data-act="back" aria-label="Go back"><svg class="i" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Back</button>
   <div class="brand">Challenge Room</div>
   <button class="avatar me" id="top-av" data-act="view" data-v="profile" aria-label="Open profile">?</button>
 </div></header>
@@ -225,6 +250,10 @@ body.auth-required .view:not(#view-login){display:none!important}
     <div class="row"><input id="p-name" maxlength="20" aria-label="Display name" autocomplete="off"><button class="btn sm" data-act="profile-save">Save</button></div>
     <div class="lbl">Summary</div>
     <div class="group" id="p-stats"></div>
+    <div class="lbl">Progress access requests</div>
+    <p class="sub">Approve a friend to view one challenge for 10 minutes. Shared snapshots are temporary and automatically cleaned up when possible.</p>
+    <div class="group" id="progress-access-panel"><div class="li"><div class="grow">Loading requests…</div></div></div>
+    <button class="btn sec" style="margin-top:8px" data-act="refresh-progress-access">Refresh access requests</button>
     <div class="lbl">Settings</div>
     <div class="group">
       <div class="li"><div class="grow"><b>Install on your phone</b><div class="meta" id="install-status">Install Challenge Room as an app.</div></div><button class="btn sec sm" data-act="install-app">Install</button></div>
@@ -504,6 +533,65 @@ async function ensureMember(code) {
   const ref = doc(db, 'challenges', code, 'members', S.uid);
   if (!(await getDoc(ref)).exists()) await setDoc(ref, { name: S.name, photo: S.photo || '', about: S.about || '', points: 0, done: {}, notes: {}, joinedAt: serverTimestamp(), updatedAt: serverTimestamp() });
 }
+const SHARE_TTL_MS = 10 * 60 * 1000;
+function cleanShareData(data) {
+  const now = Date.now();
+  return { ...data, expiresAt: now + SHARE_TTL_MS };
+}
+async function requestProgressAccess(targetUid, targetName, code) {
+  if (DEMO) return demoMsg();
+  if (!S.uid || !targetUid || targetUid === S.uid) return toast('Choose another member.');
+  try {
+    const existing = await getDocs(query(collection(db, 'progressAccessRequests'), where('requesterUid', '==', S.uid), where('targetUid', '==', targetUid), where('challengeCode', '==', code), where('status', '==', 'pending')));
+    if (!existing.empty) return toast('Request already sent.');
+    const ref = doc(collection(db, 'progressAccessRequests'));
+    await setDoc(ref, { requesterUid:S.uid, requesterName:S.name || 'Friend', targetUid, targetName:targetName || 'Friend', challengeCode:code, challengeTitle:S.chal?.title || 'Challenge', status:'pending', createdAt:Date.now(), expiresAt:Date.now()+24*60*60*1000 });
+    toast('Progress access request sent.');
+  } catch (e) { console.error(e); toast('Could not send request. Check Firestore rules.'); }
+}
+async function decideProgressRequest(id, accept) {
+  if (DEMO) return demoMsg();
+  try {
+    const rr = doc(db, 'progressAccessRequests', id), snap = await getDoc(rr);
+    if (!snap.exists()) return toast('Request has expired.');
+    const r = snap.data();
+    if (r.targetUid !== S.uid || r.expiresAt < Date.now()) return toast('This request is no longer valid.');
+    if (!accept) { await updateDoc(rr, {status:'declined', decidedAt:Date.now()}); toast('Request declined.'); return loadProgressAccess(); }
+    const ms = await getDoc(doc(db,'challenges',r.challengeCode,'members',S.uid));
+    const cs = await getDoc(doc(db,'challenges',r.challengeCode));
+    if (!ms.exists() || !cs.exists()) return toast('Your challenge data is unavailable.');
+    const m=ms.data(), c=cs.data(), expiresAt=Date.now()+SHARE_TTL_MS;
+    const share = { requestId:id, challengeCode:r.challengeCode, challengeTitle:c.title||r.challengeTitle, ownerUid:S.uid, ownerName:S.name||m.name||'Friend', viewerUid:r.requesterUid, viewerName:r.requesterName, points:Number(m.points)||0, done:m.done||{}, notes:m.notes||{}, targets:(c.targets||[]).map(t=>({id:t.id,text:t.text,subject:t.subject||'',chapter:t.chapter||'',topic:t.topic||'',frequency:t.frequency|| (t.daily?'daily':'once'),points:t.points||0})), createdAt:Date.now(), expiresAt };
+    await setDoc(doc(db,'temporaryProgressShares',id),share);
+    await updateDoc(rr,{status:'accepted',shareId:id,decidedAt:Date.now(),expiresAt});
+    toast('Access granted for 10 minutes.'); await loadProgressAccess();
+  } catch(e) { console.error(e); toast('Could not update access. Check Firestore rules.'); }
+}
+async function loadProgressAccess() {
+  const el=$('progress-access-panel'); if(!el) return;
+  if(DEMO || !S.uid) { el.innerHTML='<div class="li"><div class="grow">Sign in to manage progress sharing.</div></div>'; return; }
+  el.innerHTML='<div class="li"><div class="grow">Loading requests…</div></div>';
+  try {
+    const [incoming,outgoing,sharedToMe]=await Promise.all([
+      getDocs(query(collection(db,'progressAccessRequests'),where('targetUid','==',S.uid))),
+      getDocs(query(collection(db,'progressAccessRequests'),where('requesterUid','==',S.uid))),
+      getDocs(query(collection(db,'temporaryProgressShares'),where('viewerUid','==',S.uid)))
+    ]);
+    const now=Date.now(), rows=[];
+    for(const d of incoming.docs){const r=d.data(); if(r.expiresAt && r.expiresAt<now){try{await deleteDoc(d.ref)}catch{};continue;} if(r.status==='pending') rows.push(`<div class="li"><div class="grow"><b>${esc(r.requesterName||'Friend')}</b><div class="meta">Wants to view ${esc(r.challengeTitle||'a challenge')}</div></div><button class="btn sm" data-act="progress-accept" data-id="${esc(d.id)}">Accept</button><button class="btn sec sm" data-act="progress-decline" data-id="${esc(d.id)}">Decline</button></div>`); }
+    for(const d of outgoing.docs){const r=d.data(); if(r.status==='pending' && (!r.expiresAt||r.expiresAt>now)) rows.push(`<div class="li"><div class="grow"><b>Request to ${esc(r.targetName||'friend')}</b><div class="meta">${esc(r.challengeTitle||'Challenge')} · Pending</div></div></div>`); }
+    for(const d of sharedToMe.docs){const sh=d.data(); if(sh.expiresAt>now) rows.push(`<div class="li"><div class="grow"><b>${esc(sh.ownerName||'Friend')} · ${esc(sh.challengeTitle||'Challenge')}</b><div class="meta">Temporary access · ${Math.max(1,Math.ceil((sh.expiresAt-now)/60000))} min left</div></div><button class="btn sm" data-act="view-shared-progress" data-id="${esc(d.id)}">View</button></div>`); else {try{await deleteDoc(d.ref)}catch{}} }
+    el.innerHTML=rows.length?rows.join(''):'<div class="li"><div class="grow">No active progress requests or shares.</div></div>';
+  } catch(e){ console.error(e); el.innerHTML='<div class="li"><div class="grow">Could not load requests. Update Firestore rules for progressAccessRequests and temporaryProgressShares.</div></div>'; }
+}
+async function viewSharedProgress(id) {
+  try { const s=await getDoc(doc(db,'temporaryProgressShares',id)); if(!s.exists()) return toast('This temporary share has expired.'); const x=s.data(); if(x.viewerUid!==S.uid || x.expiresAt<=Date.now()){try{await deleteDoc(doc(db,'temporaryProgressShares',id))}catch{};return toast('This temporary share has expired.');}
+    const total=x.targets.length, done=Object.keys(x.done||{}).length;
+    const lines=x.targets.map(t=>{const keys=Object.keys(x.done||{}).filter(k=>k===t.id||k.startsWith(t.id+'@'));const completed=keys.length>0;return `<div class="li"><div class="grow"><b>${esc(t.text||'Task')}</b><div class="meta">${esc([t.subject,t.chapter,t.topic].filter(Boolean).join(' · '))}</div></div><span class="badge ${completed?'live':''}">${completed?'Completed':'Pending'}</span></div>`}).join('');
+    const notes=Object.entries(x.notes||{}).map(([d,n])=>`<div class="li"><div class="grow"><b>${esc(d)}</b><div style="white-space:pre-wrap">${esc(n)}</div></div></div>`).join('');
+    const el=$('progress-access-panel'); el.innerHTML=`<div class="li"><div class="grow"><b>${esc(x.ownerName)} · ${esc(x.challengeTitle)}</b><div class="meta">${x.points} points · ${total} tasks · Expires in ${Math.max(1,Math.ceil((x.expiresAt-Date.now())/60000))} min</div></div><button class="btn sec sm" data-act="refresh-progress-access">Back</button></div><div class="lbl">Tasks</div>${lines||'<p class="sub">No tasks included.</p>'}<div class="lbl">Journal history</div>${notes||'<p class="sub">No notes shared.</p>'}`;
+  } catch(e){console.error(e);toast('Could not open shared progress.');}
+}
 async function saveMe(fields) {
   if (DEMO) { S.me = { ...S.me, ...fields }; demoSync(); return; }
   if (!S.me) await ensureMember(S.chal.id);
@@ -666,10 +754,10 @@ async function share(code) {
   if (navigator.share) { try { await navigator.share({ title: 'Challenge Room', text, url }); } catch {} return; }
   copy(url, 'Link copied');
 }
-function openChallenge(code) { if (code !== S.active || !S.chal) watch(code); S.pane = 'quests'; setView('challenge'); }
+function openChallenge(code) { const wasChallenge = S.view === 'challenge', previousCode = S.active; if (code !== S.active || !S.chal) watch(code); if (wasChallenge && previousCode !== code) history.pushState({ crApp: true, view: 'challenge', pane: 'quests', modal: null }, '', location.href); S.pane = 'quests'; setView('challenge'); }
 
 /* ---------- name ---------- */
-function openName() { $('name-input').value = S.name; $('name-modal').classList.add('on'); setTimeout(() => $('name-input').focus(), 50); }
+function openName() { $('name-input').value = S.name; if (!$('name-modal').classList.contains('on')) { history.pushState({ ...(history.state || {}), crApp: true, view: S.view, pane: S.pane, modal: 'name' }, '', location.href); } $('name-modal').classList.add('on'); setTimeout(() => $('name-input').focus(), 50); }
 function applyName(v) {
   S.name = v; ls.set('cr_name', v);
   if (DEMO) { demoSync(); return; }
@@ -818,27 +906,58 @@ async function googleExistingLogin() {
 
 function saveName() {
   const v = $('name-input').value.trim(); if (!v) return toast('Enter a name.');
-  const first = !S.name; $('name-modal').classList.remove('on'); applyName(v); if (first) afterName();
+  const first = !S.name; $('name-modal').classList.remove('on'); if (history.state?.modal === 'name') history.replaceState({ ...history.state, modal: null }, '', location.href); applyName(v); if (first) afterName();
 }
 function saveProfile() { const v = $('p-name').value.trim(); if (!v) return toast('Enter a name.'); applyName(v); toast('Name saved'); }
 
 /* ---------- views ---------- */
 const TAB = { home: 'home', join: 'home', create: 'challenge', edit: 'challenge', 'create-mega': 'challenge', 'challenge-hub': 'challenge', 'challenge-market': 'challenge', 'challenge-mine': 'challenge', challenge: 'challenge', activity: 'activity', ai: 'ai', profile: 'profile' };
-function setView(v) {
+function paintView(v, scroll = true) {
   S.view = v;
   document.querySelectorAll('.view').forEach(el => el.classList.toggle('on', el.id === 'view-' + v));
   document.querySelectorAll('nav button').forEach(b => b.dataset.v === TAB[v] ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'));
-  $('back').classList.toggle('on', v === 'join' || v === 'create' || v === 'create-mega' || v === 'edit');
+  $('back').classList.toggle('on', v === 'join' || v === 'create' || v === 'create-mega' || v === 'edit' || v === 'challenge' || v === 'challenge-hub' || v === 'challenge-market' || v === 'challenge-mine' || v === 'activity' || v === 'ai' || v === 'profile');
   if (v === 'home' || v === 'challenge-mine' || v === 'create-mega') loadMeta();
   if (v === 'create-mega') renderMegaPicksCreate();
   if (v === 'challenge-market') loadMarket();
-  renderAll(); window.scrollTo(0, 0);
+  renderAll(); if (scroll) window.scrollTo(0, 0);
 }
-function setPane(p) {
+function setView(v, opts = {}) {
+  if (!opts.fromPop && v !== S.view) history.pushState({ crApp: true, view: v, pane: S.pane, modal: null }, '', location.href);
+  paintView(v, opts.scroll !== false);
+  if (!opts.fromPop && history.state?.crApp) history.replaceState({ ...history.state, view: S.view, pane: S.pane }, '', location.href);
+}
+function setPane(p, opts = {}) {
+  if (!opts.fromPop && p !== S.pane && S.view === 'challenge') history.pushState({ crApp: true, view: S.view, pane: p, modal: null }, '', location.href);
   S.pane = p;
   document.querySelectorAll('.pane').forEach(el => el.classList.toggle('on', el.id === 'pane-' + p));
   document.querySelectorAll('#seg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.p === p)));
 }
+function goBack() {
+  if ($('name-modal').classList.contains('on')) { history.back(); return; }
+  if (history.state?.crApp && (history.state.view !== 'home' || history.state.pane !== 'quests')) { history.back(); return; }
+  if (S.view !== 'home') { setView('home'); return; }
+  // On the home screen, let the browser/app close normally.
+  history.back();
+}
+window.addEventListener('popstate', e => {
+  const st = e.state;
+  if (st?.crApp) {
+    if (st.modal === 'name') { $('name-modal').classList.add('on'); }
+    else $('name-modal').classList.remove('on');
+    const targetView = document.body.classList.contains('auth-required') ? 'login' : (st.view || 'home');
+    paintView(targetView, true);
+    if (st.pane) setPane(st.pane, { fromPop: true });
+    if (history.state?.crApp && history.state.view !== targetView) history.replaceState({ ...history.state, view: targetView }, '', location.href);
+  } else {
+    // Keep the app's home state as a safe fallback if the browser returns to an entry
+    // created before the app's internal navigation history.
+    if (S.view !== 'home' || $('name-modal').classList.contains('on')) {
+      $('name-modal').classList.remove('on'); paintView(document.body.classList.contains('auth-required') ? 'login' : 'home');
+      history.replaceState({ crApp: true, view: S.view, pane: S.pane, modal: null }, '', location.href);
+    }
+  }
+});
 const empty = (h, p) => `<div class="empty"><b>${h}</b>${p}</div>`;
 function renderAll() { renderTop(); renderHome(); renderChallenge(); renderActivity(); renderProfile(); setPane(S.pane); }
 function renderTop() { const a = $('top-av'); a.innerHTML = S.photo ? `<img src="${esc(S.photo)}" alt="Profile" onerror="this.remove();this.parentElement.textContent='${esc(ini(S.name))}'">` : esc(ini(S.name)); }
@@ -959,7 +1078,7 @@ function renderBoard() {
   $('pane-board').innerHTML = `<div class="lbl">Standings</div>` + (list.length ? `<div class="group">` + list.map((m, i) => `<div class="li ${i === 0 ? 'lead' : ''}">
     <div class="rk">${i + 1}</div>${m.photo ? `<div class="avatar ${m.id === S.uid ? 'me' : ''}" style="padding:0"><img src="${esc(m.photo)}" alt="" onerror="this.remove()"></div>` : `<div class="avatar ${m.id === S.uid ? 'me' : ''}">${esc(ini(m.name))}</div>`}
     <div class="grow"><b>${esc(m.name || 'Player')}${m.id === S.uid ? ' (you)' : ''}</b>${m.about ? `<div class="meta">${esc(m.about)}</div>` : ''}<div class="mini"><i style="width:${Math.round((m.points || 0) / top * 100)}%"></i></div></div>
-    <div class="pts">${m.points || 0}</div></div>`).join('') + '</div>' : empty('No players yet', 'Share the code to get friends in.'));
+    <div class="pts">${m.points || 0}</div>${m.id !== S.uid ? `<button class="btn sec sm" data-act="request-progress" data-uid="${esc(m.id)}" data-name="${esc(m.name||'Friend')}">Request progress</button>` : ''}</div>`).join('') + '</div>' : empty('No players yet', 'Share the code to get friends in.'));
 }
 function renderJournal() {
   const hist = $('journal-hist'), ta = $('j-text'), notes = S.me?.notes || {}, done = S.me?.done || {};
@@ -1005,6 +1124,7 @@ function renderProfile() {
   const hosted = Object.values(S.meta).filter(x => x && x.owner === S.uid).length;
   const row = (a, b) => `<div class="li"><div class="grow">${a}</div><b>${b}</b></div>`;
   $('p-stats').innerHTML = row('Challenges joined', S.mine.length) + row('Challenges you host', hosted) + row('Points in current challenge', S.me?.points || 0) + row('Current streak', streak(S.me?.done || {}));
+  if (!S._accessLoading) { S._accessLoading = true; loadProgressAccess().finally(()=>{ S._accessLoading=false; }); }
 }
 async function loadMarket() {
   const el = $('market-list'); if (!el) return;
@@ -1166,6 +1286,11 @@ document.addEventListener('click', e => {
   else if (a === 'mega-branch') S.mine.some(m => m.code === b.dataset.code) ? openChallenge(b.dataset.code) : join(b.dataset.code);
   else if (a === 'share') share(b.dataset.code);
   else if (a === 'save-note') saveNote();
+  else if (a === 'request-progress') requestProgressAccess(b.dataset.uid,b.dataset.name,S.active);
+  else if (a === 'progress-accept') decideProgressRequest(b.dataset.id,true);
+  else if (a === 'progress-decline') decideProgressRequest(b.dataset.id,false);
+  else if (a === 'view-shared-progress') viewSharedProgress(b.dataset.id);
+  else if (a === 'refresh-progress-access') loadProgressAccess();
   else if (a === 'toggle-live') toggleLive();
   else if (a === 'delete') removeChallenge();
   else if (a === 'leave') leave();
@@ -1203,6 +1328,7 @@ window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferr
 window.addEventListener('appinstalled', () => { deferredInstallPrompt = null; const el = $('install-status'); if (el) el.textContent = 'Installed on this device.'; toast('Challenge Room installed.'); });
 
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js', {scope:'./'}).then(reg => { if (reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'}); }).catch(err => { console.warn('Service worker registration failed:', err); const el = $('install-status'); if (el) el.textContent = 'Install unavailable: service worker registration failed. Refresh the site and try again.'; }));
+history.replaceState({ crApp: true, view: S.view, pane: S.pane, modal: null }, '', location.href);
 document.body.classList.add('auth-pending');
 start();
 </script>
