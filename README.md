@@ -68,11 +68,13 @@ Challenge owners can open a challenge and choose **Edit challenge** to update it
 - Firestore rules must explicitly restrict access to these collections so only the requester and target can read/write the matching request, and only the approved viewer and owner can read a temporary share. Do not use open/public rules. The app reports a permissions message if your current rules don't permit these operations.
 - This feature stores a temporary copy only for the selected challenge; it does not create a permanent friend data archive. Review shared journal notes before approving if you don't want them included.
 
+## Daily Report (Activities)
+The Activities view now includes a local-first Daily Study Report for Physics, Chemistry, and Mathematics.
+- Add multiple subject sessions; each starts as **Questions** and cycles by tapping the session-type control: Questions → Revision → Notes Making → Questions.
+- Each session supports optional start/end times, topic/notes, and manual test score. Questions sessions additionally support questions solved and correct/attempted counts for calculated accuracy.
+- Optional per-subject question targets count only Questions sessions. Optional study-hour targets compare against timed work of all session types.
+- Drafts are stored in browser localStorage as you type. Use **Save / Update Report** to mark a date as saved in the calendar. **Copy Today's Report** copies a WhatsApp-formatted summary of the selected report to the clipboard; it does not send messages automatically.
+- Use the calendar to open saved dates and edit reports. All Daily Report data is stored on the device and is not written to Firebase. Clearing browser/site data can remove it.
 
-## Chrome Android install fix (v17)
-- The manifest `start_url` and `id` now resolve to the app directory (`./`) rather than `./index.html`, which helps Chrome open the GitHub Pages project at its deployed subpath. `scope` remains `./`.
-- The 192px and 512px PNG icons are declared for `any maskable` use; the SVG remains an ordinary icon.
-- The service worker cache is versioned to `challenge-room-v17`. It uses scope-resolved URLs and only falls back to the app shell for navigation requests, never returning HTML as a manifest or image.
-- After deploying, open `https://water17-ved.github.io/Challenges/` in Chrome, refresh, wait a few seconds, then try Chrome ⋮ → Install app. If an old broken shortcut already exists, remove it first and install again.
-- If Chrome still says “Could not open app”, clear site storage for `water17-ved.github.io` (this can sign you out or remove local-only settings), reopen the site, refresh twice, and retry. Do not clear storage unless you have a backup and know your login.
-- The update preserves the existing Firebase configuration and app UI. Live Android installation cannot be confirmed from this build environment.
+## Daily Report validation
+The inline JavaScript passes `node --check`. This package has not been tested against the live Firebase project or deployed GitHub Pages site from this environment.
