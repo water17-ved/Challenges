@@ -137,6 +137,17 @@ img,svg,video,canvas{max-width:100%;}
 .daily-subject{border:1px solid var(--line);border-radius:12px;padding:12px;margin:12px 0}.daily-subject h3{font-size:15px;margin:0 0 10px}.daily-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.daily-field{min-width:0}.daily-field label{display:block;font-size:12px;color:var(--mut);margin:0 0 4px}.daily-field input,.daily-field textarea{margin:0;min-width:0}.daily-time-row{display:flex;gap:6px;align-items:center}.daily-time-row input{flex:1;width:0;min-width:0}.daily-period{flex:0 0 54px;width:54px!important;padding:8px 6px!important;font-weight:700}.daily-field textarea{min-height:62px;resize:vertical}.daily-session{border:1px solid var(--line);border-radius:10px;padding:10px;margin:10px 0;background:var(--bg)}.daily-session-top{display:flex;align-items:center;gap:8px;margin-bottom:10px}.daily-session-top strong{flex:1;font-size:13px}.daily-type{width:auto;padding:8px 10px;font-size:12px;background:var(--s2);color:var(--tx);border-color:var(--line)}.daily-session .btn{width:auto;padding:7px 10px;font-size:12px}.daily-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.daily-actions .btn{font-size:13px;padding:11px 8px}.daily-actions .wide{grid-column:1/-1}.daily-progress{font-size:12px;color:var(--mut);margin-top:8px;line-height:1.5}.daily-calendar{margin-top:16px;border-top:1px solid var(--line);padding-top:12px}.daily-cal-day{min-height:39px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--tx);font-size:12px;padding:4px 0}.daily-cal-day.saved{border-color:var(--ok)}.daily-cal-day.selected{background:rgba(91,141,239,.22);border-color:var(--acc)}.daily-cal-day.blank{visibility:hidden}.daily-history-note{font-size:12px;color:var(--mut);margin-top:8px}
 @media(max-width:360px){.daily-grid{grid-template-columns:1fr}.daily-actions{grid-template-columns:1fr}.daily-actions .wide{grid-column:auto}}
 
+
+button.stat{text-align:left;color:inherit;width:100%;cursor:pointer}
+.megabtn{border-color:var(--acc)}.megabtn b{color:var(--acc);font-size:clamp(20px,6vw,24px)!important}
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.pill{font-size:12px;font-weight:700;padding:2px 8px;border-radius:6px;background:var(--s2);color:var(--mut)}
+.folder-head .fico{flex:none;width:36px;height:36px;display:grid;place-items:center;border-radius:10px;background:var(--s2);color:var(--acc)}
+.folder .chev{transition:transform .2s}.folder.open .folder-head .chev{transform:rotate(90deg)}
+.folder-body{margin-left:14px;border-left:2px solid var(--acc)}.folder-body .li{background:rgba(255,255,255,.015)}
+.today-head{display:flex;align-items:baseline;gap:6px;margin:14px 0 6px}.today-head b{font-size:15px}.today-head .cnt{margin-left:auto;font-weight:800;color:var(--acc);font-size:14px}
+.mega-card{background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:14px}
+.mega-card .mrow{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--mut);margin-top:12px}.mega-card .mrow b{color:inherit}
+.mega-card .group{margin-top:12px}
 </style>
 </head>
 <body>
@@ -171,6 +182,7 @@ img,svg,video,canvas{max-width:100%;}
     <div class="hub-actions">
       <button class="hub-card" data-act="view" data-v="challenge-market"><span class="hub-icon">⌕</span><span class="grow"><b>Challenge Market</b><small>Discover public challenges and join a study mission.</small></span><span>›</span></button>
       <button class="hub-card" data-act="view" data-v="challenge-mine"><span class="hub-icon">⚑</span><span class="grow"><b>My Challenges</b><small>Open your challenges, create a new one, or build a mega challenge.</small></span><span>›</span></button>
+      <button class="hub-card" data-act="view" data-v="challenge-mega"><span class="hub-icon">✦</span><span class="grow"><b>Mega Challenges</b><small>See daily and one-time tasks done per total for every challenge inside each mega.</small></span><span>›</span></button>
     </div>
   </section>
   <section class="view" id="view-challenge-market">
@@ -184,6 +196,12 @@ img,svg,video,canvas{max-width:100%;}
     <div id="mine-list" style="margin-top:16px"></div>
   </section>
 
+  <section class="view" id="view-challenge-mega">
+    <h1>Mega Challenges</h1><p class="sub">Each mega challenge with the daily and one-time tasks you have done out of the total.</p>
+    <div class="btns"><button class="btn" data-act="view" data-v="create-mega">✦ Create mega challenge</button></div>
+    <div id="mega-hub-list"></div>
+  </section>
+
   <section class="view" id="view-home">
     <h1 id="home-h">Hello</h1>
     <p class="sub">Here is where your challenges stand.</p>
@@ -192,6 +210,7 @@ img,svg,video,canvas{max-width:100%;}
       <button class="btn" data-act="view" data-v="create">New challenge</button>
       <button class="btn sec" data-act="view" data-v="join">Join with code</button>
     </div>
+    <div id="home-today"></div>
     <div class="lbl">Your challenges</div>
     <div id="home-list"></div>
   </section>
@@ -390,7 +409,7 @@ async function copy(text, ok) { try { await navigator.clipboard.writeText(text);
 /* ---------- state ---------- */
 const S = {
   uid: null, name: ls.get('cr_name', ''), mine: ls.get('cr_mine', []), active: ls.get('cr_active', ''),
-  chal: null, me: null, members: [], unsubs: [], draft: [], editTargets: [], editCode: '', view: 'home', pane: 'quests', meta: {},
+  chal: null, me: null, members: [], unsubs: [], done: {}, expanded: ls.get('cr_open', {}), draft: [], editTargets: [], editCode: '', view: 'home', pane: 'quests', meta: {},
   pendingCode: new URLSearchParams(location.search).get('c'),
   photo: ls.get('cr_photo', ''), about: ls.get('cr_about', ''), calendarMonth: new Date().getMonth(), calendarYear: new Date().getFullYear()
 };
@@ -439,7 +458,7 @@ function loadDemo() {
   DEMO_DB.DEMO77 = mkDemo('DEMO77', 'Physics PYQ sprint', 'Two weeks, one chapter a day.', 3, 17, true, 0);
   DEMO_DB.DEMO11 = mkDemo('DEMO11', 'September revision', 'Wrapped up last month.', -40, -12, true, 1);
   S.mine = Object.values(DEMO_DB).map(d => ({ code: d.chal.id, title: d.chal.title }));
-  S.mine.forEach(m => S.meta[m.code] = metaOf(DEMO_DB[m.code].chal));
+  S.mine.forEach(m => { S.meta[m.code] = metaOf(DEMO_DB[m.code].chal); S.done[m.code] = DEMO_DB[m.code].me?.done || {}; });
   $('demo-note').hidden = false; $('demo-exit').hidden = location.protocol === 'file:';
   watchDemo('DEMO42');
 }
@@ -447,11 +466,11 @@ function watchDemo(code) {
   const d = DEMO_DB[code]; S.active = code; S.chal = d.chal; S.me = d.me; demoSync();
 }
 function demoSync() {
-  const d = DEMO_DB[S.active]; d.me = S.me; S.me.name = S.name;
+  const d = DEMO_DB[S.active]; d.me = S.me; S.me.name = S.name; S.done[S.active] = S.me.done || {};
   S.members = [...d.others, { id: 'me', ...S.me }]; renderAll();
 }
 const demoMsg = () => toast('Demo mode. Open the hosted site to do this.');
-const metaOf = c => ({ title: c.title, startDate: c.startDate, endDate: c.endDate, live: c.live, n: (c.targets || []).length, owner: c.ownerUid, challengeType: c.challengeType || 'standard', childChallenges: c.childChallenges || [], desc: c.desc || '' });
+const metaOf = c => ({ targets: (c.targets || []).map(g => ({ id: g.id, text: g.text, points: g.points || 0, daily: !!g.daily, subject: g.subject || '' })), title: c.title, startDate: c.startDate, endDate: c.endDate, live: c.live, n: (c.targets || []).length, owner: c.ownerUid, challengeType: c.challengeType || 'standard', childChallenges: c.childChallenges || [], desc: c.desc || '' });
 
 /* ---------- boot ---------- */
 async function loadFirebase() {
@@ -520,7 +539,7 @@ function watch(code) {
     if (!s.exists()) { toast('That challenge no longer exists.'); removeMine(code); return; }
     S.chal = { id: s.id, ...s.data() }; S.meta[code] = metaOf(S.chal); renderAll();
   }, () => toast('Could not load the challenge.')));
-  S.unsubs.push(onSnapshot(doc(db, 'challenges', code, 'members', S.uid), s => { S.me = s.exists() ? s.data() : null; renderAll(); }));
+  S.unsubs.push(onSnapshot(doc(db, 'challenges', code, 'members', S.uid), s => { S.me = s.exists() ? s.data() : null; S.done[code] = S.me?.done || {}; renderAll(); }));
   S.unsubs.push(onSnapshot(collection(db, 'challenges', code, 'members'), s => { S.members = s.docs.map(d => ({ id: d.id, ...d.data() })); renderAll(); }));
   renderAll();
 }
@@ -534,8 +553,9 @@ async function loadMeta() {
   if (DEMO) return;
   await Promise.all(S.mine.map(async m => {
     try { const s = await getDoc(doc(db, 'challenges', m.code)); if (s.exists()) S.meta[m.code] = metaOf(s.data()); else S.meta[m.code] = { gone: true }; } catch {}
+    try { const ms = await getDoc(doc(db, 'challenges', m.code, 'members', S.uid)); if (ms.exists()) S.done[m.code] = ms.data().done || {}; else if (!S.done[m.code]) S.done[m.code] = {}; } catch {}
   }));
-  renderHome();
+  renderHome(); renderMegaHub();
 }
 
 /* ---------- actions ---------- */
@@ -627,6 +647,103 @@ async function toggle(tid) {
   if (done[key]) delete done[key]; else done[key] = day;
   try { await saveMe({ name: S.name, done, points: calcPoints(c, done) }); } catch { toast('Could not save. Check your connection.'); }
 }
+
+/* ---------- mega folders, counts, home tasks ---------- */
+const doneKey = (g, t) => g.daily ? `${g.id}@${t}` : g.id;
+function counts(code) {
+  const x = S.meta[code]; if (!x || x.gone || !x.targets) return null;
+  const t = today(), d = S.done[code] || {}, dl = x.targets.filter(g => g.daily), on = x.targets.filter(g => !g.daily);
+  return { dd: dl.filter(g => d[doneKey(g, t)]).length, dt: dl.length, od: on.filter(g => d[g.id]).length, ot: on.length };
+}
+function rollup(kids) {
+  const r = { dd: 0, dt: 0, od: 0, ot: 0, joined: 0 };
+  (kids || []).forEach(ch => { const c = counts(ch.code); if (c) { r.dd += c.dd; r.dt += c.dt; r.od += c.od; r.ot += c.ot; r.joined++; } });
+  return r;
+}
+const pills = c => c ? `<div class="pills"><span class="pill">Daily ${c.dd}/${c.dt}</span><span class="pill">One-time ${c.od}/${c.ot}</span></div>` : '';
+const pctOf = (a, b) => b ? Math.round(a / b * 100) : 0;
+const megaList = () => S.mine.filter(m => S.meta[m.code]?.challengeType === 'mega' && !S.meta[m.code]?.gone);
+const megaOf = code => megaList().find(m => (S.meta[m.code].childChallenges || []).some(ch => ch.code === code))?.code || '';
+const claimed = (code, except) => megaList().some(m => m.code !== except && (S.meta[m.code].childChallenges || []).some(ch => ch.code === code));
+const CHEV = '<svg class="i chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>';
+const FOLDER = '<span class="fico"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg></span>';
+
+function rowHtml(code, title, x, detail, nested) {
+  if (nested && !x) return `<button class="li" data-act="mega-branch" data-code="${esc(code)}"><div class="grow"><b>${esc(title)}</b><div class="meta">Not joined yet. Tap to join this challenge.</div></div>${CHEV}</button>`;
+  const st = x && !x.gone ? status(x) : null;
+  const info = !x ? 'Loading' : x.gone ? 'No longer available' : `${fmt(x.startDate)} to ${fmt(x.endDate)}, ${x.n} ${x.n === 1 ? 'target' : 'targets'}`;
+  return `<button class="li" data-act="open" data-code="${esc(code)}"><div class="grow"><b>${esc(title)}</b>${detail || !nested ? `<div class="meta">${esc(info)}</div>` : ''}${detail ? pills(counts(code)) : ''}</div>${st ? `<span class="badge ${st}">${st}</span>` : ''}${CHEV}</button>`;
+}
+function folderHtml(m, x, detail) {
+  const open = !!S.expanded[m.code], kids = x.childChallenges || [], st = status(x);
+  const head = `<button class="li folder-head" data-act="toggle-folder" data-code="${esc(m.code)}" aria-expanded="${open}">${FOLDER}<div class="grow"><b>${esc(m.title)}</b><div class="meta">Mega challenge, ${kids.length} ${kids.length === 1 ? 'challenge' : 'challenges'}</div>${detail ? pills(rollup(kids)) : ''}</div><span class="badge ${st}">${st}</span>${CHEV}</button>`;
+  const body = open ? `<div class="folder-body"><button class="li" data-act="open" data-code="${esc(m.code)}"><div class="grow"><b>Open mega challenge</b><div class="meta">Branches, invite code and settings</div></div>${CHEV}</button>${kids.map(ch => rowHtml(ch.code, ch.title, S.meta[ch.code], detail, true)).join('')}</div>` : '';
+  return `<div class="folder ${open ? 'open' : ''}">${head}${body}</div>`;
+}
+function listHtml(detail) {
+  const inFolder = new Set(); megaList().forEach(m => (S.meta[m.code].childChallenges || []).forEach(ch => inFolder.add(ch.code)));
+  const rows = [];
+  S.mine.forEach(m => {
+    const x = S.meta[m.code];
+    if (x?.challengeType === 'mega' && !x.gone) rows.push(folderHtml(m, x, detail));
+    else if (!inFolder.has(m.code)) rows.push(rowHtml(m.code, m.title, x, detail, false));
+  });
+  return '<div class="group">' + rows.join('') + '</div>';
+}
+function todayHtml() {
+  const t = today(); let tot = 0, dn = 0; const parts = [];
+  S.mine.forEach(m => {
+    const x = S.meta[m.code]; if (!x || x.gone || x.challengeType === 'mega' || status(x) !== 'live') return;
+    const d = (x.targets || []).filter(g => g.daily); if (!d.length) return;
+    const done = S.done[m.code] || {}, c = d.filter(g => done[`${g.id}@${t}`]).length, parent = megaOf(m.code);
+    tot += d.length; dn += c;
+    parts.push(`<div class="today-head"><b>${esc(m.title)}</b>${parent ? `<span class="meta">in ${esc(S.meta[parent].title)}</span>` : ''}<span class="cnt">${c}/${d.length}</span></div>
+      <div class="group">${d.map(g => `<button class="li quest ${done[`${g.id}@${t}`] ? 'on' : ''}" data-act="toggle-in" data-code="${esc(m.code)}" data-id="${esc(g.id)}"><span class="box"></span><span class="t">${esc(g.text)}</span><span class="p">+${g.points}</span></button>`).join('')}</div>`);
+  });
+  if (!parts.length) return '';
+  return `<div class="lbl">Today's daily tasks, ${dn} of ${tot} done</div><div class="bar" aria-hidden="true"><i style="width:${pctOf(dn, tot)}%"></i></div>` + parts.join('');
+}
+function renderMegaHub() {
+  const el = $('mega-hub-list'); if (!el) return;
+  const megas = megaList();
+  if (!megas.length) { el.innerHTML = empty('No mega challenges yet', 'Combine several challenges into one mission.'); return; }
+  el.innerHTML = megas.map(m => {
+    const x = S.meta[m.code], kids = x.childChallenges || [], r = rollup(kids), st = status(x);
+    return `<div class="mega-card"><div class="row"><div class="grow"><b>${esc(m.title)}</b><div class="meta">${fmt(x.startDate)} to ${fmt(x.endDate)}, ${kids.length} ${kids.length === 1 ? 'challenge' : 'challenges'}</div></div><span class="badge ${st}">${st}</span></div>
+      <div class="mrow"><span>Daily tasks done today</span><b>${r.dd}/${r.dt}</b></div><div class="bar"><i style="width:${pctOf(r.dd, r.dt)}%"></i></div>
+      <div class="mrow"><span>One-time tasks done</span><b>${r.od}/${r.ot}</b></div><div class="bar"><i style="width:${pctOf(r.od, r.ot)}%"></i></div>
+      <div class="group">${kids.map(ch => { const c = counts(ch.code); return `<button class="li" data-act="${c ? 'open' : 'mega-branch'}" data-code="${esc(ch.code)}"><div class="grow"><b>${esc(ch.title)}</b>${c ? pills(c) : '<div class="meta">Not joined yet. Tap to join.</div>'}</div>${CHEV}</button>`; }).join('')}</div>
+      <div class="btns"><button class="btn sec" data-act="open" data-code="${esc(m.code)}">Open mega challenge</button></div></div>`;
+  }).join('');
+}
+function openMegaEntry() {
+  const megas = megaList();
+  if (!megas.length) return setView('create-mega');
+  if (megas.length === 1) { openChallenge(megas[0].code); return; }
+  setView('challenge-mega');
+}
+function toggleFolder(code) { S.expanded[code] = !S.expanded[code]; ls.set('cr_open', S.expanded); renderHome(); }
+async function toggleIn(code, tid) {
+  if (code === S.active && S.chal) return toggle(tid);
+  const x = S.meta[code]; if (!x || status(x) !== 'live') return;
+  if (DEMO) return demoMsg();
+  const t = x.targets.find(g => g.id === tid); if (!t) return;
+  const day = today(), key = doneKey(t, day), done = { ...(S.done[code] || {}) };
+  if (done[key]) delete done[key]; else done[key] = day;
+  const points = Object.keys(done).reduce((a, k) => a + (x.targets.find(g => g.id === k.split('@')[0])?.points || 0), 0);
+  const prev = S.done[code]; S.done[code] = done; renderHome(); renderMegaHub();
+  try { await ensureMember(code); await updateDoc(doc(db, 'challenges', code, 'members', S.uid), { name: S.name, done, points, updatedAt: serverTimestamp() }); }
+  catch { S.done[code] = prev; renderHome(); renderMegaHub(); toast('Could not save. Check your connection.'); }
+}
+function branchMeta(code) {
+  const c = counts(code);
+  return c ? `Daily ${c.dd}/${c.dt} today, one-time ${c.od}/${c.ot}` : (S.mine.some(m => m.code === code) ? 'Open linked challenge branch' : 'Join this challenge branch');
+}
+function megaSummary(kids) {
+  const r = rollup(kids); if (!r.joined) return '';
+  return `<div class="mega-card" style="margin-top:0"><div class="mrow" style="margin-top:0"><span>Daily tasks done today</span><b>${r.dd}/${r.dt}</b></div><div class="bar"><i style="width:${pctOf(r.dd, r.dt)}%"></i></div><div class="mrow"><span>One-time tasks done</span><b>${r.od}/${r.ot}</b></div><div class="bar"><i style="width:${pctOf(r.od, r.ot)}%"></i></div></div>`;
+}
+
 async function saveNote() {
   if (!S.chal) return toast('Open a challenge first.');
   const notes = { ...(S.me?.notes || {}) }; const v = $('j-text').value.trim();
@@ -696,7 +813,7 @@ function renderEditTasks() {
 function renderMegaPicksEdit(current) {
   const el = $('mega-picks-edit'); if (!el) return;
   const selected = new Set((current || []).map(x => x.code));
-  const candidates = S.mine.filter(m => m.code !== S.editCode && (S.meta[m.code]?.challengeType || 'standard') !== 'mega' && !S.meta[m.code]?.gone);
+  const candidates = S.mine.filter(m => m.code !== S.editCode && (S.meta[m.code]?.challengeType || 'standard') !== 'mega' && !S.meta[m.code]?.gone && !claimed(m.code, S.editCode));
   el.innerHTML = candidates.length ? candidates.map(m => `<label class="checkline"><input type="checkbox" data-mega-edit-code="${esc(m.code)}" data-mega-edit-title="${esc(m.title)}" ${selected.has(m.code)?'checked':''}><span><b>${esc(m.title)}</b><div class="meta">Code ${esc(m.code)}</div></span></label>`).join('') : '<div class="empty"><b>No standard challenges available</b>Create or join standard challenges to add branches.</div>';
 }
 function addEditTask() {
@@ -921,13 +1038,13 @@ function saveName() {
 function saveProfile() { const v = $('p-name').value.trim(); if (!v) return toast('Enter a name.'); applyName(v); toast('Name saved'); }
 
 /* ---------- views ---------- */
-const TAB = { home: 'home', join: 'home', create: 'challenge', edit: 'challenge', 'create-mega': 'challenge', 'challenge-hub': 'challenge', 'challenge-market': 'challenge', 'challenge-mine': 'challenge', challenge: 'challenge', activity: 'activity', ai: 'ai', profile: 'profile' };
+const TAB = { home: 'home', join: 'home', create: 'challenge', edit: 'challenge', 'create-mega': 'challenge', 'challenge-hub': 'challenge', 'challenge-market': 'challenge', 'challenge-mine': 'challenge', 'challenge-mega': 'challenge', challenge: 'challenge', activity: 'activity', ai: 'ai', profile: 'profile' };
 function paintView(v, scroll = true) {
   S.view = v;
   document.querySelectorAll('.view').forEach(el => el.classList.toggle('on', el.id === 'view-' + v));
   document.querySelectorAll('nav button').forEach(b => b.dataset.v === TAB[v] ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'));
-  $('back').classList.toggle('on', v === 'join' || v === 'create' || v === 'create-mega' || v === 'edit' || v === 'challenge' || v === 'challenge-hub' || v === 'challenge-market' || v === 'challenge-mine' || v === 'activity' || v === 'ai' || v === 'profile');
-  if (v === 'home' || v === 'challenge-mine' || v === 'create-mega') loadMeta();
+  $('back').classList.toggle('on', v === 'join' || v === 'create' || v === 'create-mega' || v === 'edit' || v === 'challenge' || v === 'challenge-hub' || v === 'challenge-market' || v === 'challenge-mine' || v === 'challenge-mega' || v === 'activity' || v === 'ai' || v === 'profile');
+  if (v === 'home' || v === 'challenge-mine' || v === 'challenge-mega' || v === 'create-mega') loadMeta();
   if (v === 'create-mega') renderMegaPicksCreate();
   if (v === 'challenge-market') loadMarket();
   renderAll(); if (scroll) window.scrollTo(0, 0);
@@ -969,27 +1086,23 @@ window.addEventListener('popstate', e => {
   }
 });
 const empty = (h, p) => `<div class="empty"><b>${h}</b>${p}</div>`;
-function renderAll() { renderHome(); renderChallenge(); renderActivity(); renderProfile(); setPane(S.pane); }
+function renderAll() { renderHome(); renderMegaHub(); renderChallenge(); renderActivity(); renderProfile(); setPane(S.pane); }
 
 function renderHome() {
   $('home-h').textContent = S.name ? `Hello, ${S.name}` : 'Hello';
-  const live = S.mine.filter(m => { const x = S.meta[m.code]; return x && !x.gone && status(x) === 'live'; }).length;
-  let todayTxt = '-';
-  if (S.chal) { const t = today(), d = S.chal.targets.filter(g => g.daily), dn = d.filter(g => S.me?.done?.[`${g.id}@${t}`]).length; todayTxt = d.length ? `${dn}/${d.length}` : '-'; }
+  let live = 0, dTot = 0, dDone = 0;
+  S.mine.forEach(m => { const x = S.meta[m.code]; if (x && !x.gone && status(x) === 'live') { live++; if (x.challengeType !== 'mega') { const c = counts(m.code); if (c) { dTot += c.dt; dDone += c.dd; } } } });
+  const n = megaList().length;
+  const megaBtn = n === 0 ? ['＋', 'Create a mega challenge'] : n === 1 ? ['Enter ›', 'Enter mega challenge'] : [`${n} megas ›`, 'Choose a mega challenge'];
   $('home-stats').innerHTML = `<div class="stat"><b>${S.mine.length}</b><span>Challenges joined</span></div>
     <div class="stat"><b>${live}</b><span>Live right now</span></div>
-    <div class="stat"><b>${todayTxt}</b><span>Daily quests done today</span></div>
-    <div class="stat"><b>${S.me?.points || 0}</b><span>Points in current challenge</span></div>`;
+    <div class="stat"><b>${dTot ? `${dDone}/${dTot}` : '-'}</b><span>Daily tasks done today</span></div>
+    <button class="stat megabtn" data-act="open-mega"><b>${megaBtn[0]}</b><span>${megaBtn[1]}</span></button>`;
   const el = $('home-list');
-  if (!S.mine.length) { el.innerHTML = empty('No challenges yet', 'Create one or join with a code.'); $('mine-list').innerHTML = el.innerHTML; renderMegaPicksCreate(); return; }
-  const cards = S.mine.map(m => {
-    const x = S.meta[m.code]; const st = x && !x.gone ? status(x) : null;
-    const info = !x ? 'Loading' : x.gone ? 'No longer available' : `${fmt(x.startDate)} to ${fmt(x.endDate)}, ${x.n} ${x.n === 1 ? 'target' : 'targets'}`;
-    return `<button class="li" data-act="open" data-code="${esc(m.code)}"><div class="grow"><b>${esc(m.title)}</b><div class="meta">${esc(info)}${x?.challengeType === 'mega' ? ' · Mega challenge' : ''}</div></div>
-      ${st ? `<span class="badge ${st}">${st}</span>` : ''}<svg class="i chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>`;
-  }).join('');
-  el.innerHTML = '<div class="group">' + cards + '</div>';
-  $('mine-list').innerHTML = '<div class="group">' + cards + '</div>'; renderMegaPicksCreate();
+  if (!S.mine.length) { $('home-today').innerHTML = ''; el.innerHTML = empty('No challenges yet', 'Create one or join with a code.'); $('mine-list').innerHTML = el.innerHTML; renderMegaPicksCreate(); return; }
+  $('home-today').innerHTML = todayHtml();
+  el.innerHTML = listHtml(false);
+  $('mine-list').innerHTML = listHtml(true); renderMegaPicksCreate();
 }
 
 function renderChallenge() {
@@ -1022,7 +1135,7 @@ function renderQuests() {
   $('pane-quests').innerHTML = `
     ${daily.length ? tree(daily, 'Daily tasks') + `<div class="bar" aria-hidden="true"><i style="width:${pct}%"></i></div><div class="sub" style="font-size:13px;margin-top:6px">${dn} of ${daily.length} daily tasks done today</div>` : ''}
     ${once.length ? tree(once, 'One-time tasks') : ''}
-    ${children.length ? `<div class="lbl">Mega challenge branches</div><div class="group">${children.map(ch => `<button class="li" data-act="mega-branch" data-code="${esc(ch.code)}"><div class="grow"><b>${esc(ch.title)}</b><div class="meta">${S.mine.some(m => m.code === ch.code) ? 'Open linked challenge branch' : 'Join this challenge branch'}</div></div><span>›</span></button>`).join('')}</div>` : ''}
+    ${children.length ? megaSummary(children) + `<div class="lbl">Mega challenge branches</div><div class="group">${children.map(ch => `<button class="li" data-act="mega-branch" data-code="${esc(ch.code)}"><div class="grow"><b>${esc(ch.title)}</b><div class="meta">${branchMeta(ch.code)}</div></div><span>›</span></button>`).join('')}</div>` : ''}
     <div class="lbl">Invite friends</div>
     <div class="group"><div class="li"><div class="grow"><b>Code ${esc(c.id)}</b><div class="meta">Friends enter this code or open your link.</div></div>
       <button class="btn sm" data-act="share" data-code="${esc(c.id)}">Share</button></div></div>
@@ -1200,7 +1313,7 @@ async function loadMarket() {
 }
 function renderMegaPicksCreate() {
   const el = $('mega-picks-create'); if (!el) return;
-  const candidates = S.mine.filter(m => (S.meta[m.code]?.challengeType || 'standard') !== 'mega' && !S.meta[m.code]?.gone);
+  const candidates = S.mine.filter(m => (S.meta[m.code]?.challengeType || 'standard') !== 'mega' && !S.meta[m.code]?.gone && !claimed(m.code, ''));
   if (!candidates.length) { el.innerHTML = '<div class="li"><div class="grow"><b>No smaller challenges available</b><div class="meta">Create or join standard challenges first, then return here to combine them.</div></div></div>'; return; }
   el.innerHTML = candidates.map(m => `<label class="checkline"><input type="checkbox" data-mega-create-code="${esc(m.code)}" data-mega-create-title="${esc(m.title)}"><span><b>${esc(m.title)}</b><div class="meta">Code ${esc(m.code)}${S.meta[m.code]?.n != null ? ` · ${S.meta[m.code].n} tasks` : ''}</div></span></label>`).join('');
 }
@@ -1343,6 +1456,9 @@ document.addEventListener('click', e => {
   else if (a === 'daily-select-date') dailySelectDate(b.dataset.date);
   else if (a === 'open') openChallenge(b.dataset.code);
   else if (a === 'toggle') toggle(b.dataset.id);
+  else if (a === 'toggle-in') toggleIn(b.dataset.code, b.dataset.id);
+  else if (a === 'toggle-folder') toggleFolder(b.dataset.code);
+  else if (a === 'open-mega') openMegaEntry();
   else if (a === 'calendar-prev' || a === 'calendar-next') { S.calendarMonth += a === 'calendar-prev' ? -1 : 1; if (S.calendarMonth < 0) { S.calendarMonth = 11; S.calendarYear--; } if (S.calendarMonth > 11) { S.calendarMonth = 0; S.calendarYear++; } renderProgress(); }
   else if (a === 'calendar-day') showCalendarDay(b.dataset.date);
   else if (a === 'join') join($('join-code').value);

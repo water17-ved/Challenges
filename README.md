@@ -78,3 +78,13 @@ The Activities view now includes a local-first Daily Study Report for Physics, C
 
 ## Daily Report validation
 The inline JavaScript passes `node --check`. This package has not been tested against the live Firebase project or deployed GitHub Pages site from this environment.
+
+## Mega folders, Home tasks and Mega hub (v18)
+- **My Challenges / Home:** a mega challenge is now a folder row. Tap it to expand in place; inside you get **Open mega challenge** plus every branch challenge. Challenges that sit inside a mega are hidden from the top level so they never appear twice. Open/closed state is remembered on the device.
+- **My Challenges** shows full detail: dates, target count, and **Daily done/total (today)** and **One-time done/total** for every challenge and for each mega folder as a whole. Home keeps a compact version of the same list.
+- **Home → Today's daily tasks:** every live standard challenge lists its daily tasks grouped by challenge (with the parent mega in small text). Tick them right there. Points are calculated exactly as inside the challenge.
+- **Home → fourth tile** now enters the mega challenge: opens it directly if you have one, shows the Mega Challenges screen if you have several, or starts "Create mega challenge" if you have none.
+- **Challenge tab → Mega Challenges** (new third box): one card per mega with total daily and one-time progress bars, then every challenge inside it with its own daily and one-time done/total.
+- The mega challenge page now starts with a combined progress summary, and each branch row shows its counts.
+- A challenge can belong to only one mega: challenges already inside another mega are not offered in the create/edit pickers.
+- Home reads each joined challenge and your own member document once when it opens. No new Firestore rules are needed because members already read their own member document. Cache version bumped to v18.

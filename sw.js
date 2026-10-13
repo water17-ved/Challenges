@@ -1,4 +1,4 @@
-const CACHE = 'challenge-room-v17-daily-report';
+const CACHE = 'challenge-room-v18-mega-folders';
 const SHELL = ['./', './index.html', './manifest.json', './icon.svg', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
