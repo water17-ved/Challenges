@@ -148,12 +148,99 @@ button.stat{text-align:left;color:inherit;width:100%;cursor:pointer}
 .mega-card{background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:14px}
 .mega-card .mrow{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--mut);margin-top:12px}.mega-card .mrow b{color:inherit}
 .mega-card .group{margin-top:12px}
+
+/* --- notifications --- */
+.notif-btn{position:relative;padding:6px;border-radius:10px;color:var(--mut);display:flex;align-items:center;transition:color .15s}
+.notif-btn:hover,.notif-btn.active{color:var(--acc)}
+.notif-dot{position:absolute;top:4px;right:4px;min-width:16px;height:16px;border-radius:8px;background:var(--bad);color:#fff;font-size:10px;font-weight:800;display:grid;place-items:center;padding:0 3px;border:2px solid var(--bg);pointer-events:none;opacity:0;transition:opacity .2s}
+.notif-dot.on{opacity:1}
+#notif-sheet{position:fixed;inset:0;z-index:30;display:none;flex-direction:column;justify-content:flex-end}
+#notif-sheet.open{display:flex}
+#notif-sheet .scrim{position:absolute;inset:0;background:rgba(0,0,0,.55)}
+#notif-sheet .panel{position:relative;z-index:1;background:var(--s1);border-radius:22px 22px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));max-height:82vh;overflow-y:auto;overscroll-behavior:contain}
+#notif-sheet .drag{width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 14px}
+#notif-sheet h2{font-size:18px;font-weight:800;margin-bottom:2px}
+.notif-banner{background:var(--s1);border:1px solid var(--acc);border-radius:14px;padding:12px 14px;margin:0 0 10px;display:flex;gap:10px;align-items:flex-start}
+.notif-banner .nb-icon{flex:none;width:36px;height:36px;border-radius:10px;background:linear-gradient(145deg,#5B8DEF,#22D3EE);display:grid;place-items:center}
+.notif-banner .nb-body{flex:1;min-width:0}
+.notif-banner .nb-body b{display:block;font-size:14px}
+.notif-banner .nb-body small{color:var(--mut);font-size:12px}
+.notif-banner .nb-acts{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.nb-acts .btn{padding:4px 12px;font-size:13px}
+/* home banner strip */
+#home-banners{margin-bottom:4px}
+/* compact request logo-button on board */
+.req-logo-btn{padding:4px;border-radius:8px;background:var(--s2);display:inline-flex;align-items:center;justify-content:center;transition:background .15s;position:relative}
+.req-logo-btn:hover{background:var(--line)}
+.req-logo-btn .req-state{position:absolute;bottom:-3px;right:-3px;width:13px;height:13px;border-radius:50%;border:2px solid var(--bg);font-size:7px;display:grid;place-items:center;font-weight:800}
+.req-state.pending{background:#F59E0B}
+.req-state.accepted{background:var(--ok)}
+.req-state.declined{background:var(--bad)}
+/* notif item */
+.notif-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.notif-item:last-child{border:0}
+.ni-icon{flex:none;width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:var(--s2)}
+.ni-body{flex:1;min-width:0}.ni-body b{font-size:13px;display:block}.ni-body small{color:var(--mut);font-size:12px}
+.ni-acts{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.notif-empty{text-align:center;padding:28px 0;color:var(--mut);font-size:14px}
+/* share notes toggle */
+.share-opts{margin-top:8px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mut)}
+.share-opts input[type=checkbox]{width:16px;height:16px;accent-color:var(--acc)}
+
+/* admin & archive */
+.admin-row{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--line)}
+.admin-row:last-child{border:0}.admin-row .grow{flex:1;min-width:0}
+.danger-zone{border:1px solid var(--bad);border-radius:12px;padding:10px 14px;margin-top:10px}
+.danger-zone .lbl{color:var(--bad)}
+.frozen-banner{background:rgba(91,141,239,.12);border:1px solid var(--acc);border-radius:12px;padding:10px 14px;margin-bottom:10px;font-size:13px}
+.activity-row{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
+.activity-row:last-child{border:0}.activity-row .av{flex:none}
+.completion-bar-wrap{margin-top:4px}.completion-bar-wrap .meta{display:flex;justify-content:space-between;font-size:11px;color:var(--mut);margin-bottom:2px}
+.inactive-chip{font-size:10px;font-weight:800;padding:1px 7px;border-radius:5px;background:rgba(248,113,113,.15);color:var(--bad);margin-left:4px}
+/* home additions */
+.rivalry{background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:9px 13px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:13px}
+.rivalry .pb{color:#F59E0B;font-weight:800}
+.missed-banner{background:var(--s1);border:1px solid var(--bad);border-radius:12px;padding:9px 13px;display:flex;gap:9px;align-items:flex-start;margin-bottom:8px;font-size:12px}
+.missed-banner .dot{width:7px;height:7px;border-radius:50%;background:var(--bad);margin-top:3px;flex:none}
+.ann-strip{background:var(--s1);border-left:3px solid var(--acc);border-radius:0 12px 12px 0;padding:7px 11px;margin-bottom:6px;font-size:12px}
+.ann-strip b{display:block;font-size:10px;font-weight:800;color:var(--acc);text-transform:uppercase;letter-spacing:.04em}
+/* home calendar */
+.home-cal{background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px}
+.home-cal .hc-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:12px;font-weight:800}
+.home-cal .hc-hd span{color:var(--mut);font-weight:600;font-size:11px}
+.hc-days{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.hc-dlbl{text-align:center;font-size:9px;color:var(--mut);font-weight:700;padding-bottom:2px}
+.hc-cell{text-align:center;padding:1px 0}
+.hc-num{font-size:10px;font-weight:700;color:var(--mut);line-height:1.2}
+.hc-num.today{color:var(--tx);background:var(--s2);border-radius:5px;padding:0 3px}
+.hc-dot{width:6px;height:6px;border-radius:50%;margin:1px auto 0}
+.dot-green{background:#34D399}.dot-amber{background:#F59E0B}.dot-red{background:#F87171}.dot-gray{background:var(--line)}.dot-blue{background:var(--acc)}
+.hc-legend{display:flex;gap:10px;margin-top:7px;flex-wrap:wrap}
+.hc-legend span{font-size:9px;color:var(--mut);display:flex;align-items:center;gap:3px}
+.hc-legend i{width:7px;height:7px;border-radius:50%;display:inline-block}
+/* weekly chart */
+.week-card{background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:10px}
+.wbars{display:flex;gap:5px;align-items:flex-end;height:50px;margin-bottom:4px}
+.wbar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px}
+.wbar-inner{width:100%;border-radius:3px 3px 0 0;background:var(--line);min-height:4px}
+.wbar-inner.acc{background:var(--acc)}
+.wday{font-size:9px;color:var(--mut);text-align:center}
+.week-totals{display:flex;justify-content:space-between;font-size:12px;margin-top:6px}
+.week-totals .big{font-weight:800;font-size:15px}
+/* quick join */
+.qjoin{display:flex;gap:7px;margin-bottom:10px}
+.qjoin input{flex:1;background:var(--s2);border:1px solid var(--line);border-radius:9px;padding:7px 11px;font-size:13px;color:var(--tx);font-family:inherit;outline:none;letter-spacing:.12em;text-transform:uppercase}
+.qjoin button{background:var(--acc);border:0;border-radius:9px;padding:7px 14px;font-size:13px;font-weight:800;color:#fff;cursor:pointer}
+/* challenge-tab daily strip */
+.tab-daily{margin-bottom:8px}
+.tab-daily .lbl{margin-bottom:4px}
 </style>
 </head>
 <body>
 <header class="top"><div class="top-in">
   <button class="back" id="back" data-act="back" aria-label="Go back"><svg class="i" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Back</button>
   <div class="brand">Challenge Room</div>
+  <button class="notif-btn" id="notif-bell" data-act="open-notifs" aria-label="Notifications"><svg width="22" height="22" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="nbg" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse"><stop stop-color="#5B8DEF"/><stop offset="1" stop-color="#22D3EE"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="17" fill="url(#nbg)"/><path d="M18 18h28v6H35v22h-7V24H18z" fill="#081326"/><path d="m42 31 6 6-6 6" fill="none" stroke="#081326" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="notif-dot" id="notif-dot"></span></button>
 </div></header>
 
 <main class="app">
@@ -204,24 +291,33 @@ button.stat{text-align:left;color:inherit;width:100%;cursor:pointer}
 
   <section class="view" id="view-home">
     <h1 id="home-h">Hello</h1>
-    <p class="sub">Here is where your challenges stand.</p>
-    <div class="stats" id="home-stats"></div>
-    <div class="btns">
+    <div class="btns" style="margin-bottom:8px">
       <button class="btn" data-act="view" data-v="create">New challenge</button>
       <button class="btn sec" data-act="view" data-v="join">Join with code</button>
     </div>
+    <div class="stats" id="home-stats"></div>
+    <div id="home-rivalry"></div>
+    <div id="home-missed"></div>
+    <div id="home-banners"></div>
+    <div id="home-cal-wrap"></div>
     <div id="home-today"></div>
+    <div id="home-onetimes"></div>
+    <div class="lbl">Quick join</div>
+    <div class="qjoin"><input id="qjoin-code" maxlength="6" placeholder="Enter code" aria-label="Challenge code"/><button data-act="qjoin">Join</button></div>
     <div class="lbl">Your challenges</div>
     <div id="home-list"></div>
+    <div id="home-week"></div>
   </section>
 
   <section class="view" id="view-challenge">
     <div id="ch-head"></div>
+    <div class="tab-daily" id="tab-daily-strip" hidden></div>
     <div class="seg" id="seg" hidden>
       <button data-act="pane" data-p="quests" aria-pressed="true">Quests</button>
       <button data-act="pane" data-p="progress" aria-pressed="false">Progress</button>
       <button data-act="pane" data-p="board" aria-pressed="false">Board</button>
       <button data-act="pane" data-p="journal" aria-pressed="false">Journal</button>
+      <button data-act="pane" data-p="admin" aria-pressed="false" id="admin-tab" hidden>Admin</button>
     </div>
     <div class="pane on" id="pane-quests"></div>
     <div class="pane" id="pane-progress"></div>
@@ -234,6 +330,7 @@ button.stat{text-align:left;color:inherit;width:100%;cursor:pointer}
       <div class="lbl">History</div>
       <div class="group" id="journal-hist"></div>
     </div>
+    <div class="pane" id="pane-admin"></div>
   </section>
 
   <section class="view" id="view-ai">
@@ -282,7 +379,7 @@ button.stat{text-align:left;color:inherit;width:100%;cursor:pointer}
     <div class="lbl">Progress access requests</div>
     <p class="sub">Approve a friend to view one challenge for 10 minutes. Shared snapshots are temporary and automatically cleaned up when possible.</p>
     <div class="group" id="progress-access-panel"><div class="li"><div class="grow">Loading requests…</div></div></div>
-    <button class="btn sec" style="margin-top:8px" data-act="refresh-progress-access">Refresh access requests</button>
+    <!-- refresh moved to notif sheet -->
     <div class="lbl">Settings</div>
     <div class="group">
       <div class="li"><div class="grow"><b>Install on your phone</b><div class="meta" id="install-status">Install Challenge Room as an app.</div></div><button class="btn sec sm" data-act="install-app">Install</button></div>
@@ -370,6 +467,16 @@ button.stat{text-align:left;color:inherit;width:100%;cursor:pointer}
   <label for="name-input">Display name</label><input id="name-input" maxlength="20" autocomplete="off">
   <button class="btn" style="margin-top:14px" data-act="save-name">Continue</button>
 </div></div>
+<div id="notif-sheet" role="dialog" aria-modal="true" aria-label="Notifications">
+  <div class="scrim" data-act="close-notifs"></div>
+  <div class="panel">
+    <div class="drag"></div>
+    <h2>Notifications</h2>
+    <p class="sub" style="margin-bottom:12px">Requests, replies and active shares.</p>
+    <div id="notif-list"><div class="notif-empty">Loading…</div></div>
+    <button class="btn sec" style="margin-top:14px;width:100%" data-act="close-notifs">Close</button>
+  </div>
+</div>
 <div id="toast" role="status"></div>
 
 <script type="module">
@@ -409,7 +516,7 @@ async function copy(text, ok) { try { await navigator.clipboard.writeText(text);
 /* ---------- state ---------- */
 const S = {
   uid: null, name: ls.get('cr_name', ''), mine: ls.get('cr_mine', []), active: ls.get('cr_active', ''),
-  chal: null, me: null, members: [], unsubs: [], done: {}, expanded: ls.get('cr_open', {}), draft: [], editTargets: [], editCode: '', view: 'home', pane: 'quests', meta: {},
+  chal: null, me: null, members: [], unsubs: [], notifUnsubs: [], done: {}, expanded: ls.get('cr_open', {}), notifs: { incoming: [], outgoing: [], shares: [] }, homeCalMonth: new Date().getMonth(), homeCalYear: new Date().getFullYear(), pinned: ls.get('cr_pinned',''), dismissed: ls.get('cr_dismissed',{}), draft: [], editTargets: [], editCode: '', view: 'home', pane: 'quests', meta: {},
   pendingCode: new URLSearchParams(location.search).get('c'),
   photo: ls.get('cr_photo', ''), about: ls.get('cr_about', ''), calendarMonth: new Date().getMonth(), calendarYear: new Date().getFullYear()
 };
@@ -470,7 +577,7 @@ function demoSync() {
   S.members = [...d.others, { id: 'me', ...S.me }]; renderAll();
 }
 const demoMsg = () => toast('Demo mode. Open the hosted site to do this.');
-const metaOf = c => ({ targets: (c.targets || []).map(g => ({ id: g.id, text: g.text, points: g.points || 0, daily: !!g.daily, subject: g.subject || '' })), title: c.title, startDate: c.startDate, endDate: c.endDate, live: c.live, n: (c.targets || []).length, owner: c.ownerUid, challengeType: c.challengeType || 'standard', childChallenges: c.childChallenges || [], desc: c.desc || '' });
+const metaOf = c => ({ targets: (c.targets || []).map(g => ({ id: g.id, text: g.text, points: g.points || 0, daily: !!g.daily, subject: g.subject || '' })), announcement: c.announcement || '', announcementAt: c.announcementAt || '', archived: !!c.archived, title: c.title, startDate: c.startDate, endDate: c.endDate, live: c.live, n: (c.targets || []).length, owner: c.ownerUid, challengeType: c.challengeType || 'standard', childChallenges: c.childChallenges || [], desc: c.desc || '' });
 
 /* ---------- boot ---------- */
 async function loadFirebase() {
@@ -501,6 +608,7 @@ async function start() {
       S.uid = u.uid; lastUid = u.uid; ls.set('cr_last_uid', u.uid);
       $('account-status').textContent = 'Guest session (this browser)';
       if (!S.name) openName(); else afterName();
+      startNotifListeners();
       return;
     }
     document.body.classList.remove('auth-required');
@@ -517,6 +625,7 @@ async function start() {
     lastUid = u.uid; S.uid = u.uid; ls.set('cr_last_uid', u.uid);
     $('account-status').textContent = u.isAnonymous ? 'Guest session (this browser)' : 'Google account connected: ' + (u.email || u.displayName || 'signed in');
     if (!S.name) openName(); else afterName();
+    startNotifListeners(); GCal.init();
   });
   // Wait for onAuthStateChanged before choosing the login or app screen. This avoids a login-screen flash on reload.
   // Existing anonymous sessions are not discarded; Google sign-in attempts to link them first.
@@ -579,24 +688,25 @@ async function requestProgressAccess(targetUid, targetName, code) {
     toast('Progress access request sent.');
   } catch (e) { console.error(e); toast('Could not send request. Check Firestore rules.'); }
 }
-async function decideProgressRequest(id, accept) {
+async function decideProgressRequest(id, accept, includeNotes=true) {
   if (DEMO) return demoMsg();
   try {
-    const rr = doc(db, 'progressAccessRequests', id), snap = await getDoc(rr);
+    const rr = doc(db,'progressAccessRequests',id), snap = await getDoc(rr);
     if (!snap.exists()) return toast('Request has expired.');
     const r = snap.data();
     if (r.targetUid !== S.uid || r.expiresAt < Date.now()) return toast('This request is no longer valid.');
-    if (!accept) { await updateDoc(rr, {status:'declined', decidedAt:Date.now()}); toast('Request declined.'); return loadProgressAccess(); }
+    if (!accept) { await updateDoc(rr,{status:'declined',decidedAt:Date.now()}); toast('Request declined.'); return; }
     const ms = await getDoc(doc(db,'challenges',r.challengeCode,'members',S.uid));
     const cs = await getDoc(doc(db,'challenges',r.challengeCode));
     if (!ms.exists() || !cs.exists()) return toast('Your challenge data is unavailable.');
     const m=ms.data(), c=cs.data(), expiresAt=Date.now()+SHARE_TTL_MS;
-    const share = { requestId:id, challengeCode:r.challengeCode, challengeTitle:c.title||r.challengeTitle, ownerUid:S.uid, ownerName:S.name||m.name||'Friend', viewerUid:r.requesterUid, viewerName:r.requesterName, points:Number(m.points)||0, done:m.done||{}, notes:m.notes||{}, targets:(c.targets||[]).map(t=>({id:t.id,text:t.text,subject:t.subject||'',chapter:t.chapter||'',topic:t.topic||'',frequency:t.frequency|| (t.daily?'daily':'once'),points:t.points||0})), createdAt:Date.now(), expiresAt };
+    const share = { requestId:id, challengeCode:r.challengeCode, challengeTitle:c.title||r.challengeTitle, ownerUid:S.uid, ownerName:S.name||m.name||'Friend', viewerUid:r.requesterUid, viewerName:r.requesterName, points:Number(m.points)||0, done:m.done||{}, notes: includeNotes?(m.notes||{}):{}, targets:(c.targets||[]).map(t=>({id:t.id,text:t.text,subject:t.subject||'',chapter:t.chapter||'',topic:t.topic||'',points:t.points||0,daily:!!t.daily})), expiresAt, createdAt:Date.now() };
     await setDoc(doc(db,'temporaryProgressShares',id),share);
     await updateDoc(rr,{status:'accepted',shareId:id,decidedAt:Date.now(),expiresAt});
-    toast('Access granted for 10 minutes.'); await loadProgressAccess();
+    toast(`Access granted${includeNotes?'':' (notes hidden)'} for 10 minutes.`);
   } catch(e) { console.error(e); toast('Could not update access. Check Firestore rules.'); }
 }
+
 async function loadProgressAccess() {
   const el=$('progress-access-panel'); if(!el) return;
   if(DEMO || !S.uid) { el.innerHTML='<div class="li"><div class="grow">Sign in to manage progress sharing.</div></div>'; return; }
@@ -742,6 +852,507 @@ function branchMeta(code) {
 function megaSummary(kids) {
   const r = rollup(kids); if (!r.joined) return '';
   return `<div class="mega-card" style="margin-top:0"><div class="mrow" style="margin-top:0"><span>Daily tasks done today</span><b>${r.dd}/${r.dt}</b></div><div class="bar"><i style="width:${pctOf(r.dd, r.dt)}%"></i></div><div class="mrow"><span>One-time tasks done</span><b>${r.od}/${r.ot}</b></div><div class="bar"><i style="width:${pctOf(r.od, r.ot)}%"></i></div></div>`;
+}
+
+
+/* ========================================================
+   NOTIFICATION ENGINE
+   ======================================================== */
+function reqState(uid) {
+  const r = S.notifs.outgoing.find(r => r.targetUid === uid && r.challengeCode === S.active);
+  if (!r) return '';
+  if (r.status === 'pending') return 'pending';
+  if (r.status === 'accepted') return 'accepted';
+  return 'declined';
+}
+function reqStateLabel(uid) {
+  const st = reqState(uid);
+  return { pending: 'Request pending', accepted: 'Accepted – open Notifications to view', declined: 'Declined', '': 'Request progress' }[st];
+}
+function startNotifListeners() {
+  if (DEMO || !S.uid) return;
+  S.notifUnsubs.forEach(f => f());
+  S.notifUnsubs = [];
+  const now = Date.now;
+  const qIn = query(collection(db,'progressAccessRequests'),where('targetUid','==',S.uid));
+  S.notifUnsubs.push(onSnapshot(qIn, snap => {
+    S.notifs.incoming = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(r => !r.expiresAt || r.expiresAt > Date.now());
+    updateNotifUI();
+  }));
+  const qOut = query(collection(db,'progressAccessRequests'),where('requesterUid','==',S.uid));
+  S.notifUnsubs.push(onSnapshot(qOut, snap => {
+    const prev = S.notifs.outgoing.filter(r => r.status === 'pending').map(r => r.id);
+    S.notifs.outgoing = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(r => !r.expiresAt || r.expiresAt > Date.now());
+    // toast when something changed from pending to accepted/declined
+    S.notifs.outgoing.forEach(r => {
+      if (prev.includes(r.id) && r.status === 'accepted') toast(`${r.targetName || 'Friend'} allowed access — open Notifications to view.`);
+      if (prev.includes(r.id) && r.status === 'declined') toast(`${r.targetName || 'Friend'} declined your request.`);
+    });
+    updateNotifUI(); renderChallenge();
+  }));
+  const qSh = query(collection(db,'temporaryProgressShares'),where('viewerUid','==',S.uid));
+  S.notifUnsubs.push(onSnapshot(qSh, snap => {
+    S.notifs.shares = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(sh => sh.expiresAt > Date.now());
+    updateNotifUI();
+  }));
+}
+function stopNotifListeners() { S.notifUnsubs.forEach(f => f()); S.notifUnsubs = []; }
+function notifCount() {
+  const now = Date.now();
+  const unread = S.notifs.incoming.filter(r => r.status === 'pending').length
+    + S.notifs.outgoing.filter(r => r.status === 'accepted').length
+    + S.notifs.shares.length;
+  return unread;
+}
+function updateNotifUI() {
+  const n = notifCount();
+  const dot = $('notif-dot');
+  if (dot) { dot.textContent = n > 9 ? '9+' : (n || ''); dot.classList.toggle('on', n > 0); }
+  renderHomeBanners();
+  // if sheet is open, re-render it
+  const sheet = $('notif-sheet');
+  if (sheet?.classList.contains('open')) renderNotifSheet();
+  // re-render challenge board so logo-button states update
+  if (document.querySelector('#view-challenge.active')) renderChallenge();
+}
+function renderHomeBanners() {
+  const el = $('home-banners'); if (!el) return;
+  const pending = S.notifs.incoming.filter(r => r.status === 'pending');
+  const accepted = S.notifs.outgoing.filter(r => r.status === 'accepted');
+  const banners = [];
+  pending.forEach(r => {
+    banners.push(`<div class="notif-banner">
+      <div class="nb-icon">''' + LOGO_SVG + '''</div>
+      <div class="nb-body"><b>${esc(r.requesterName || 'Friend')} wants your progress</b>
+        <small>${esc(r.challengeTitle || 'A challenge')} · ` + '${Math.max(1, Math.ceil((r.expiresAt - Date.now()) / 3600000))}h left' + `</small>
+        <div class="nb-acts">
+          <div class="share-opts"><input type="checkbox" id="nb-notes-${esc(r.id)}" checked><label for="nb-notes-${esc(r.id)}">Include journal notes</label></div>
+        </div>
+        <div class="nb-acts" style="margin-top:6px">
+          <button class="btn sm" data-act="nb-accept" data-id="${esc(r.id)}" data-rid="${esc(r.id)}">Allow</button>
+          <button class="btn sec sm" data-act="nb-decline" data-id="${esc(r.id)}">Decline</button>
+        </div>
+      </div></div>`);
+  });
+  accepted.forEach(r => {
+    banners.push(`<div class="notif-banner">
+      <div class="nb-icon">''' + LOGO_SVG + '''</div>
+      <div class="nb-body"><b>${esc(r.targetName || 'Friend')} allowed access</b>
+        <small>${esc(r.challengeTitle || 'A challenge')}</small>
+        <div class="nb-acts"><button class="btn sm" data-act="view-shared-progress" data-id="${esc(r.shareId || r.id)}">View now</button></div>
+      </div></div>`);
+  });
+  el.innerHTML = banners.join('');
+}
+function renderNotifSheet() {
+  const el = $('notif-list'); if (!el) return;
+  const now = Date.now(), rows = [];
+  S.notifs.incoming.filter(r => r.status === 'pending').forEach(r => {
+    rows.push(`<div class="notif-item">
+      <div class="ni-icon">''' + LOGO_SVG + '''</div>
+      <div class="ni-body"><b>${esc(r.requesterName || 'Friend')} wants your progress</b>
+        <small>${esc(r.challengeTitle || 'Challenge')} · ` + '${Math.max(1,Math.ceil((r.expiresAt-now)/3600000))}h left' + `</small>
+        <div class="ni-acts">
+          <div class="share-opts" style="margin-bottom:6px"><input type="checkbox" id="ns-notes-${esc(r.id)}" checked><label for="ns-notes-${esc(r.id)}">Include notes</label></div>
+          <button class="btn sm" data-act="nb-accept" data-id="${esc(r.id)}">Allow</button>
+          <button class="btn sec sm" data-act="nb-decline" data-id="${esc(r.id)}">Decline</button>
+        </div></div></div>`);
+  });
+  S.notifs.incoming.filter(r => r.status === 'accepted' || r.status === 'declined').forEach(r => {
+    rows.push(`<div class="notif-item">
+      <div class="ni-icon" style="background:${r.status==='declined'?'var(--bad)':'var(--ok)'}">''' + LOGO_SVG + '''</div>
+      <div class="ni-body"><b>${esc(r.requesterName || 'Friend')} — ${r.status === 'declined' ? 'declined' : 'you allowed'}</b>
+        <small>${esc(r.challengeTitle || 'Challenge')}</small></div></div>`);
+  });
+  S.notifs.outgoing.forEach(r => {
+    const st = r.status;
+    const stLabel = st === 'pending' ? '⏳ Waiting' : st === 'accepted' ? '✓ Accepted' : '✗ Declined';
+    const acts = st === 'accepted' ? `<div class="ni-acts"><button class="btn sm" data-act="view-shared-progress" data-id="${esc(r.shareId || r.id)}">View progress</button></div>` : '';
+    rows.push(`<div class="notif-item">
+      <div class="ni-icon">''' + LOGO_SVG + '''</div>
+      <div class="ni-body"><b>Request to ${esc(r.targetName || 'Friend')}</b>
+        <small>${esc(r.challengeTitle || 'Challenge')} · ${stLabel}</small>${acts}</div></div>`);
+  });
+  S.notifs.shares.forEach(sh => {
+    const min = Math.max(1, Math.ceil((sh.expiresAt - now) / 60000));
+    rows.push(`<div class="notif-item">
+      <div class="ni-icon" style="background:var(--ok)">''' + LOGO_SVG + '''</div>
+      <div class="ni-body"><b>${esc(sh.ownerName || 'Friend')} shared progress</b>
+        <small>${esc(sh.challengeTitle || 'Challenge')} · ${min} min left</small>
+        <div class="ni-acts"><button class="btn sm" data-act="view-shared-progress" data-id="${esc(sh.id)}">View</button></div></div></div>`);
+  });
+  el.innerHTML = rows.length ? rows.join('') : '<div class="notif-empty">Nothing here yet</div>';
+}
+function openNotifSheet() {
+  renderNotifSheet();
+  const sh = $('notif-sheet'); sh.classList.add('open');
+  $('notif-bell')?.classList.add('active');
+}
+function closeNotifSheet() {
+  $('notif-sheet')?.classList.remove('open');
+  $('notif-bell')?.classList.remove('active');
+}
+async function nbAccept(id) {
+  const r = S.notifs.incoming.find(x => x.id === id);
+  if (!r) return toast('Request no longer available.');
+  const incNotes = !!document.querySelector(`#nb-notes-${id}, #ns-notes-${id}`)?.checked;
+  await decideProgressRequest(id, true, incNotes);
+}
+
+/* ═══════════════════════════════════════════════════
+   HOME ADDITIONS
+   ═══════════════════════════════════════════════════ */
+function allTimePoints() { return S.mine.reduce((a, m) => a + (S.done[m.code] ? Object.keys(S.done[m.code]).reduce((s, k) => { const x = S.meta[m.code]; return s + (x?.targets?.find(t => t.id === k.split('@')[0])?.points || 0); }, 0) : 0), 0); }
+function streak7Days() {
+  // streak across ALL challenges (any task done = green day)
+  const allDone = new Set();
+  S.mine.forEach(m => { const d = S.done[m.code] || {}; Object.values(d).forEach(v => { if (v) allDone.add(v); }); });
+  let n = 0;
+  for (let i = 1; ; i++) { const d = dayOff(-i); if (allDone.has(d)) n++; else break; if (n > 365) break; }
+  return n;
+}
+function todayScore() {
+  const t = today(); let pts = 0;
+  S.mine.forEach(m => { const x = S.meta[m.code]; if (!x || x.gone) return; const d = S.done[m.code] || {}; Object.entries(d).forEach(([k, v]) => { if (v === t) pts += (x.targets?.find(g => g.id === k.split('@')[0])?.points || 0); }); });
+  return pts;
+}
+function nextDeadline() {
+  const t = today(); let best = null;
+  S.mine.forEach(m => { const x = S.meta[m.code]; if (!x || x.gone || status(x) !== 'live') return; if (!best || x.endDate < best.endDate) best = { title: m.title, endDate: x.endDate, code: m.code }; });
+  if (!best) return null;
+  const days = Math.max(0, Math.round((new Date(best.endDate) - new Date(t)) / 86400000));
+  return { ...best, days };
+}
+function whoAhead() {
+  // find person just above me in the most active challenge
+  let result = null;
+  S.mine.forEach(m => {
+    const x = S.meta[m.code]; if (!x || x.gone || status(x) !== 'live' || x.challengeType === 'mega') return;
+    if (m.code !== S.active) return; // only current
+    const list = [...S.members].sort((a, b) => (b.points || 0) - (a.points || 0));
+    const myIdx = list.findIndex(p => p.id === S.uid);
+    if (myIdx <= 0) return;
+    const above = list[myIdx - 1];
+    const diff = (above.points || 0) - (list[myIdx]?.points || 0);
+    result = { name: above.name || 'Player', diff, challenge: m.title };
+  });
+  return result;
+}
+function personalBest() { return ls.get('cr_pb', 0); }
+function updatePB() { const t = todayScore(), pb = personalBest(); if (t > pb) { ls.set('cr_pb', t); } }
+function missedYesterday() {
+  const y = dayOff(-1);
+  const key = 'cr_missed_dismissed_' + y;
+  if (ls.get(key, false)) return false;
+  let hasTasks = false, done = false;
+  S.mine.forEach(m => { const x = S.meta[m.code]; if (!x || x.gone || x.challengeType === 'mega') return; const d = (x.targets || []).filter(g => g.daily); if (!d.length) return; hasTasks = true; const md = S.done[m.code] || {}; if (d.some(g => md[`${g.id}@${y}`])) done = true; });
+  return hasTasks && !done;
+}
+function dismissMissed() { const y = dayOff(-1); ls.set('cr_missed_dismissed_' + y, true); renderHome(); }
+function renderRivalry() {
+  const el = $('home-rivalry'); if (!el) return;
+  const ahead = whoAhead(), pb = personalBest(), ts = todayScore();
+  let html = '';
+  if (ahead) html += `<div class="rivalry"><div><b>${ahead.diff} pts behind ${esc(ahead.name)}</b><div class="meta" style="font-size:11px">${esc(ahead.challenge)}</div></div><div class="pb">PB ${pb}</div></div>`;
+  el.innerHTML = html;
+}
+function renderMissedBanner() {
+  const el = $('home-missed'); if (!el) return;
+  if (!missedYesterday()) { el.innerHTML = ''; return; }
+  el.innerHTML = `<div class="missed-banner"><div class="dot"></div><div><b>Missed yesterday</b><div>No daily tasks completed yesterday — keep the streak alive today.</div></div><button class="btn sec sm" style="margin-left:auto;flex:none" data-act="dismiss-missed">✕</button></div>`;
+}
+function creatorAnnouncements() {
+  const out = [];
+  S.mine.forEach(m => {
+    const x = S.meta[m.code]; if (!x || x.gone) return;
+    const ann = x.announcement; if (!ann) return;
+    const key = 'ann_' + m.code + '_' + (x.announcementAt || '');
+    if (S.dismissed[key]) return;
+    out.push({ code: m.code, title: m.title, text: ann, key });
+  });
+  return out;
+}
+function renderHomeAnnouncements() {
+  // already handled in renderHomeBanners for request banners
+  // add announcement cards before it
+  const el = $('home-banners'); if (!el) return;
+  const anns = creatorAnnouncements();
+  const annHtml = anns.map(a => `<div class="ann-strip"><b>📣 ${esc(a.title)}</b>${esc(a.text)}<button class="btn sec sm" style="margin-left:8px" data-act="dismiss-ann" data-key="${esc(a.key)}">✕</button></div>`).join('');
+  // prepend to existing banners
+  el.innerHTML = annHtml + (el.innerHTML || '');
+}
+function homeDotColor(date) {
+  const t = today();
+  if (date > t) return 'dot-gray';
+  let hasTasks = false, totalD = 0, doneD = 0;
+  S.mine.forEach(m => {
+    const x = S.meta[m.code]; if (!x || x.gone || x.challengeType === 'mega') return;
+    if (x.startDate > date || x.endDate < date) return;
+    const d = (x.targets || []).filter(g => g.daily); if (!d.length) return;
+    hasTasks = true; totalD += d.length;
+    const md = S.done[m.code] || {};
+    doneD += d.filter(g => md[`${g.id}@${date}`]).length;
+  });
+  if (!hasTasks) return 'dot-gray';
+  if (doneD === 0) return date < t ? 'dot-red' : 'dot-gray';
+  if (doneD >= totalD) return 'dot-green';
+  return 'dot-amber';
+}
+function renderHomeCalendar() {
+  const el = $('home-cal-wrap'); if (!el) return;
+  const year = S.homeCalYear, month = S.homeCalMonth;
+  const first = new Date(year, month, 1), offset = first.getDay();
+  const days = new Date(year, month + 1, 0).getDate();
+  const t = today();
+  const dayNames = ['S','M','T','W','T','F','S'];
+  let cells = dayNames.map(d => `<div class="hc-dlbl">${d}</div>`).join('');
+  for (let i = 0; i < offset; i++) cells += '<div></div>';
+  for (let n = 1; n <= days; n++) {
+    const date = `${year}-${String(month+1).padStart(2,'0')}-${String(n).padStart(2,'0')}`;
+    const dot = homeDotColor(date);
+    const numCls = date === t ? ' today' : '';
+    cells += `<div class="hc-cell"><div class="hc-num${numCls}">${n}</div><div class="hc-dot ${dot}"></div></div>`;
+  }
+  const title = first.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+  el.innerHTML = `<div class="lbl">Calendar</div><div class="home-cal">
+    <div class="hc-hd">${title}<span>Tap month to navigate</span></div>
+    <div class="hc-days">${cells}</div>
+    <div class="hc-legend">
+      <span><i style="background:#34D399"></i>All done</span>
+      <span><i style="background:#F59E0B"></i>Partial</span>
+      <span><i style="background:#F87171"></i>Missed</span>
+      <span><i style="background:var(--acc)"></i>Today</span>
+    </div>
+    <div class="row" style="gap:6px;margin-top:8px">
+      <button class="btn sec sm" data-act="home-cal-prev">‹</button>
+      <button class="btn sec sm" data-act="home-cal-next">›</button>
+    </div>
+  </div>`;
+}
+function renderOneTimeDue() {
+  const el = $('home-onetimes'); if (!el) return;
+  const t = today(); const items = [];
+  S.mine.forEach(m => {
+    const x = S.meta[m.code]; if (!x || x.gone || status(x) !== 'live' || x.challengeType === 'mega') return;
+    const d = S.done[m.code] || {};
+    (x.targets || []).filter(g => !g.daily && !d[g.id]).forEach(g => items.push({ code: m.code, title: m.title, g, endDate: x.endDate }));
+  });
+  if (!items.length) { el.innerHTML = ''; return; }
+  items.sort((a, b) => a.endDate.localeCompare(b.endDate));
+  const shown = items.slice(0, 5);
+  el.innerHTML = `<div class="lbl">One-time tasks due soon</div><div class="group">${shown.map(it => `<button class="li quest" data-act="toggle-in" data-code="${esc(it.code)}" data-id="${esc(it.g.id)}"><span class="box"></span><span class="t">${esc(it.g.text)} <span class="meta">· ${esc(it.title)}</span></span><span class="p">+${it.g.points}</span></button>`).join('')}</div>`;
+}
+function renderWeekChart() {
+  const el = $('home-week'); if (!el) return;
+  const days = Array.from({length:7}, (_, i) => dayOff(i - 6));
+  const labels = ['M','T','W','T','F','S','S'].slice(0,7);
+  const vals = days.map(date => {
+    let pts = 0;
+    S.mine.forEach(m => { const x = S.meta[m.code]; if (!x || x.gone) return; const d = S.done[m.code] || {}; Object.entries(d).forEach(([k, v]) => { if (v === date) pts += x.targets?.find(g => g.id === k.split('@')[0])?.points || 0; }); });
+    return pts;
+  });
+  const max = Math.max(1, ...vals);
+  const bars = vals.map((v, i) => `<div class="wbar-col"><div class="wbar-inner${days[i] === today() ? ' acc' : ''}" style="height:${Math.round(v/max*44)+4}px"></div><div class="wday">${labels[i]}</div></div>`).join('');
+  const atp = allTimePoints();
+  const ended = S.mine.filter(m => { const x = S.meta[m.code]; return x && !x.gone && status(x) === 'ended'; }).length;
+  el.innerHTML = `<div class="lbl">This week</div><div class="week-card"><div class="wbars">${bars}</div><div class="week-totals"><div><div class="big">${atp} pts</div><div class="meta">All-time total</div></div><div style="text-align:right"><div class="big">${ended}</div><div class="meta">Challenges done</div></div></div></div>`;
+}
+function renderTabDailyStrip() {
+  const el = $('tab-daily-strip'); if (!el) return;
+  const c = S.chal; if (!c || c.challengeType === 'mega') { el.hidden = true; return; }
+  const t = today(), done = S.me?.done || {}, daily = (c.targets || []).filter(g => g.daily);
+  if (!daily.length) { el.hidden = true; return; }
+  const dn = daily.filter(g => done[`${g.id}@${t}`]).length;
+  el.hidden = false;
+  el.innerHTML = `<div class="lbl">Today — ${dn}/${daily.length} daily tasks</div><div class="group">${daily.map(g => { const on = !!done[`${g.id}@${t}`]; return `<button class="li quest ${on?'on':''}" data-act="toggle" data-id="${esc(g.id)}"><span class="box"></span><span class="t">${esc(g.text)}</span><span class="p">+${g.points}</span></button>`; }).join('')}</div>`;
+}
+
+/* ═══════════════════════════════════════════════════
+   ADMIN PANEL
+   ═══════════════════════════════════════════════════ */
+function renderAdmin() {
+  const el = $('pane-admin'); if (!el) return;
+  const c = S.chal; const at = $('admin-tab');
+  if (!c || c.ownerUid !== S.uid) { if (at) at.hidden = true; el.innerHTML = ''; return; }
+  if (at) at.hidden = false;
+  const st = status(c);
+  const isArchived = !!c.archived;
+  const members = S.members;
+  const t = today();
+
+  // Completion rate per target
+  const totM = members.length || 1;
+  const targetRows = (c.targets || []).map(g => {
+    const key = g.daily ? `${g.id}@${t}` : g.id;
+    const doneCount = members.filter(m => m.done?.[key]).length;
+    const pct = Math.round(doneCount / totM * 100);
+    return `<div class="completion-bar-wrap">
+      <div class="meta"><span>${esc(g.text.slice(0,40))}${g.daily?' (daily)':''}</span><span>${doneCount}/${totM}</span></div>
+      <div class="bar"><i style="width:${pct}%"></i></div>
+    </div>`;
+  }).join('');
+
+  // Activity feed (last 10 events from members' done entries)
+  const events = [];
+  members.forEach(m => {
+    Object.entries(m.done || {}).forEach(([k, date]) => {
+      const g = (c.targets || []).find(x => x.id === k.split('@')[0]);
+      if (g) events.push({ name: m.name || 'Player', text: g.text, date, pts: g.points });
+    });
+  });
+  events.sort((a, b) => b.date.localeCompare(a.date));
+  const feedHtml = events.slice(0, 10).map(e => `<div class="activity-row"><div class="av avatar">${esc(ini(e.name))}</div><div class="grow"><b>${esc(e.name)}</b> completed <i>${esc(e.text.slice(0,40))}</i><div class="meta">${fmt(e.date)} · +${e.pts} pts</div></div></div>`).join('') || '<div class="meta" style="padding:8px 0">No activity yet.</div>';
+
+  // Inactive members (no task in last 3 days)
+  const cutoff = dayOff(-3);
+  const inactiveIds = new Set(members.filter(m => !Object.values(m.done || {}).some(d => d >= cutoff)).map(m => m.id));
+
+  // Member kick rows
+  const memberRows = members.filter(m => m.id !== S.uid).map(m => {
+    const inactive = inactiveIds.has(m.id);
+    return `<div class="admin-row"><div class="grow"><b>${esc(m.name||'Player')}${inactive?'<span class="inactive-chip">Inactive 3d</span>':''}</b><div class="meta">${m.points||0} pts</div></div><button class="btn bad sm" data-act="kick-member" data-uid="${esc(m.id)}" data-name="${esc(m.name||'Player')}">Kick</button></div>`;
+  }).join('') || '<div class="meta" style="padding:8px 0">You are the only member.</div>';
+
+  el.innerHTML = `
+    ${isArchived ? `<div class="frozen-banner">🔒 This challenge is archived. The board and scores are frozen.</div>` : ''}
+    <div class="lbl">Announcement</div>
+    <p class="sub">Post a message visible to all members on their Home screen.</p>
+    <textarea id="ann-text" maxlength="200" rows="2" placeholder="e.g. Mock test tomorrow — finish today's tasks!">${esc(c.announcement||'')}</textarea>
+    <div class="btns"><button class="btn" data-act="post-announcement">Post announcement</button>${c.announcement?`<button class="btn sec" data-act="clear-announcement">Clear</button>`:''}</div>
+    <div class="lbl">Extend / close date</div>
+    <div class="row"><label for="admin-end" style="color:var(--mut);font-size:13px;flex:none;margin-right:8px">End date</label><input id="admin-end" type="date" value="${esc(c.endDate)}" style="flex:1"><button class="btn sm" style="margin-left:8px" data-act="admin-set-end">Save</button></div>
+    <div class="btns"><button class="btn sec" data-act="close-challenge-now">Close challenge now</button></div>
+    <div class="lbl">Transfer ownership</div>
+    <select id="transfer-select" aria-label="Transfer to">
+      <option value="">— choose member —</option>
+      ${members.filter(m=>m.id!==S.uid).map(m=>`<option value="${esc(m.id)}">${esc(m.name||'Player')}</option>`).join('')}
+    </select>
+    <div class="btns"><button class="btn sec" data-act="admin-transfer">Transfer ownership</button></div>
+    <div class="lbl">Members</div>
+    <div class="group">${memberRows}</div>
+    <div class="lbl">Completion rate — today's daily tasks</div>
+    <div class="group" style="padding:10px 14px">${targetRows||'<div class="meta">No tasks.</div>'}</div>
+    <div class="lbl">Activity feed</div>
+    <div class="group" style="padding:10px 14px">${feedHtml}</div>
+    <div class="lbl">Archive & export</div>
+    ${isArchived
+      ? `<div class="btns"><button class="btn sec" data-act="export-csv">Export CSV</button><button class="btn sec" data-act="clone-challenge">Rerun (clone challenge)</button></div>`
+      : `<div class="btns"><button class="btn sec" data-act="export-csv">Export CSV</button><button class="btn sec" data-act="clone-challenge">Rerun (clone challenge)</button></div><div class="danger-zone"><div class="lbl">Archive</div><p class="sub">Freeze scores and mark challenge as complete. Cannot be undone.</p><button class="btn bad" data-act="archive-challenge">Archive and freeze</button></div>`
+    }`;
+}
+
+/* ═══════════════════════════════════════════════════
+   ADMIN ACTIONS
+   ═══════════════════════════════════════════════════ */
+async function postAnnouncement() {
+  const c = S.chal; if (!c || c.ownerUid !== S.uid) return;
+  const text = $('ann-text')?.value.trim() || '';
+  if (DEMO) return demoMsg();
+  try {
+    await updateDoc(doc(db, 'challenges', c.id), { announcement: text, announcementAt: today() });
+    S.chal.announcement = text; S.meta[c.id] = metaOf(S.chal);
+    toast(text ? 'Announcement posted.' : 'Announcement cleared.'); renderAdmin(); renderHome();
+  } catch { toast('Could not post. Check connection.'); }
+}
+async function clearAnnouncement() { $('ann-text') && ($('ann-text').value = ''); postAnnouncement(); }
+async function adminSetEndDate() {
+  const c = S.chal; if (!c || c.ownerUid !== S.uid) return;
+  const end = $('admin-end')?.value; if (!end || end < c.startDate) return toast('End date must be after start date.');
+  if (DEMO) return demoMsg();
+  try { await updateDoc(doc(db, 'challenges', c.id), { endDate: end }); toast('End date updated.'); S.chal.endDate = end; S.meta[c.id] = metaOf(S.chal); renderAll(); } catch { toast('Could not update.'); }
+}
+async function closeChallengeNow() {
+  const c = S.chal; if (!c || c.ownerUid !== S.uid) return;
+  if (!confirm('End this challenge now? This sets today as the end date.')) return;
+  if (DEMO) return demoMsg();
+  try { await updateDoc(doc(db, 'challenges', c.id), { endDate: today(), live: false }); toast('Challenge closed.'); S.chal.endDate = today(); S.chal.live = false; S.meta[c.id] = metaOf(S.chal); renderAll(); } catch { toast('Could not close.'); }
+}
+async function kickMember(uid, name) {
+  const c = S.chal; if (!c || c.ownerUid !== S.uid) return;
+  if (!confirm(`Remove ${name} from this challenge?`)) return;
+  if (DEMO) return demoMsg();
+  try { await deleteDoc(doc(db, 'challenges', c.id, 'members', uid)); toast(`${name} removed.`); } catch { toast('Could not remove member.'); }
+}
+async function adminTransfer() {
+  const c = S.chal; if (!c || c.ownerUid !== S.uid) return;
+  const uid = $('transfer-select')?.value; if (!uid) return toast('Choose a member.');
+  const name = S.members.find(m => m.id === uid)?.name || 'Player';
+  if (!confirm(`Transfer ownership to ${name}? You will lose admin access.`)) return;
+  if (DEMO) return demoMsg();
+  try { await updateDoc(doc(db, 'challenges', c.id), { ownerUid: uid, ownerName: name }); toast('Ownership transferred.'); } catch { toast('Could not transfer.'); }
+}
+async function archiveChallenge() {
+  const c = S.chal; if (!c || c.ownerUid !== S.uid) return;
+  if (!confirm('Archive and freeze this challenge? Scores are locked. This cannot be undone.')) return;
+  if (DEMO) return demoMsg();
+  try { await updateDoc(doc(db, 'challenges', c.id), { archived: true, live: false, archivedAt: today() }); toast('Challenge archived and scores frozen.'); } catch { toast('Could not archive.'); }
+}
+function exportCSV() {
+  const c = S.chal; if (!c) return;
+  const rows = [['Name', 'Points', 'Rank', ...( c.targets || []).map(t => t.text.slice(0,30))]];
+  const list = [...S.members].sort((a,b) => (b.points||0)-(a.points||0));
+  list.forEach((m, i) => {
+    const done = m.done || {};
+    const t = today();
+    const cells = (c.targets || []).map(g => { const key = g.daily ? `${g.id}@${t}` : g.id; return done[key] ? 'done' : ''; });
+    rows.push([m.name || 'Player', m.points || 0, i + 1, ...cells]);
+  });
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = (c.title || 'challenge').replace(/[^a-z0-9]/gi, '_') + '_results.csv';
+  a.click(); toast('CSV downloaded.');
+}
+async function cloneChallenge() {
+  const c = S.chal; if (!c || c.ownerUid !== S.uid) return;
+  if (!confirm('Clone this challenge? A new copy will be created with the same tasks and fresh start/end dates (today + same duration).')) return;
+  if (DEMO) return demoMsg();
+  try {
+    const dur = Math.max(1, Math.round((new Date(c.endDate) - new Date(c.startDate)) / 86400000));
+    const start = today(), end = dayOff(dur);
+    let code; for (let i = 0; i < 5; i++) { code = genCode(); if (!(await getDoc(doc(db, 'challenges', code))).exists()) break; }
+    const title = c.title + ' (rerun)';
+    await setDoc(doc(db, 'challenges', code), { title, desc: c.desc || '', startDate: start, endDate: end, targets: c.targets || [], childChallenges: [], challengeType: c.challengeType || 'standard', discoverable: true, live: true, ownerUid: S.uid, ownerName: S.name, createdAt: serverTimestamp() });
+    await ensureMember(code); addMine(code, title); watch(code); await loadMeta();
+    toast('Challenge cloned! Opening new copy.'); setView('challenge');
+  } catch { toast('Could not clone. Check connection.'); }
+}
+
+/* ═══════════════════════════════════════════════════
+   GOOGLE CALENDAR SYNC (OAuth via GIS)
+   ═══════════════════════════════════════════════════ */
+const GCal = (() => {
+  const CLIENT_ID = ''; // user must fill in
+  const SCOPES = 'https://www.googleapis.com/auth/calendar.events';
+  let tokenClient = null, accessToken = null;
+  function init() {
+    if (!window.google?.accounts?.oauth2 || !CLIENT_ID) return;
+    tokenClient = window.google.accounts.oauth2.initTokenClient({ client_id: CLIENT_ID, scope: SCOPES, callback: r => { if (r?.access_token) { accessToken = r.access_token; ls.set('gcal_token', accessToken); toast('Google Calendar connected.'); } } });
+    const saved = ls.get('gcal_token', null); if (saved) accessToken = saved;
+  }
+  function connect() { if (!tokenClient) return toast('Google Calendar not configured. Add your OAuth Client ID.'); tokenClient.requestAccessToken(); }
+  async function createEvent(title, startDate, endDate, description) {
+    if (!accessToken) return;
+    const body = { summary: title, description, start: { date: startDate }, end: { date: endDate }, reminders: { useDefault: false, overrides: [{ method: 'popup', minutes: 480 }] } };
+    try {
+      const r = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', { method:'POST', headers:{ Authorization:`Bearer ${accessToken}`, 'Content-Type':'application/json'}, body: JSON.stringify(body) });
+      if (!r.ok) { accessToken = null; ls.set('gcal_token', null); return; }
+      const ev = await r.json(); return ev.id;
+    } catch {}
+  }
+  async function syncChallenge(code, title, startDate, endDate, desc) {
+    if (!accessToken) return;
+    const evId = ls.get('gcal_ev_' + code, null);
+    if (evId) return;
+    const id = await createEvent(`📌 ${title}`, startDate, endDate, desc || 'Challenge Room challenge');
+    if (id) { ls.set('gcal_ev_' + code, id); toast('Synced to Google Calendar.'); }
+  }
+  return { init, connect, syncChallenge };
+})();
+
+function qjoin() {
+  const code = $('qjoin-code')?.value.trim().toUpperCase().slice(0,6);
+  if (!code || code.length < 4) return toast('Enter a valid code.');
+  S.pendingCode = code; setView('join'); $('join-code').value = code;
 }
 
 async function saveNote() {
@@ -952,7 +1563,7 @@ async function logout() {
   if (DEMO) { toast('Demo mode has no account to log out of.'); return; }
   try {
     await signOut(auth);
-    S.uid = null; S.chal = null; S.me = null; S.members = []; S.unsubs.forEach(fn => fn()); S.unsubs = [];
+    S.uid = null; S.chal = null; S.me = null; S.members = []; S.unsubs.forEach(fn => fn()); S.unsubs = []; stopNotifListeners();
     document.body.classList.add('auth-required'); setView('login');
     toast('Logged out.');
   } catch (err) { toast('Could not log out. Check your connection and try again.'); }
@@ -1086,23 +1697,29 @@ window.addEventListener('popstate', e => {
   }
 });
 const empty = (h, p) => `<div class="empty"><b>${h}</b>${p}</div>`;
-function renderAll() { renderHome(); renderMegaHub(); renderChallenge(); renderActivity(); renderProfile(); setPane(S.pane); }
+function renderAll() { renderHome(); renderMegaHub(); renderChallenge(); renderActivity(); renderProfile(); renderAdmin(); setPane(S.pane); }
 
 function renderHome() {
   $('home-h').textContent = S.name ? `Hello, ${S.name}` : 'Hello';
+  updatePB();
   let live = 0, dTot = 0, dDone = 0;
   S.mine.forEach(m => { const x = S.meta[m.code]; if (x && !x.gone && status(x) === 'live') { live++; if (x.challengeType !== 'mega') { const c = counts(m.code); if (c) { dTot += c.dt; dDone += c.dd; } } } });
   const n = megaList().length;
   const megaBtn = n === 0 ? ['＋', 'Create a mega challenge'] : n === 1 ? ['Enter ›', 'Enter mega challenge'] : [`${n} megas ›`, 'Choose a mega challenge'];
-  $('home-stats').innerHTML = `<div class="stat"><b>${S.mine.length}</b><span>Challenges joined</span></div>
-    <div class="stat"><b>${live}</b><span>Live right now</span></div>
-    <div class="stat"><b>${dTot ? `${dDone}/${dTot}` : '-'}</b><span>Daily tasks done today</span></div>
+  const dl = nextDeadline();
+  const str = streak7Days(), ts = todayScore();
+  $('home-stats').innerHTML = `
+    <div class="stat"><b>🔥 ${str}</b><span>Day streak</span></div>
+    <div class="stat"><b>+${ts}</b><span>Today's score</span></div>
+    <div class="stat"><b>${dl ? dl.days + 'd' : '-'}</b><span>${dl ? esc(dl.title.slice(0,14)) : 'Next deadline'}</span></div>
     <button class="stat megabtn" data-act="open-mega"><b>${megaBtn[0]}</b><span>${megaBtn[1]}</span></button>`;
   const el = $('home-list');
-  if (!S.mine.length) { $('home-today').innerHTML = ''; el.innerHTML = empty('No challenges yet', 'Create one or join with a code.'); $('mine-list').innerHTML = el.innerHTML; renderMegaPicksCreate(); return; }
+  if (!S.mine.length) { $('home-today').innerHTML = ''; if($('home-rivalry')) $('home-rivalry').innerHTML=''; el.innerHTML = empty('No challenges yet', 'Create one or join with a code.'); $('mine-list').innerHTML = el.innerHTML; renderMegaPicksCreate(); return; }
+  renderRivalry(); renderMissedBanner(); renderHomeBanners(); renderHomeAnnouncements();
+  renderHomeCalendar(); renderOneTimeDue();
   $('home-today').innerHTML = todayHtml();
   el.innerHTML = listHtml(false);
-  $('mine-list').innerHTML = listHtml(true); renderMegaPicksCreate();
+  $('mine-list').innerHTML = listHtml(true); renderMegaPicksCreate(); renderWeekChart();
 }
 
 function renderChallenge() {
@@ -1119,7 +1736,7 @@ function renderChallenge() {
   head.innerHTML = `<h1>${esc(c.title)}</h1>
     <div class="row" style="margin-top:8px;flex-wrap:wrap"><span class="badge ${st}">${st}</span><span class="sub" style="margin:0">${esc(msg)}, ${S.members.length} ${S.members.length === 1 ? 'player' : 'players'}</span></div>
     ${c.desc ? `<p class="sub">${esc(c.desc)}</p>` : ''}${sw}`;
-  renderQuests(); renderProgress(); renderBoard(); renderJournal();
+  renderQuests(); renderProgress(); renderBoard(); renderJournal(); renderAdmin(); renderTabDailyStrip();
 }
 
 function renderQuests() {
@@ -1139,7 +1756,7 @@ function renderQuests() {
     <div class="lbl">Invite friends</div>
     <div class="group"><div class="li"><div class="grow"><b>Code ${esc(c.id)}</b><div class="meta">Friends enter this code or open your link.</div></div>
       <button class="btn sm" data-act="share" data-code="${esc(c.id)}">Share</button></div></div>
-    ${owner ? `<div class="btns"><button class="btn sec" data-act="edit-challenge">Edit challenge</button></div><div class="btns"><button class="btn sec" data-act="toggle-live">${c.live ? 'Pause challenge' : 'Go live'}</button><button class="btn bad" data-act="delete">Delete</button></div>` : ''}
+    ${owner ? `<div class="btns"><button class="btn sec" data-act="edit-challenge">Edit challenge</button></div>` : ''}
     <div class="btns"><button class="btn bad" data-act="leave">Leave</button></div>`;
 }
 
@@ -1221,7 +1838,7 @@ function renderBoard() {
   $('pane-board').innerHTML = `<div class="lbl">Standings</div>` + (list.length ? `<div class="group">` + list.map((m, i) => `<div class="li ${i === 0 ? 'lead' : ''}">
     <div class="rk">${i + 1}</div>${m.photo ? `<div class="avatar ${m.id === S.uid ? 'me' : ''}" style="padding:0"><img src="${esc(m.photo)}" alt="" onerror="this.remove()"></div>` : `<div class="avatar ${m.id === S.uid ? 'me' : ''}">${esc(ini(m.name))}</div>`}
     <div class="grow"><b>${esc(m.name || 'Player')}${m.id === S.uid ? ' (you)' : ''}</b>${m.about ? `<div class="meta">${esc(m.about)}</div>` : ''}<div class="mini"><i style="width:${Math.round((m.points || 0) / top * 100)}%"></i></div></div>
-    <div class="pts">${m.points || 0}</div>${m.id !== S.uid ? `<button class="btn sec sm" data-act="request-progress" data-uid="${esc(m.id)}" data-name="${esc(m.name||'Friend')}">Request progress</button>` : ''}</div>`).join('') + '</div>' : empty('No players yet', 'Share the code to get friends in.'));
+    <div class="pts">${m.points || 0}</div>${m.id !== S.uid ? `<button class="req-logo-btn" data-act="request-progress" data-uid="${esc(m.id)}" data-name="${esc(m.name||'Friend')}" title="Request to view progress" aria-label="Request progress for ${esc(m.name||'friend')}"><svg width="20" height="20" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="ntg" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse"><stop stop-color="#5B8DEF"/><stop offset="1" stop-color="#22D3EE"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="17" fill="url(#ntg)"/><path d="M18 18h28v6H35v22h-7V24H18z" fill="#081326"/><path d="m42 31 6 6-6 6" fill="none" stroke="#081326" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="req-state ${reqState(m.id)}" title="${reqStateLabel(m.id)}"></span></button>` : ''}</div>`).join('') + '</div>' : empty('No players yet', 'Share the code to get friends in.'));
 }
 function renderJournal() {
   const hist = $('journal-hist'), ta = $('j-text'), notes = S.me?.notes || {}, done = S.me?.done || {};
@@ -1457,8 +2074,28 @@ document.addEventListener('click', e => {
   else if (a === 'open') openChallenge(b.dataset.code);
   else if (a === 'toggle') toggle(b.dataset.id);
   else if (a === 'toggle-in') toggleIn(b.dataset.code, b.dataset.id);
+  else if (a === 'open-notifs') openNotifSheet();
+  else if (a === 'close-notifs') closeNotifSheet();
+  else if (a === 'nb-accept') nbAccept(b.dataset.id);
+  else if (a === 'nb-decline') decideProgressRequest(b.dataset.id, false);
   else if (a === 'toggle-folder') toggleFolder(b.dataset.code);
   else if (a === 'open-mega') openMegaEntry();
+  else if (a === 'dismiss-missed') dismissMissed();
+  else if (a === 'dismiss-ann') { const k=b.dataset.key; S.dismissed[k]=true; ls.set('cr_dismissed',S.dismissed); renderHome(); }
+  else if (a === 'home-cal-prev') { S.homeCalMonth--; if(S.homeCalMonth<0){S.homeCalMonth=11;S.homeCalYear--;} renderHomeCalendar(); }
+  else if (a === 'home-cal-next') { S.homeCalMonth++; if(S.homeCalMonth>11){S.homeCalMonth=0;S.homeCalYear++;} renderHomeCalendar(); }
+  else if (a === 'qjoin') qjoin();
+  else if (a === 'post-announcement') postAnnouncement();
+  else if (a === 'clear-announcement') clearAnnouncement();
+  else if (a === 'admin-set-end') adminSetEndDate();
+  else if (a === 'close-challenge-now') closeChallengeNow();
+  else if (a === 'kick-member') kickMember(b.dataset.uid, b.dataset.name);
+  else if (a === 'admin-transfer') adminTransfer();
+  else if (a === 'archive-challenge') archiveChallenge();
+  else if (a === 'export-csv') exportCSV();
+  else if (a === 'clone-challenge') cloneChallenge();
+  else if (a === 'toggle-live') toggleLive();
+  else if (a === 'delete') removeChallenge();
   else if (a === 'calendar-prev' || a === 'calendar-next') { S.calendarMonth += a === 'calendar-prev' ? -1 : 1; if (S.calendarMonth < 0) { S.calendarMonth = 11; S.calendarYear--; } if (S.calendarMonth > 11) { S.calendarMonth = 0; S.calendarYear++; } renderProgress(); }
   else if (a === 'calendar-day') showCalendarDay(b.dataset.date);
   else if (a === 'join') join($('join-code').value);
