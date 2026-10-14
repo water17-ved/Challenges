@@ -43,9 +43,9 @@ h1{font-size:25px;font-weight:800;letter-spacing:-.015em;line-height:1.2}
 .li b{font-weight:700}
 .li .meta{color:var(--mut);font-size:14px}
 .chev{color:var(--mut)}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;margin-bottom:8px}
 .stat{background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:14px}
-.stat b{display:block;font-size:28px;font-weight:800;line-height:1.1}
+.stat b{display:block;font-size:clamp(20px,6vw,28px);font-weight:800;line-height:1.1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .stat span{font-size:13px;color:var(--mut)}
 .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px 16px;border-radius:10px;background:var(--acc);color:#0B1020;font-weight:700;border:1px solid var(--acc)}
 .btn.sec{background:transparent;color:var(--tx);border-color:var(--line)}
@@ -209,11 +209,11 @@ button.stat{text-align:left;color:inherit;width:100%;cursor:pointer}
 .home-cal .hc-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:12px;font-weight:800}
 .home-cal .hc-hd span{color:var(--mut);font-weight:600;font-size:11px}
 .hc-days{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
-.hc-dlbl{text-align:center;font-size:9px;color:var(--mut);font-weight:700;padding-bottom:2px}
-.hc-cell{text-align:center;padding:1px 0}
-.hc-num{font-size:10px;font-weight:700;color:var(--mut);line-height:1.2}
+.hc-dlbl{text-align:center;font-size:9px;color:var(--mut);font-weight:700;padding:2px 0 4px}
+.hc-cell{text-align:center;padding:3px 0}
+.hc-num{font-size:11px;font-weight:700;color:var(--mut);line-height:1.3}
 .hc-num.today{color:var(--tx);background:var(--s2);border-radius:5px;padding:0 3px}
-.hc-dot{width:6px;height:6px;border-radius:50%;margin:1px auto 0}
+.hc-dot{width:8px;height:8px;border-radius:50%;margin:2px auto 0}
 .dot-green{background:#34D399}.dot-amber{background:#F59E0B}.dot-red{background:#F87171}.dot-gray{background:var(--line)}.dot-blue{background:var(--acc)}
 .hc-legend{display:flex;gap:10px;margin-top:7px;flex-wrap:wrap}
 .hc-legend span{font-size:9px;color:var(--mut);display:flex;align-items:center;gap:3px}
@@ -922,7 +922,7 @@ function renderHomeBanners() {
   const banners = [];
   pending.forEach(r => {
     banners.push(`<div class="notif-banner">
-      <div class="nb-icon">''' + LOGO_SVG + '''</div>
+      <div class="nb-icon"><svg width="18" height="18" viewBox="0 0 64 64" aria-hidden="true" style="display:block"><defs><linearGradient id="lg1" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse"><stop stop-color="#5B8DEF"/><stop offset="1" stop-color="#22D3EE"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="17" fill="url(#lg1)"/><path d="M18 18h28v6H35v22h-7V24H18z" fill="#081326"/><path d="m42 31 6 6-6 6" fill="none" stroke="#081326" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <div class="nb-body"><b>${esc(r.requesterName || 'Friend')} wants your progress</b>
         <small>${esc(r.challengeTitle || 'A challenge')} · ` + '${Math.max(1, Math.ceil((r.expiresAt - Date.now()) / 3600000))}h left' + `</small>
         <div class="nb-acts">
@@ -936,7 +936,7 @@ function renderHomeBanners() {
   });
   accepted.forEach(r => {
     banners.push(`<div class="notif-banner">
-      <div class="nb-icon">''' + LOGO_SVG + '''</div>
+      <div class="nb-icon"><svg width="18" height="18" viewBox="0 0 64 64" aria-hidden="true" style="display:block"><defs><linearGradient id="lg1" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse"><stop stop-color="#5B8DEF"/><stop offset="1" stop-color="#22D3EE"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="17" fill="url(#lg1)"/><path d="M18 18h28v6H35v22h-7V24H18z" fill="#081326"/><path d="m42 31 6 6-6 6" fill="none" stroke="#081326" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <div class="nb-body"><b>${esc(r.targetName || 'Friend')} allowed access</b>
         <small>${esc(r.challengeTitle || 'A challenge')}</small>
         <div class="nb-acts"><button class="btn sm" data-act="view-shared-progress" data-id="${esc(r.shareId || r.id)}">View now</button></div>
@@ -949,7 +949,7 @@ function renderNotifSheet() {
   const now = Date.now(), rows = [];
   S.notifs.incoming.filter(r => r.status === 'pending').forEach(r => {
     rows.push(`<div class="notif-item">
-      <div class="ni-icon">''' + LOGO_SVG + '''</div>
+      <div class="ni-icon"><svg width="18" height="18" viewBox="0 0 64 64" aria-hidden="true" style="display:block"><defs><linearGradient id="lg1" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse"><stop stop-color="#5B8DEF"/><stop offset="1" stop-color="#22D3EE"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="17" fill="url(#lg1)"/><path d="M18 18h28v6H35v22h-7V24H18z" fill="#081326"/><path d="m42 31 6 6-6 6" fill="none" stroke="#081326" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <div class="ni-body"><b>${esc(r.requesterName || 'Friend')} wants your progress</b>
         <small>${esc(r.challengeTitle || 'Challenge')} · ` + '${Math.max(1,Math.ceil((r.expiresAt-now)/3600000))}h left' + `</small>
         <div class="ni-acts">
@@ -960,7 +960,7 @@ function renderNotifSheet() {
   });
   S.notifs.incoming.filter(r => r.status === 'accepted' || r.status === 'declined').forEach(r => {
     rows.push(`<div class="notif-item">
-      <div class="ni-icon" style="background:${r.status==='declined'?'var(--bad)':'var(--ok)'}">''' + LOGO_SVG + '''</div>
+      <div class="ni-icon" style="background:${r.status==='declined'?'var(--bad)':'var(--ok)'}"><svg width="18" height="18" viewBox="0 0 64 64" aria-hidden="true" style="display:block"><defs><linearGradient id="lg1" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse"><stop stop-color="#5B8DEF"/><stop offset="1" stop-color="#22D3EE"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="17" fill="url(#lg1)"/><path d="M18 18h28v6H35v22h-7V24H18z" fill="#081326"/><path d="m42 31 6 6-6 6" fill="none" stroke="#081326" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <div class="ni-body"><b>${esc(r.requesterName || 'Friend')} — ${r.status === 'declined' ? 'declined' : 'you allowed'}</b>
         <small>${esc(r.challengeTitle || 'Challenge')}</small></div></div>`);
   });
@@ -969,14 +969,14 @@ function renderNotifSheet() {
     const stLabel = st === 'pending' ? '⏳ Waiting' : st === 'accepted' ? '✓ Accepted' : '✗ Declined';
     const acts = st === 'accepted' ? `<div class="ni-acts"><button class="btn sm" data-act="view-shared-progress" data-id="${esc(r.shareId || r.id)}">View progress</button></div>` : '';
     rows.push(`<div class="notif-item">
-      <div class="ni-icon">''' + LOGO_SVG + '''</div>
+      <div class="ni-icon"><svg width="18" height="18" viewBox="0 0 64 64" aria-hidden="true" style="display:block"><defs><linearGradient id="lg1" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse"><stop stop-color="#5B8DEF"/><stop offset="1" stop-color="#22D3EE"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="17" fill="url(#lg1)"/><path d="M18 18h28v6H35v22h-7V24H18z" fill="#081326"/><path d="m42 31 6 6-6 6" fill="none" stroke="#081326" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <div class="ni-body"><b>Request to ${esc(r.targetName || 'Friend')}</b>
         <small>${esc(r.challengeTitle || 'Challenge')} · ${stLabel}</small>${acts}</div></div>`);
   });
   S.notifs.shares.forEach(sh => {
     const min = Math.max(1, Math.ceil((sh.expiresAt - now) / 60000));
     rows.push(`<div class="notif-item">
-      <div class="ni-icon" style="background:var(--ok)">''' + LOGO_SVG + '''</div>
+      <div class="ni-icon" style="background:var(--ok)"><svg width="18" height="18" viewBox="0 0 64 64" aria-hidden="true" style="display:block"><defs><linearGradient id="lg1" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse"><stop stop-color="#5B8DEF"/><stop offset="1" stop-color="#22D3EE"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="17" fill="url(#lg1)"/><path d="M18 18h28v6H35v22h-7V24H18z" fill="#081326"/><path d="m42 31 6 6-6 6" fill="none" stroke="#081326" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <div class="ni-body"><b>${esc(sh.ownerName || 'Friend')} shared progress</b>
         <small>${esc(sh.challengeTitle || 'Challenge')} · ${min} min left</small>
         <div class="ni-acts"><button class="btn sm" data-act="view-shared-progress" data-id="${esc(sh.id)}">View</button></div></div></div>`);
@@ -1711,7 +1711,7 @@ function renderHome() {
   $('home-stats').innerHTML = `
     <div class="stat"><b>🔥 ${str}</b><span>Day streak</span></div>
     <div class="stat"><b>+${ts}</b><span>Today's score</span></div>
-    <div class="stat"><b>${dl ? dl.days + 'd' : '-'}</b><span>${dl ? esc(dl.title.slice(0,14)) : 'Next deadline'}</span></div>
+    <div class="stat"><b style="font-size:clamp(16px,5vw,24px)">${dl ? dl.days + 'd' : '-'}</b><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block">${dl ? esc(dl.title.slice(0,16)) : 'Next deadline'}</span></div>
     <button class="stat megabtn" data-act="open-mega"><b>${megaBtn[0]}</b><span>${megaBtn[1]}</span></button>`;
   const el = $('home-list');
   if (!S.mine.length) { $('home-today').innerHTML = ''; if($('home-rivalry')) $('home-rivalry').innerHTML=''; el.innerHTML = empty('No challenges yet', 'Create one or join with a code.'); $('mine-list').innerHTML = el.innerHTML; renderMegaPicksCreate(); return; }
