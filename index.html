@@ -234,6 +234,35 @@ button.stat{text-align:left;color:inherit;width:100%;cursor:pointer}
 /* challenge-tab daily strip */
 .tab-daily{margin-bottom:8px}
 .tab-daily .lbl{margin-bottom:4px}
+
+/* bulk task adder */
+.bulk-card{background:var(--s2);border:1px solid var(--acc);border-radius:14px;padding:14px;margin:10px 0}
+.bulk-card .bc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.bulk-card .bc-head b{font-size:15px}
+.bulk-task-row{display:flex;gap:6px;margin-bottom:6px}
+.bulk-task-row input{flex:1}
+.bulk-task-row select{width:100px}
+/* global leaderboard */
+.lb-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.lb-row:last-child{border:0}
+.lb-rank{width:24px;text-align:center;font-weight:800;font-size:14px;color:var(--mut)}
+.lb-row.top1 .lb-rank{color:#FFD700;font-size:16px}
+.lb-row.top2 .lb-rank{color:#C0C0C0}
+.lb-row.top3 .lb-rank{color:#CD7F32}
+.lb-pts{font-weight:800;font-size:14px;color:var(--acc);white-space:nowrap}
+.lb-ch{font-size:11px;color:var(--mut);white-space:nowrap}
+/* archive */
+.arch-section{margin-top:12px}
+.arch-section .lbl{color:var(--mut)}
+/* discovery filters */
+.disc-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.disc-filters button{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;background:var(--s2);border:1px solid var(--line);color:var(--mut)}
+.disc-filters button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.disc-search{display:flex;gap:6px;margin-bottom:8px}
+.disc-search input{flex:1;background:var(--s2);border:1px solid var(--line);border-radius:9px;padding:7px 11px;font-size:13px;color:var(--tx);font-family:inherit;outline:none}
+/* suggest edit */
+.suggest-row{background:var(--s2);border-radius:10px;padding:8px 12px;margin-bottom:6px;font-size:13px}
+.suggest-row b{display:block;font-size:12px;color:var(--acc)}
 </style>
 </head>
 <body>
@@ -269,11 +298,22 @@ button.stat{text-align:left;color:inherit;width:100%;cursor:pointer}
     <div class="hub-actions">
       <button class="hub-card" data-act="view" data-v="challenge-market"><span class="hub-icon">⌕</span><span class="grow"><b>Challenge Market</b><small>Discover public challenges and join a study mission.</small></span><span>›</span></button>
       <button class="hub-card" data-act="view" data-v="challenge-mine"><span class="hub-icon">⚑</span><span class="grow"><b>My Challenges</b><small>Open your challenges, create a new one, or build a mega challenge.</small></span><span>›</span></button>
+      <button class="hub-card" data-act="view" data-v="archive"><span class="hub-icon">📦</span><span class="grow"><b>Archive</b><small>Challenges that have ended or been archived.</small></span><span>›</span></button>
+      <button class="hub-card" data-act="view" data-v="global-lb"><span class="hub-icon">🏆</span><span class="grow"><b>Global Leaderboard</b><small>Top players across all public challenges.</small></span><span>›</span></button>
       <button class="hub-card" data-act="view" data-v="challenge-mega"><span class="hub-icon">✦</span><span class="grow"><b>Mega Challenges</b><small>See daily and one-time tasks done per total for every challenge inside each mega.</small></span><span>›</span></button>
     </div>
   </section>
   <section class="view" id="view-challenge-market">
-    <h1>Challenge Market</h1><p class="sub">Public challenges created in Challenge Room. New challenges are discoverable in the market by default.</p>
+    <h1>Challenge Market</h1><p class="sub">Browse and join public challenges. Filter by subject or search by name.</p>
+    <div class="disc-search"><input id="disc-search" placeholder="Search challenges…" aria-label="Search"/></div>
+    <div class="disc-filters" id="disc-filters">
+      <button class="on" data-subj="">All</button>
+      <button data-subj="Physics">Physics</button>
+      <button data-subj="Chemistry">Chemistry</button>
+      <button data-subj="Mathematics">Mathematics</button>
+      <button data-subj="Biology">Biology</button>
+      <button data-subj="General">General</button>
+    </div>
     <div class="btns"><button class="btn sec" data-act="market-refresh">Refresh market</button><button class="btn" data-act="view" data-v="challenge-mine">My Challenges</button></div>
     <div id="market-list" class="group" style="margin-top:16px"></div>
   </section>
@@ -331,6 +371,18 @@ button.stat{text-align:left;color:inherit;width:100%;cursor:pointer}
       <div class="group" id="journal-hist"></div>
     </div>
     <div class="pane" id="pane-admin"></div>
+  </section>
+
+  <section class="view" id="view-global-lb">
+    <h1>Global Leaderboard</h1>
+    <p class="sub">Top players across all public challenges by total points.</p>
+    <div id="global-lb-list"></div>
+  </section>
+
+  <section class="view" id="view-archive">
+    <h1>Archive</h1>
+    <p class="sub">Challenges you were in that have ended or been archived.</p>
+    <div id="archive-list"></div>
   </section>
 
   <section class="view" id="view-ai">
@@ -410,14 +462,31 @@ button.stat{text-align:left;color:inherit;width:100%;cursor:pointer}
     <label for="c-desc">Description (optional)</label><input id="c-desc" maxlength="140" placeholder="Rules, prize, anything friends should know">
     <div class="row"><div class="grow"><label for="c-start">Starts</label><input id="c-start" type="date"></div>
       <div class="grow"><label for="c-end">Ends</label><input id="c-end" type="date"></div></div>
-    <div class="lbl">Challenge structure</div>
-    <p class="sub" style="margin-bottom:8px">Build a tree: Subject → Chapter → Topic → Task. Add as many topic/task branches as needed.</p>
-    <label for="t-subject">Subject</label><select id="t-subject"><option>Physics</option><option>Chemistry</option><option>Mathematics</option><option>Biology</option><option>General</option></select>
-    <label for="t-chapter">Chapter / branch</label><input id="t-chapter" maxlength="80" placeholder="e.g. Chemical Bonding">
-    <label for="t-topic">Topic / sub-branch</label><input id="t-topic" maxlength="80" placeholder="e.g. VSEPR Theory">
-    <label for="t-text">Task</label><input id="t-text" maxlength="100" aria-label="Task" placeholder="e.g. Solve 20 PYQs on molecular geometry">
-    <div class="row" style="margin-top:8px"><select id="t-type" class="grow" aria-label="Task frequency"><option value="daily">Daily task</option><option value="once">One-time task</option></select><button class="btn sec sm" data-act="add-target">Add task</button></div>
+    <div class="lbl">Add tasks</div>
+    <p class="sub" style="margin-bottom:8px">Use the bulk adder to add many tasks at once — set a subject and topic, add tasks, then change the topic and repeat. If you cover 3 or more subjects the challenge becomes a Mega Challenge automatically.</p>
+    <button class="btn sec" data-act="open-bulk-adder" style="margin-bottom:8px">＋ Open bulk task adder</button>
+    <div id="bulk-adder-card" hidden>
+      <div class="bulk-card">
+        <div class="bc-head"><b>Bulk task adder</b><button class="btn sec sm" data-act="close-bulk-adder">Done</button></div>
+        <label for="b-subject">Subject</label>
+        <select id="b-subject"><option>Physics</option><option>Chemistry</option><option>Mathematics</option><option>Biology</option><option>General</option></select>
+        <label for="b-chapter" style="margin-top:8px">Chapter</label>
+        <input id="b-chapter" maxlength="80" placeholder="e.g. Electrostatics">
+        <label for="b-topic" style="margin-top:8px">Topic</label>
+        <input id="b-topic" maxlength="80" placeholder="e.g. Coulomb's Law">
+        <div class="lbl" style="margin-top:10px">Tasks for this topic</div>
+        <div id="bulk-task-rows"></div>
+        <button class="btn sec sm" data-act="bulk-add-row" style="margin-bottom:8px">＋ Add another task</button>
+        <div class="btns">
+          <button class="btn" data-act="bulk-save-topic">Save topic tasks</button>
+          <button class="btn sec" data-act="bulk-clear-topic">Change topic</button>
+        </div>
+      </div>
+    </div>
     <div class="group" id="draft-list" style="margin-top:10px" hidden></div>
+    <div id="auto-mega-note" hidden><div class="ann-strip"><b>⚡ Auto Mega Challenge</b>Tasks span 3+ subjects — this will be created as a Mega Challenge with each subject as a branch.</div></div>
+    <label for="c-vis" style="margin-top:10px">Visibility</label>
+    <select id="c-vis"><option value="public">Public — anyone can find and join</option><option value="private">Private — join by code only</option><option value="editable">Public + community can suggest edits</option></select>
     <button class="btn" style="margin-top:16px" data-act="create">Create and go live</button>
     <div class="group" id="created-box" style="margin-top:16px;padding:14px" hidden></div>
   </section>
@@ -516,7 +585,7 @@ async function copy(text, ok) { try { await navigator.clipboard.writeText(text);
 /* ---------- state ---------- */
 const S = {
   uid: null, name: ls.get('cr_name', ''), mine: ls.get('cr_mine', []), active: ls.get('cr_active', ''),
-  chal: null, me: null, members: [], unsubs: [], notifUnsubs: [], done: {}, expanded: ls.get('cr_open', {}), notifs: { incoming: [], outgoing: [], shares: [] }, homeCalMonth: new Date().getMonth(), homeCalYear: new Date().getFullYear(), pinned: ls.get('cr_pinned',''), dismissed: ls.get('cr_dismissed',{}), draft: [], editTargets: [], editCode: '', view: 'home', pane: 'quests', meta: {},
+  chal: null, me: null, members: [], unsubs: [], notifUnsubs: [], done: {}, expanded: ls.get('cr_open', {}), notifs: { incoming: [], outgoing: [], shares: [] }, homeCalMonth: new Date().getMonth(), homeCalYear: new Date().getFullYear(), pinned: ls.get('cr_pinned',''), dismissed: ls.get('cr_dismissed',{}), discSubj: '', discSearch: '', bulkRows: 1, draft: [], editTargets: [], editCode: '', view: 'home', pane: 'quests', meta: {},
   pendingCode: new URLSearchParams(location.search).get('c'),
   photo: ls.get('cr_photo', ''), about: ls.get('cr_about', ''), calendarMonth: new Date().getMonth(), calendarYear: new Date().getFullYear()
 };
@@ -577,7 +646,7 @@ function demoSync() {
   S.members = [...d.others, { id: 'me', ...S.me }]; renderAll();
 }
 const demoMsg = () => toast('Demo mode. Open the hosted site to do this.');
-const metaOf = c => ({ targets: (c.targets || []).map(g => ({ id: g.id, text: g.text, points: g.points || 0, daily: !!g.daily, subject: g.subject || '' })), announcement: c.announcement || '', announcementAt: c.announcementAt || '', archived: !!c.archived, title: c.title, startDate: c.startDate, endDate: c.endDate, live: c.live, n: (c.targets || []).length, owner: c.ownerUid, challengeType: c.challengeType || 'standard', childChallenges: c.childChallenges || [], desc: c.desc || '' });
+const metaOf = c => ({ targets: (c.targets || []).map(g => ({ id: g.id, text: g.text, points: g.points || 0, daily: !!g.daily, subject: g.subject || '' })), announcement: c.announcement || '', announcementAt: c.announcementAt || '', archived: !!c.archived, allowSuggest: !!c.allowSuggest, title: c.title, startDate: c.startDate, endDate: c.endDate, live: c.live, n: (c.targets || []).length, owner: c.ownerUid, challengeType: c.challengeType || 'standard', childChallenges: c.childChallenges || [], desc: c.desc || '' });
 
 /* ---------- boot ---------- */
 async function loadFirebase() {
@@ -1355,6 +1424,161 @@ function qjoin() {
   S.pendingCode = code; setView('join'); $('join-code').value = code;
 }
 
+
+/* ═══════════════════════════════════════════════════
+   GLOBAL LEADERBOARD
+   ═══════════════════════════════════════════════════ */
+async function loadGlobalLeaderboard() {
+  const el = $('global-lb-list'); if (!el) return;
+  el.innerHTML = '<div class="meta" style="padding:8px 0">Loading…</div>';
+  try {
+    const snap = await getDocs(query(collection(db, 'challenges'), where('discoverable', '==', true)));
+    const playerMap = {};
+    await Promise.all(snap.docs.map(async d => {
+      const members = await getDocs(collection(db, 'challenges', d.id, 'members'));
+      members.docs.forEach(m => {
+        const data = m.data();
+        const uid = m.id;
+        if (!playerMap[uid]) playerMap[uid] = { name: data.name || 'Player', pts: 0, challenges: 0 };
+        playerMap[uid].pts += Number(data.points) || 0;
+        playerMap[uid].challenges++;
+      });
+    }));
+    const list = Object.values(playerMap).sort((a, b) => b.pts - a.pts).slice(0, 50);
+    if (!list.length) { el.innerHTML = empty('No data yet', 'Join public challenges to appear here.'); return; }
+    el.innerHTML = '<div class="group" style="padding:10px 14px">' + list.map((p, i) => {
+      const cls = i === 0 ? 'lb-row top1' : i === 1 ? 'lb-row top2' : i === 2 ? 'lb-row top3' : 'lb-row';
+      const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : String(i + 1);
+      return `<div class="${cls}"><div class="lb-rank">${medal}</div><div class="avatar">${esc(ini(p.name))}</div><div class="grow"><b>${esc(p.name)}</b><div class="meta">${p.challenges} challenge${p.challenges > 1 ? 's' : ''}</div></div><div class="lb-pts">${p.pts}</div></div>`;
+    }).join('') + '</div>';
+  } catch { el.innerHTML = empty('Unavailable', 'Firestore rules must allow reading member subcollections of public challenges.'); }
+}
+
+/* ═══════════════════════════════════════════════════
+   ARCHIVE VIEW
+   ═══════════════════════════════════════════════════ */
+function renderArchive() {
+  const el = $('archive-list'); if (!el) return;
+  const ended = S.mine.filter(m => { const x = S.meta[m.code]; return x && !x.gone && (status(x) === 'ended' || x.archived); });
+  if (!ended.length) { el.innerHTML = empty('No archived challenges', 'Challenges you complete will appear here.'); return; }
+  el.innerHTML = '<div class="group">' + ended.map(m => {
+    const x = S.meta[m.code], st = x.archived ? 'archived' : 'ended';
+    const c = counts(m.code);
+    return `<button class="li" data-act="open" data-code="${esc(m.code)}">
+      <div class="grow"><b>${esc(m.title)}</b>
+        <div class="meta">${fmt(x.startDate)} – ${fmt(x.endDate)}</div>
+        ${c ? `<div class="meta">${c.od}/${c.ot} tasks · ${c.dd}/${c.dt} daily</div>` : ''}
+      </div>
+      <span class="badge ${st}">${st}</span>
+      <svg class="i chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+    </button>`;
+  }).join('') + '</div>';
+}
+
+/* ═══════════════════════════════════════════════════
+   IMPROVED DISCOVERY
+   ═══════════════════════════════════════════════════ */
+
+async function suggestEdit(code, title) {
+  if (!S.uid) return toast('Sign in to suggest edits.');
+  const text = prompt(`Suggest a task or change for "${title}":\n(Describe what you'd add or change)`);
+  if (!text?.trim()) return;
+  try {
+    await setDoc(doc(db, 'challenges', code, 'suggestions', S.uid + '_' + Date.now()), { uid: S.uid, name: S.name || 'Player', text: text.trim(), createdAt: serverTimestamp() });
+    toast('Suggestion sent to the challenge owner.');
+  } catch { toast('Could not send suggestion. Check connection.'); }
+}
+
+/* ═══════════════════════════════════════════════════
+   BULK TASK ADDER
+   ═══════════════════════════════════════════════════ */
+function openBulkAdder() {
+  $('bulk-adder-card').hidden = false;
+  renderBulkRows();
+}
+function closeBulkAdder() { $('bulk-adder-card').hidden = true; }
+function renderBulkRows() {
+  const el = $('bulk-task-rows'); if (!el) return;
+  el.innerHTML = Array.from({length: S.bulkRows}, (_, i) => `
+    <div class="bulk-task-row">
+      <input class="bulk-task-text" data-i="${i}" maxlength="100" placeholder="Task ${i+1}" aria-label="Task ${i+1}">
+      <select class="bulk-task-type" data-i="${i}"><option value="daily">Daily</option><option value="once">One-time</option></select>
+    </div>`).join('');
+}
+function bulkAddRow() { S.bulkRows++; renderBulkRows(); }
+function bulkSaveTopic() {
+  const subj = $('b-subject')?.value || 'General';
+  const chapter = $('b-chapter')?.value.trim() || '';
+  const topic = $('b-topic')?.value.trim() || '';
+  const texts = [...document.querySelectorAll('.bulk-task-text')];
+  const types = [...document.querySelectorAll('.bulk-task-type')];
+  let added = 0;
+  texts.forEach((inp, i) => {
+    const text = inp.value.trim(); if (!text) return;
+    const type = types[i]?.value || 'daily';
+    if (S.draft.length >= 100) return;
+    S.draft.push({ id: 't' + Date.now().toString(36) + S.draft.length + i, text, subject: subj, chapter, topic, daily: type === 'daily', points: 10 });
+    added++;
+  });
+  if (!added) return toast('Enter at least one task.');
+  toast(`${added} task${added>1?'s':''} added.`);
+  renderDraft(); checkAutoMega();
+}
+function bulkClearTopic() {
+  $('b-topic') && ($('b-topic').value = '');
+  S.bulkRows = 1; renderBulkRows();
+  toast('Topic cleared — set a new topic and add more tasks.');
+}
+function checkAutoMega() {
+  const subjects = new Set(S.draft.map(t => t.subject).filter(Boolean));
+  const el = $('auto-mega-note'); if (el) el.hidden = subjects.size < 3;
+}
+
+/* ═══════════════════════════════════════════════════
+   AUTO-MEGA ON CREATE
+   ═══════════════════════════════════════════════════ */
+async function createChallengeAutoMega() {
+  if (DEMO) return demoMsg();
+  const title = $('c-title')?.value.trim(), desc = $('c-desc')?.value.trim() || '';
+  const startDate = $('c-start')?.value, endDate = $('c-end')?.value;
+  if (!title) return toast('Add a title.');
+  if (!S.draft.length) return toast('Add at least one task.');
+  if (!startDate || !endDate || endDate < startDate) return toast('Check the start and end dates.');
+  const vis = $('c-vis')?.value || 'public';
+  const discoverable = vis !== 'private';
+  const allowSuggest = vis === 'editable';
+  // auto-mega check
+  const subjects = [...new Set(S.draft.map(t => t.subject).filter(Boolean))];
+  if (subjects.length >= 3) {
+    // create one standard challenge per subject, then wrap in mega
+    const childCodes = [];
+    for (const subj of subjects) {
+      const tasks = S.draft.filter(t => t.subject === subj);
+      let code; for (let i = 0; i < 5; i++) { code = genCode(); if (!(await getDoc(doc(db, 'challenges', code))).exists()) break; }
+      await setDoc(doc(db, 'challenges', code), { title: `${title} – ${subj}`, desc, startDate, endDate, targets: tasks, childChallenges: [], challengeType: 'standard', discoverable, allowSuggest, live: true, ownerUid: S.uid, ownerName: S.name, createdAt: serverTimestamp() });
+      await ensureMember(code); addMine(code, `${title} – ${subj}`);
+      childCodes.push({ code, title: `${title} – ${subj}` });
+    }
+    // create mega
+    let megaCode; for (let i = 0; i < 5; i++) { megaCode = genCode(); if (!(await getDoc(doc(db, 'challenges', megaCode))).exists()) break; }
+    await setDoc(doc(db, 'challenges', megaCode), { title, desc, startDate, endDate, targets: [], childChallenges: childCodes, challengeType: 'mega', discoverable, allowSuggest, live: true, ownerUid: S.uid, ownerName: S.name, createdAt: serverTimestamp() });
+    await ensureMember(megaCode); addMine(megaCode, title);
+    watch(megaCode);
+    S.draft = []; renderDraft(); $('auto-mega-note').hidden = true;
+    toast(`Auto Mega Challenge created with ${subjects.length} branches!`);
+    const box = $('created-box'); box.hidden = false;
+    box.innerHTML = `<b>Mega Challenge live! ${subjects.length} branches created.</b><div class="codebox">${megaCode}</div><div class="sub">Share this code. Members can join individual branches too.</div><div class="btns"><button class="btn" data-act="share" data-code="${megaCode}">Share</button><button class="btn sec" data-act="open" data-code="${megaCode}">Open</button></div>`;
+    return;
+  }
+  // standard create
+  let code; for (let i = 0; i < 5; i++) { code = genCode(); if (!(await getDoc(doc(db, 'challenges', code))).exists()) break; }
+  await setDoc(doc(db, 'challenges', code), { title, desc, startDate, endDate, targets: S.draft, childChallenges: [], challengeType: 'standard', discoverable, allowSuggest, live: true, ownerUid: S.uid, ownerName: S.name, createdAt: serverTimestamp() });
+  await ensureMember(code); addMine(code, title); watch(code);
+  S.draft = []; renderDraft();
+  const box = $('created-box'); box.hidden = false;
+  box.innerHTML = `<b>Your challenge is live</b><div class="codebox">${code}</div><div class="sub">Friends open the link, or enter this code under Join with code.</div><div class="btns"><button class="btn" data-act="share" data-code="${code}">Share</button><button class="btn sec" data-act="open" data-code="${code}">Open</button></div>`;
+}
+
 async function saveNote() {
   if (!S.chal) return toast('Open a challenge first.');
   const notes = { ...(S.me?.notes || {}) }; const v = $('j-text').value.trim();
@@ -1377,23 +1601,7 @@ async function removeChallenge() {
   try { await deleteDoc(doc(db, 'challenges', c.id)); } catch { toast('Could not delete.'); }
 }
 async function createChallenge() {
-  if (DEMO) return demoMsg();
-  const title = $('c-title').value.trim(), desc = $('c-desc').value.trim();
-  const startDate = $('c-start').value, endDate = $('c-end').value;
-  if (!title) return toast('Add a title.');
-  if (!S.draft.length) return toast('Add at least one task to your challenge.');
-  if (!startDate || !endDate || endDate < startDate) return toast('Check the start and end dates.');
-  try {
-    let code;
-    for (let i = 0; i < 5; i++) { code = genCode(); if (!(await getDoc(doc(db, 'challenges', code))).exists()) break; }
-    await setDoc(doc(db, 'challenges', code), { title, desc, startDate, endDate, targets: S.draft, childChallenges: [], challengeType: 'standard', discoverable: true, live: true, ownerUid: S.uid, ownerName: S.name, createdAt: serverTimestamp() });
-    await ensureMember(code); addMine(code, title); watch(code);
-    S.draft = []; renderDraft(); $('c-title').value = ''; $('c-desc').value = ''; $('t-chapter').value = ''; $('t-topic').value = ''; $('t-text').value = ''; $('created-box').hidden = false;
-    const box = $('created-box'); box.hidden = false;
-    box.innerHTML = `<b>Your challenge is live</b><div class="codebox">${code}</div>
-      <div class="sub">Friends open the link, or enter this code under Join with code.</div>
-      <div class="btns"><button class="btn" data-act="share" data-code="${code}">Share</button><button class="btn sec" data-act="open" data-code="${code}">Open</button></div>`;
-  } catch { toast('Could not create. Check Firestore rules and your connection.'); }
+  try { await createChallengeAutoMega(); } catch(e) { console.error(e); toast('Could not create. Check Firestore rules and your connection.'); }
 }
 function beginEditChallenge() {
   const c = S.chal;
@@ -1649,13 +1857,13 @@ function saveName() {
 function saveProfile() { const v = $('p-name').value.trim(); if (!v) return toast('Enter a name.'); applyName(v); toast('Name saved'); }
 
 /* ---------- views ---------- */
-const TAB = { home: 'home', join: 'home', create: 'challenge', edit: 'challenge', 'create-mega': 'challenge', 'challenge-hub': 'challenge', 'challenge-market': 'challenge', 'challenge-mine': 'challenge', 'challenge-mega': 'challenge', challenge: 'challenge', activity: 'activity', ai: 'ai', profile: 'profile' };
+const TAB = { home: 'home', join: 'home', create: 'challenge', edit: 'challenge', 'create-mega': 'challenge', 'challenge-hub': 'challenge', 'challenge-market': 'challenge', 'challenge-mine': 'challenge', 'challenge-mega': 'challenge', 'global-lb': 'challenge', archive: 'challenge', challenge: 'challenge', activity: 'activity', ai: 'ai', profile: 'profile' };
 function paintView(v, scroll = true) {
   S.view = v;
   document.querySelectorAll('.view').forEach(el => el.classList.toggle('on', el.id === 'view-' + v));
   document.querySelectorAll('nav button').forEach(b => b.dataset.v === TAB[v] ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'));
-  $('back').classList.toggle('on', v === 'join' || v === 'create' || v === 'create-mega' || v === 'edit' || v === 'challenge' || v === 'challenge-hub' || v === 'challenge-market' || v === 'challenge-mine' || v === 'challenge-mega' || v === 'activity' || v === 'ai' || v === 'profile');
-  if (v === 'home' || v === 'challenge-mine' || v === 'challenge-mega' || v === 'create-mega') loadMeta();
+  $('back').classList.toggle('on', v === 'join' || v === 'create' || v === 'create-mega' || v === 'edit' || v === 'challenge' || v === 'challenge-hub' || v === 'challenge-market' || v === 'challenge-mine' || v === 'challenge-mega' || v === 'global-lb' || v === 'archive' || v === 'activity' || v === 'ai' || v === 'profile');
+  if (v === 'home' || v === 'challenge-mine' || v === 'challenge-mega' || v === 'create-mega' || v === 'archive') loadMeta(); if (v === 'global-lb') loadGlobalLeaderboard(); if (v === 'market') loadMarket();
   if (v === 'create-mega') renderMegaPicksCreate();
   if (v === 'challenge-market') loadMarket();
   renderAll(); if (scroll) window.scrollTo(0, 0);
@@ -1697,7 +1905,7 @@ window.addEventListener('popstate', e => {
   }
 });
 const empty = (h, p) => `<div class="empty"><b>${h}</b>${p}</div>`;
-function renderAll() { renderHome(); renderMegaHub(); renderChallenge(); renderActivity(); renderProfile(); renderAdmin(); setPane(S.pane); }
+function renderAll() { renderHome(); renderMegaHub(); renderChallenge(); renderActivity(); renderProfile(); renderAdmin(); renderArchive(); setPane(S.pane); }
 
 function renderHome() {
   $('home-h').textContent = S.name ? `Hello, ${S.name}` : 'Hello';
@@ -2081,6 +2289,13 @@ document.addEventListener('click', e => {
   else if (a === 'toggle-folder') toggleFolder(b.dataset.code);
   else if (a === 'open-mega') openMegaEntry();
   else if (a === 'dismiss-missed') dismissMissed();
+  else if (a === 'open-bulk-adder') openBulkAdder();
+  else if (a === 'close-bulk-adder') closeBulkAdder();
+  else if (a === 'bulk-add-row') bulkAddRow();
+  else if (a === 'bulk-save-topic') bulkSaveTopic();
+  else if (a === 'bulk-clear-topic') bulkClearTopic();
+  else if (a === 'suggest-edit') suggestEdit(b.dataset.code, b.dataset.title);
+  else if (a === 'join-market') { S.pendingCode = b.dataset.code; setView('join'); $('join-code') && ($('join-code').value = b.dataset.code); }
   else if (a === 'dismiss-ann') { const k=b.dataset.key; S.dismissed[k]=true; ls.set('cr_dismissed',S.dismissed); renderHome(); }
   else if (a === 'home-cal-prev') { S.homeCalMonth--; if(S.homeCalMonth<0){S.homeCalMonth=11;S.homeCalYear--;} renderHomeCalendar(); }
   else if (a === 'home-cal-next') { S.homeCalMonth++; if(S.homeCalMonth>11){S.homeCalMonth=0;S.homeCalYear++;} renderHomeCalendar(); }
@@ -2145,7 +2360,12 @@ document.addEventListener('change', e => {
   if (wrap && e.target.dataset.editField) { const i = +wrap.dataset.editIndex, field = e.target.dataset.editField; if (S.editTargets[i]) S.editTargets[i][field] = field === 'daily' ? e.target.value === 'daily' : e.target.value; }
 });
 document.addEventListener('input', e => { if(e.target.matches('[data-daily-field], [data-daily-target]')) dailyInputUpdate(e.target); const wrap = e.target.closest('.edit-task'); if (wrap && e.target.dataset.editField) { const i = +wrap.dataset.editIndex, field = e.target.dataset.editField; if (S.editTargets[i]) S.editTargets[i][field] = e.target.value; } });
-$('t-text').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addTarget(); } });
+$('t-text')?.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addTarget(); } });
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-subj]');
+  if (b && b.closest('#disc-filters')) { e.preventDefault(); setDiscFilter(b.dataset.subj); }
+});
+$('disc-search')?.addEventListener('input', e => { S.discSearch = e.target.value; loadMarket(); });
 $('join-code').addEventListener('keydown', e => { if (e.key === 'Enter') join($('join-code').value); });
 $('name-input').addEventListener('keydown', e => { if (e.key === 'Enter') saveName(); });
 $('p-name').addEventListener('keydown', e => { if (e.key === 'Enter') saveProfile(); });
