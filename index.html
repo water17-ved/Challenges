@@ -1663,7 +1663,6 @@ function renderBadgeSheet(){
       ${lockedList.map(k=>{const d=BADGE_DEFS[k];return`<div class="badge-card locked"><div>${imgOrLock(k)}</div><div class="bc-name" style="opacity:.45">${d.name}</div><div class="bc-sub">${d.sub}</div></div>`;}).join('')}
     </div>`;
 }
-function renderHomeBadgesCard(){ renderBadgeSheet(); }
 function openBadgeSheet(){ renderBadgeSheet(); $('badge-sheet')?.classList.add('open'); $('badge-trigger')?.classList.add('active'); }
 function closeBadgeSheet(){ $('badge-sheet')?.classList.remove('open'); $('badge-trigger')?.classList.remove('active'); }
 async function saveNote() {
@@ -1992,7 +1991,7 @@ window.addEventListener('popstate', e => {
   }
 });
 const empty = (h, p) => `<div class="empty"><b>${h}</b>${p}</div>`;
-function renderAll() { renderHome(); renderMegaHub(); renderChallenge(); renderActivity(); renderProfile(); renderAdmin(); renderArchive(); renderProfileBadges(); renderHomeBadgesCard(); setPane(S.pane); }
+function renderAll() { renderHome(); renderMegaHub(); renderChallenge(); renderActivity(); renderProfile(); renderAdmin(); renderArchive(); renderProfileBadges(); setPane(S.pane); }
 
 function renderHome() {
   $('home-h').textContent = S.name ? `Hello, ${S.name}` : 'Hello';
@@ -2010,7 +2009,7 @@ function renderHome() {
     <button class="stat megabtn" data-act="open-mega"><b>${megaBtn[0]}</b><span>${megaBtn[1]}</span></button>`;
   const el = $('home-list');
   if (!S.mine.length) { $('home-today').innerHTML = ''; if($('home-rivalry')) $('home-rivalry').innerHTML=''; el.innerHTML = empty('No challenges yet', 'Create one or join with a code.'); $('mine-list').innerHTML = el.innerHTML; renderMegaPicksCreate(); return; }
-  renderHomeBadgesCard(); renderRivalry(); renderMissedBanner(); renderHomeBanners(); renderHomeAnnouncements();
+  renderRivalry(); renderMissedBanner(); renderHomeBanners(); renderHomeAnnouncements();
   renderHomeCalendar(); renderOneTimeDue();
   $('home-today').innerHTML = todayHtml();
   el.innerHTML = listHtml(false);
