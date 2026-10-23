@@ -351,6 +351,7 @@ button.stat{text-align:left;color:inherit;width:100%;cursor:pointer}
 
   <section class="view" id="view-challenge">
     <div id="ch-head"></div>
+    <div id="badge-shelf" class="badge-shelf"></div>
     <div class="tab-daily" id="tab-daily-strip" hidden></div>
     <div class="seg" id="seg" hidden>
       <button data-act="pane" data-p="quests" aria-pressed="true">Quests</button>
@@ -428,6 +429,7 @@ button.stat{text-align:left;color:inherit;width:100%;cursor:pointer}
     <div class="row"><input id="p-name" maxlength="20" aria-label="Display name" autocomplete="off"><button class="btn sm" data-act="profile-save">Save</button></div>
     <div class="lbl">Summary</div>
     <div class="group" id="p-stats"></div>
+    <div class="lbl">Badges</div><div class="profile-badges" id="profile-badges"><div class="meta">No badges yet.</div></div>
     <div class="lbl">Progress access requests</div>
     <p class="sub">Approve a friend to view one challenge for 10 minutes. Shared snapshots are temporary and automatically cleaned up when possible.</p>
     <div class="group" id="progress-access-panel"><div class="li"><div class="grow">Loading requests…</div></div></div>
@@ -859,14 +861,17 @@ function folderHtml(m, x, detail) {
   const body = open ? `<div class="folder-body"><button class="li" data-act="open" data-code="${esc(m.code)}"><div class="grow"><b>Open mega challenge</b><div class="meta">Branches, invite code and settings</div></div>${CHEV}</button>${kids.map(ch => rowHtml(ch.code, ch.title, S.meta[ch.code], detail, true)).join('')}</div>` : '';
   return `<div class="folder ${open ? 'open' : ''}">${head}${body}</div>`;
 }
+function isArchived(x) { return x && (x.archived || status(x) === 'ended'); }
 function listHtml(detail) {
   const inFolder = new Set(); megaList().forEach(m => (S.meta[m.code].childChallenges || []).forEach(ch => inFolder.add(ch.code)));
   const rows = [];
   S.mine.forEach(m => {
     const x = S.meta[m.code];
-    if (x?.challengeType === 'mega' && !x.gone) rows.push(folderHtml(m, x, detail));
+    if (!x || x.gone || isArchived(x)) return; // ended/archived go to Archive only
+    if (x.challengeType === 'mega') rows.push(folderHtml(m, x, detail));
     else if (!inFolder.has(m.code)) rows.push(rowHtml(m.code, m.title, x, detail, false));
   });
+  if (!rows.length) return '<div class="group">' + empty('No active challenges', 'Ended challenges are in Archive.') + '</div>';
   return '<div class="group">' + rows.join('') + '</div>';
 }
 function todayHtml() {
@@ -1579,6 +1584,44 @@ async function createChallengeAutoMega() {
   box.innerHTML = `<b>Your challenge is live</b><div class="codebox">${code}</div><div class="sub">Friends open the link, or enter this code under Join with code.</div><div class="btns"><button class="btn" data-act="share" data-code="${code}">Share</button><button class="btn sec" data-act="open" data-code="${code}">Open</button></div>`;
 }
 
+/* BADGES */
+const BADGE_DEFS={oak:{name:"Oak",sub:"Mega Champion"},cherry_blossom:{name:"Cherry Blossom",sub:"Runner-up"},lotus:{name:"Lotus",sub:"Third Place"},sunflower:{name:"Sunflower",sub:"Top 5"},pine:{name:"Pine",sub:"Top 10"},bamboo:{name:"Bamboo",sub:"Participant"},lily:{name:"Lily",sub:"First Challenge"},olive:{name:"Olive",sub:"7-day streak"},willow:{name:"Willow",sub:"Mega Veteran"},dead_tree:{name:"Dead Tree",sub:"Never Gave Up"}};
+const BADGE_SVGS={'oak':'<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="bgoak" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#A8C97F" stop-opacity=".2"/><stop offset="100%" stop-color="#6B8E4E" stop-opacity=".04"/></radialGradient><linearGradient id="icoak" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#6B8E4E"/><stop offset="1" stop-color="#A8C97F"/></linearGradient></defs><circle cx="32" cy="32" r="30" fill="url(#bgoak)" stroke="#6B8E4E" stroke-width="1.5"/><path d="M32 56 Q20 44 18 30 Q16 14 32 10 Q48 14 46 30 Q44 44 32 56Z M28 30 Q22 20 26 14 M36 30 Q42 20 38 14" fill="none" stroke="url(#icoak)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>','lily':'<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="bglily" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#F0B8CE" stop-opacity=".2"/><stop offset="100%" stop-color="#D4769A" stop-opacity=".04"/></radialGradient><linearGradient id="iclily" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#D4769A"/><stop offset="1" stop-color="#F0B8CE"/></linearGradient></defs><circle cx="32" cy="32" r="30" fill="url(#bglily)" stroke="#D4769A" stroke-width="1.5"/><path d="M32 8 Q38 20 48 20 Q40 28 44 40 Q36 34 32 48 Q28 34 20 40 Q24 28 16 20 Q26 20 32 8Z" fill="none" stroke="url(#iclily)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>','bamboo':'<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="bgbamboo" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#80C9A0" stop-opacity=".2"/><stop offset="100%" stop-color="#4E8E6B" stop-opacity=".04"/></radialGradient><linearGradient id="icbamboo" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#4E8E6B"/><stop offset="1" stop-color="#80C9A0"/></linearGradient></defs><circle cx="32" cy="32" r="30" fill="url(#bgbamboo)" stroke="#4E8E6B" stroke-width="1.5"/><path d="M28 8 L28 56 M36 8 L36 56 M28 18 Q32 15 36 18 M28 30 Q32 27 36 30 M28 42 Q32 39 36 42" fill="none" stroke="url(#icbamboo)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>','cherry_blossom':'<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="bgcherry_blossom" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#F5C2D0" stop-opacity=".2"/><stop offset="100%" stop-color="#E07B9A" stop-opacity=".04"/></radialGradient><linearGradient id="iccherry_blossom" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#E07B9A"/><stop offset="1" stop-color="#F5C2D0"/></linearGradient></defs><circle cx="32" cy="32" r="30" fill="url(#bgcherry_blossom)" stroke="#E07B9A" stroke-width="1.5"/><path d="M32 32 Q24 18 32 20 Q40 18 44 20 Q46 28 44 32 Q46 40 40 44 Q32 46 28 44 Q18 40 20 32Z" fill="none" stroke="url(#iccherry_blossom)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>','pine':'<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="bgpine" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#5EAD75" stop-opacity=".2"/><stop offset="100%" stop-color="#2E6B3E" stop-opacity=".04"/></radialGradient><linearGradient id="icpine" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#2E6B3E"/><stop offset="1" stop-color="#5EAD75"/></linearGradient></defs><circle cx="32" cy="32" r="30" fill="url(#bgpine)" stroke="#2E6B3E" stroke-width="1.5"/><path d="M32 8 L20 28 L26 28 L16 44 L24 44 L14 58 L50 58 L40 44 L48 44 L38 28 L44 28Z" fill="none" stroke="url(#icpine)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>','olive':'<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="bgolive" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#BADA8F" stop-opacity=".2"/><stop offset="100%" stop-color="#7A9E5A" stop-opacity=".04"/></radialGradient><linearGradient id="icolive" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7A9E5A"/><stop offset="1" stop-color="#BADA8F"/></linearGradient></defs><circle cx="32" cy="32" r="30" fill="url(#bgolive)" stroke="#7A9E5A" stroke-width="1.5"/><path d="M32 10 Q44 18 44 32 Q44 48 32 54 Q20 48 20 32 Q20 18 32 10Z M24 22 Q32 16 40 22 M22 34 Q32 28 42 34" fill="none" stroke="url(#icolive)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>','willow':'<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="bgwillow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#97CFAD" stop-opacity=".2"/><stop offset="100%" stop-color="#5A8E70" stop-opacity=".04"/></radialGradient><linearGradient id="icwillow" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#5A8E70"/><stop offset="1" stop-color="#97CFAD"/></linearGradient></defs><circle cx="32" cy="32" r="30" fill="url(#bgwillow)" stroke="#5A8E70" stroke-width="1.5"/><path d="M32 8 L32 24 M24 12 Q20 28 16 44 M40 12 Q44 28 48 44 M28 18 Q24 34 20 52 M36 18 Q40 34 44 52" fill="none" stroke="url(#icwillow)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>','lotus':'<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="bglotus" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#E8AEE0" stop-opacity=".2"/><stop offset="100%" stop-color="#C07AB8" stop-opacity=".04"/></radialGradient><linearGradient id="iclotus" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#C07AB8"/><stop offset="1" stop-color="#E8AEE0"/></linearGradient></defs><circle cx="32" cy="32" r="30" fill="url(#bglotus)" stroke="#C07AB8" stroke-width="1.5"/><path d="M32 44 Q20 36 18 24 Q24 20 32 26 Q40 20 46 24 Q44 36 32 44Z M32 44 Q26 50 20 52 M32 44 Q38 50 44 52 M32 26 L32 10" fill="none" stroke="url(#iclotus)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>','sunflower':'<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="bgsunflower" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#FFD97A" stop-opacity=".2"/><stop offset="100%" stop-color="#E8B840" stop-opacity=".04"/></radialGradient><linearGradient id="icsunflower" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#E8B840"/><stop offset="1" stop-color="#FFD97A"/></linearGradient></defs><circle cx="32" cy="32" r="30" fill="url(#bgsunflower)" stroke="#E8B840" stroke-width="1.5"/><path d="M32 20 L35 26 L41 24 L39 30 L45 32 L39 34 L41 40 L35 38 L32 44 L29 38 L23 40 L25 34 L19 32 L25 30 L23 24 L29 26Z" fill="none" stroke="url(#icsunflower)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>','dead_tree':'<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="bgdead_tree" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#C4A882" stop-opacity=".2"/><stop offset="100%" stop-color="#7A6A5A" stop-opacity=".04"/></radialGradient><linearGradient id="icdead_tree" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7A6A5A"/><stop offset="1" stop-color="#C4A882"/></linearGradient></defs><circle cx="32" cy="32" r="30" fill="url(#bgdead_tree)" stroke="#7A6A5A" stroke-width="1.5"/><path d="M32 56 L32 20 M32 20 L20 10 M32 20 L44 10 M32 30 L22 22 M32 30 L42 22 M32 40 L24 34 M32 40 L40 34" fill="none" stroke="url(#icdead_tree)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'};
+function badgeSvg(k){return BADGE_SVGS[k]||"";}
+function earnedBadges(){
+  const e=new Set(ls.get("cr_badges",[]));
+  if(streak7Days()>=7)e.add("olive");
+  if(S.mine.length>=1)e.add("lily");
+  if(S.mine.filter(m=>{const x=S.meta[m.code];return x&&x.challengeType==="mega"&&(status(x)==="ended"||x.archived);}).length>=2)e.add("willow");
+  if(S.mine.filter(m=>{const x=S.meta[m.code];return x&&(status(x)==="ended"||x.archived);}).length>=1)e.add("dead_tree");
+  return[...e];
+}
+function awardMegaBadge(rank){
+  const b=ls.get("cr_badges",[]);
+  const k=rank===1?"oak":rank===2?"cherry_blossom":rank===3?"lotus":rank<=5?"sunflower":rank<=10?"pine":"bamboo";
+  if(!b.includes(k)){b.push(k);ls.set("cr_badges",b);toast("\uD83C\uDFC5 Badge earned: "+BADGE_DEFS[k].name+"!");}
+  renderBadgeShelf();renderProfileBadges();
+}
+function checkMegaWinner(megaCode){
+  const x=S.meta[megaCode];if(!x||x.challengeType!=="mega")return;
+  if(status(x)!=="ended"&&!x.archived)return;
+  const totals={};
+  (x.childChallenges||[]).forEach(ch=>{S.members.forEach(m=>{totals[m.id]=(totals[m.id]||0)+(m.points||0);});});
+  const sorted=Object.entries(totals).sort((a,b)=>b[1]-a[1]);
+  const myRank=sorted.findIndex(([uid])=>uid===S.uid)+1;
+  if(myRank>0)awardMegaBadge(myRank);
+}
+function renderBadgeShelf(){
+  const el=$("badge-shelf");if(!el)return;
+  const e=new Set(earnedBadges());if(!e.size){el.innerHTML="";return;}
+  el.innerHTML='<div class="lbl">Your badges</div><div class="badge-wall">'+[...e].map(k=>{const d=BADGE_DEFS[k];return'<div class="badge-card earned" title="'+d.sub+'"><div>'+badgeSvg(k)+'</div><div class="bc-name">'+d.name+'</div><div class="bc-sub">'+d.sub+'</div></div>';}).join("")+"</div>";
+}
+function renderProfileBadges(){
+  const el=$("profile-badges");if(!el)return;
+  const e=new Set(earnedBadges());
+  if(!e.size){el.innerHTML='<div class="meta">No badges yet. Win a mega challenge to earn one.</div>';return;}
+  el.innerHTML=[...e].map(k=>{const d=BADGE_DEFS[k];return'<div class="pb-chip">'+badgeSvg(k)+'<span>'+d.name+'</span></div>';}).join("");
+}
 async function saveNote() {
   if (!S.chal) return toast('Open a challenge first.');
   const notes = { ...(S.me?.notes || {}) }; const v = $('j-text').value.trim();
@@ -1905,7 +1948,7 @@ window.addEventListener('popstate', e => {
   }
 });
 const empty = (h, p) => `<div class="empty"><b>${h}</b>${p}</div>`;
-function renderAll() { renderHome(); renderMegaHub(); renderChallenge(); renderActivity(); renderProfile(); renderAdmin(); renderArchive(); setPane(S.pane); }
+function renderAll() { renderHome(); renderMegaHub(); renderChallenge(); renderActivity(); renderProfile(); renderAdmin(); renderArchive(); renderBadgeShelf(); renderProfileBadges(); setPane(S.pane); }
 
 function renderHome() {
   $('home-h').textContent = S.name ? `Hello, ${S.name}` : 'Hello';
@@ -1944,7 +1987,7 @@ function renderChallenge() {
   head.innerHTML = `<h1>${esc(c.title)}</h1>
     <div class="row" style="margin-top:8px;flex-wrap:wrap"><span class="badge ${st}">${st}</span><span class="sub" style="margin:0">${esc(msg)}, ${S.members.length} ${S.members.length === 1 ? 'player' : 'players'}</span></div>
     ${c.desc ? `<p class="sub">${esc(c.desc)}</p>` : ''}${sw}`;
-  renderQuests(); renderProgress(); renderBoard(); renderJournal(); renderAdmin(); renderTabDailyStrip();
+  renderQuests(); renderProgress(); renderBoard(); renderJournal(); renderAdmin(); renderTabDailyStrip(); renderBadgeShelf(); renderProfileBadges(); if(S.chal?.challengeType==='mega')checkMegaWinner(S.active);
 }
 
 function renderQuests() {
