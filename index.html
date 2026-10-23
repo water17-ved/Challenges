@@ -160,6 +160,12 @@ button.stat{text-align:left;color:inherit;width:100%;cursor:pointer}
 #notif-sheet .panel{position:relative;z-index:1;background:var(--s1);border-radius:22px 22px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));max-height:82vh;overflow-y:auto;overscroll-behavior:contain}
 #notif-sheet .drag{width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 14px}
 #notif-sheet h2{font-size:18px;font-weight:800;margin-bottom:2px}
+#badge-sheet{position:fixed;inset:0;z-index:30;display:none;flex-direction:column;justify-content:flex-end}
+#badge-sheet.open{display:flex}
+#badge-sheet .scrim{position:absolute;inset:0;background:rgba(0,0,0,.55)}
+#badge-sheet .panel{position:relative;z-index:1;background:var(--s1);border-radius:22px 22px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));max-height:82vh;overflow-y:auto;overscroll-behavior:contain}
+#badge-sheet .drag{width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 14px}
+#badge-sheet h2{font-size:18px;font-weight:800;margin-bottom:2px}
 .notif-banner{background:var(--s1);border:1px solid var(--acc);border-radius:14px;padding:12px 14px;margin:0 0 10px;display:flex;gap:10px;align-items:flex-start}
 .notif-banner .nb-icon{flex:none;width:36px;height:36px;border-radius:10px;background:linear-gradient(145deg,#5B8DEF,#22D3EE);display:grid;place-items:center}
 .notif-banner .nb-body{flex:1;min-width:0}
