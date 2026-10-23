@@ -269,6 +269,7 @@ button.stat{text-align:left;color:inherit;width:100%;cursor:pointer}
 <header class="top"><div class="top-in">
   <button class="back" id="back" data-act="back" aria-label="Go back"><svg class="i" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Back</button>
   <div class="brand">Challenge Room</div>
+  <button class="notif-btn" id="badge-trigger" data-act="open-badges" aria-label="Badges" title="Your badges"><svg width="22" height="22" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="bdg" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse"><stop stop-color="#F59E0B"/><stop offset="1" stop-color="#FBBF24"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="17" fill="url(#bdg)"/><path d="M32 12a10 10 0 0 1 6.5 17.5L40 46H24l1.5-16.5A10 10 0 0 1 32 12z" fill="#081326"/><circle cx="32" cy="50" r="4" fill="#081326"/></svg></button>
   <button class="notif-btn" id="notif-bell" data-act="open-notifs" aria-label="Notifications"><svg width="22" height="22" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="nbg" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse"><stop stop-color="#5B8DEF"/><stop offset="1" stop-color="#22D3EE"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="17" fill="url(#nbg)"/><path d="M18 18h28v6H35v22h-7V24H18z" fill="#081326"/><path d="m42 31 6 6-6 6" fill="none" stroke="#081326" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="notif-dot" id="notif-dot"></span></button>
 </div></header>
 
@@ -336,7 +337,7 @@ button.stat{text-align:left;color:inherit;width:100%;cursor:pointer}
       <button class="btn sec" data-act="view" data-v="join">Join with code</button>
     </div>
     <div class="stats" id="home-stats"></div>
-    <div id="home-badges-card"></div><div id="home-rivalry"></div>
+    <div id="home-rivalry"></div>
     <div id="home-missed"></div>
     <div id="home-banners"></div>
     <div id="home-cal-wrap"></div>
@@ -537,6 +538,16 @@ button.stat{text-align:left;color:inherit;width:100%;cursor:pointer}
   <label for="name-input">Display name</label><input id="name-input" maxlength="20" autocomplete="off">
   <button class="btn" style="margin-top:14px" data-act="save-name">Continue</button>
 </div></div>
+<div id="badge-sheet" role="dialog" aria-modal="true" aria-label="Badges">
+  <div class="scrim" data-act="close-badges"></div>
+  <div class="panel">
+    <div class="drag"></div>
+    <h2>Badges</h2>
+    <p class="sub" style="margin-bottom:12px">Earned and locked. Win mega challenges to collect them all.</p>
+    <div id="badge-sheet-body"></div>
+    <button class="btn sec" style="margin-top:14px;width:100%" data-act="close-badges">Close</button>
+  </div>
+</div>
 <div id="notif-sheet" role="dialog" aria-modal="true" aria-label="Notifications">
   <div class="scrim" data-act="close-notifs"></div>
   <div class="panel">
@@ -1633,26 +1644,28 @@ function renderProfileBadges(){
   el.innerHTML=[...e].map(k=>{const d=BADGE_DEFS[k];return'<div class="pb-chip">'+badgeSvg(k)+'<span>'+d.name+'</span></div>';}).join("");
 }
 
-function renderHomeBadgesCard(){
-  const el=$('home-badges-card'); if(!el) return;
+function renderBadgeSheet(){
+  const el=$('badge-sheet-body'); if(!el) return;
   const earned=new Set(earnedBadges());
   const all=Object.keys(BADGE_DEFS);
-  if(!all.length){el.innerHTML='';return;}
+  if(!all.length){el.innerHTML='<div class="meta">No badges defined.</div>';return;}
   const earnedList=all.filter(k=>earned.has(k));
   const lockedList=all.filter(k=>!earned.has(k));
-  const imgOrLock=(k,size=48)=>{const src=BADGE_IMGS[k];return src?`<img src="${src}" width="${size}" height="${size}" style="border-radius:8px;object-fit:cover" alt="${k}">`:
-    `<div style="width:${size}px;height:${size}px;border-radius:8px;background:var(--s2);display:grid;place-items:center;font-size:20px">🔒</div>`;};
-  el.innerHTML=`<div class="lbl">Badges</div><div class="home-cal" style="padding:12px">
-    ${earnedList.length?`<div style="font-size:10px;font-weight:800;color:var(--acc);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Earned (${earnedList.length})</div>
-    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
-      ${earnedList.map(k=>{const d=BADGE_DEFS[k];return`<div class="badge-card earned" style="width:72px">${imgOrLock(k)}<div class="bc-name">${d.name}</div><div class="bc-sub">${d.sub}</div></div>`;}).join('')}
-    </div>`:''}
-    <div style="font-size:10px;font-weight:800;color:var(--mut);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Locked (${lockedList.length})</div>
-    <div style="display:flex;flex-wrap:wrap;gap:8px">
-      ${lockedList.map(k=>{const d=BADGE_DEFS[k];return`<div class="badge-card locked" style="width:72px">${imgOrLock(k)}<div class="bc-name" style="opacity:.45">${d.name}</div><div class="bc-sub">${d.sub}</div></div>`;}).join('')}
-    </div>
-  </div>`;
+  const imgOrLock=(k,size=52)=>{const src=BADGE_IMGS[k];return src?`<img src="${src}" width="${size}" height="${size}" style="border-radius:10px;object-fit:cover" alt="${k}">`:
+    `<div style="width:${size}px;height:${size}px;border-radius:10px;background:var(--s2);display:grid;place-items:center;font-size:22px">🔒</div>`;};
+  el.innerHTML=`
+    ${earnedList.length?`<div style="font-size:10px;font-weight:800;color:var(--acc);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Earned (${earnedList.length})</div>
+    <div class="badge-wall" style="margin-bottom:16px">
+      ${earnedList.map(k=>{const d=BADGE_DEFS[k];return`<div class="badge-card earned"><div>${imgOrLock(k)}</div><div class="bc-name">${d.name}</div><div class="bc-sub">${d.sub}</div></div>`;}).join('')}
+    </div>`:`<div class="meta" style="margin-bottom:16px">No badges earned yet — win a mega challenge!</div>`}
+    <div style="font-size:10px;font-weight:800;color:var(--mut);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Locked (${lockedList.length})</div>
+    <div class="badge-wall">
+      ${lockedList.map(k=>{const d=BADGE_DEFS[k];return`<div class="badge-card locked"><div>${imgOrLock(k)}</div><div class="bc-name" style="opacity:.45">${d.name}</div><div class="bc-sub">${d.sub}</div></div>`;}).join('')}
+    </div>`;
 }
+function renderHomeBadgesCard(){ renderBadgeSheet(); }
+function openBadgeSheet(){ renderBadgeSheet(); $('badge-sheet')?.classList.add('open'); $('badge-trigger')?.classList.add('active'); }
+function closeBadgeSheet(){ $('badge-sheet')?.classList.remove('open'); $('badge-trigger')?.classList.remove('active'); }
 async function saveNote() {
   if (!S.chal) return toast('Open a challenge first.');
   const notes = { ...(S.me?.notes || {}) }; const v = $('j-text').value.trim();
@@ -2357,6 +2370,8 @@ document.addEventListener('click', e => {
   else if (a === 'toggle') toggle(b.dataset.id);
   else if (a === 'toggle-in') toggleIn(b.dataset.code, b.dataset.id);
   else if (a === 'open-notifs') openNotifSheet();
+  else if (a === 'open-badges') openBadgeSheet();
+  else if (a === 'close-badges') closeBadgeSheet();
   else if (a === 'close-notifs') closeNotifSheet();
   else if (a === 'nb-accept') nbAccept(b.dataset.id);
   else if (a === 'nb-decline') decideProgressRequest(b.dataset.id, false);
