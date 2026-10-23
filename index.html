@@ -12,6 +12,8 @@
 <link rel="manifest" href="manifest.json">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -269,9 +271,84 @@ button.stat{text-align:left;color:inherit;width:100%;cursor:pointer}
 /* suggest edit */
 .suggest-row{background:var(--s2);border-radius:10px;padding:8px 12px;margin-bottom:6px;font-size:13px}
 .suggest-row b{display:block;font-size:12px;color:var(--acc)}
+
+/* Collectible badge gallery refresh */
+#badge-sheet .panel{background:radial-gradient(ellipse at 50% -20%,rgba(91,141,239,.16),transparent 55%),var(--s1)}
+#badge-sheet h2{font-size:22px;letter-spacing:-.035em}
+.badge-collection-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 0 14px;padding:13px 14px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(135deg,rgba(91,141,239,.10),rgba(34,211,238,.045))}
+.badge-collection-head .bch-title{font-size:12px;font-weight:850;letter-spacing:.09em;text-transform:uppercase}
+.badge-collection-head .bch-count{font-size:12px;color:var(--mut);margin-top:3px}
+.badge-collection-head .bch-number{font-size:25px;font-weight:900;letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+.badge-progress{height:5px;background:var(--s2);border-radius:99px;overflow:hidden;margin-top:9px}
+.badge-progress>span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#5B8DEF,#22D3EE);transition:width .35s ease}
+.badge-section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:17px 2px 9px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--mut)}
+.badge-section-title .bst-count{padding:4px 7px;border:1px solid var(--line);border-radius:999px;font-size:10px;letter-spacing:0}
+.badge-wall{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.badge-card{position:relative;display:flex;min-width:0;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:12px 7px 11px;border:1px solid var(--line);border-radius:17px;background:linear-gradient(155deg,var(--s2),rgba(255,255,255,.015));overflow:hidden;isolation:isolate;transition:transform .18s ease,border-color .18s ease,background .18s ease}
+.badge-card:before{content:"";position:absolute;inset:0 0 auto;height:3px;background:linear-gradient(90deg,#5B8DEF,#22D3EE);opacity:.9}
+.badge-card.earned{border-color:rgba(91,141,239,.38);box-shadow:inset 0 0 0 1px rgba(91,141,239,.045),0 5px 18px rgba(0,0,0,.08)}
+.badge-card.earned:after{content:"✓";position:absolute;right:7px;top:7px;width:17px;height:17px;display:grid;place-items:center;border-radius:50%;background:rgba(52,211,153,.16);border:1px solid rgba(52,211,153,.42);color:#34d399;font-size:10px;font-weight:900}
+.badge-card.locked{background:linear-gradient(155deg,rgba(120,130,145,.07),var(--s1));border-style:dashed;opacity:.78}
+.badge-card.locked:before{background:var(--line);opacity:.8}
+.badge-card>div:first-child{display:grid;place-items:center;width:100%;min-height:82px}
+.badge-card img{width:76px;height:76px;max-width:100%;object-fit:contain;border-radius:14px!important;filter:drop-shadow(0 5px 7px rgba(0,0,0,.2));}
+.badge-card.locked img{filter:grayscale(1) brightness(.58) drop-shadow(0 3px 5px rgba(0,0,0,.12));opacity:.68}
+.badge-card.locked>div:first-child>div{border:1px dashed var(--line);background:var(--s2)!important;color:var(--mut)}
+.bc-name{font-size:12px;font-weight:850;line-height:1.2;overflow-wrap:anywhere}
+.bc-sub{font-size:10px;line-height:1.35;color:var(--mut);min-height:27px;max-width:100%;overflow-wrap:anywhere}
+.badge-card.earned .bc-sub{color:var(--mut)}
+.badge-card.locked .bc-name{opacity:.65!important}
+@media(min-width:430px){.badge-wall{grid-template-columns:repeat(4,minmax(0,1fr))}.badge-card{padding:13px 8px}.badge-card img{width:82px;height:82px}}
+@media(max-width:340px){.badge-wall{grid-template-columns:repeat(2,minmax(0,1fr))}.badge-card img{width:72px;height:72px}}
+@media(hover:hover){.badge-card.earned:hover{transform:translateY(-2px);border-color:rgba(34,211,238,.65)}}
+
+
+/* Challenge Room animated launch splash — centered, lightweight, accessible */
+#app-splash{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;overflow:hidden;padding:24px;background:radial-gradient(ellipse at 50% 43%,rgba(37,103,221,.13),transparent 39%),linear-gradient(145deg,#080e22,#050a18 75%);opacity:1;visibility:visible;transition:opacity .42s ease,visibility .42s ease;color:#f4f7ff}
+#app-splash.splash-hidden{opacity:0;visibility:hidden;pointer-events:none}
+#app-splash .splash-ambient{position:absolute;width:260px;height:260px;border-radius:50%;background:#247bff;filter:blur(90px);opacity:0;animation:cr-ambient 4.2s ease-in-out infinite;pointer-events:none}
+#app-splash .splash-inner{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;max-width:440px;text-align:center;transform:translateY(-1vh);animation:cr-mark-in .85s cubic-bezier(.2,.8,.2,1) both}
+#app-splash .splash-halo{position:absolute;top:2%;width:min(66vw,260px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(48,132,255,.18),transparent 68%);filter:blur(12px);opacity:0;animation:cr-halo-in 1.2s .3s ease-out forwards;pointer-events:none}
+#app-splash .splash-mark{display:block;position:relative;width:min(66vw,260px);height:auto;aspect-ratio:1;overflow:visible}
+#app-splash .splash-bar{transform-box:fill-box;transform-origin:center bottom;transform:scaleY(.03);opacity:.3;animation:cr-bar-rise .78s cubic-bezier(.18,.85,.25,1.15) forwards}
+#app-splash .splash-bar.left{animation-delay:.22s}#app-splash .splash-bar.center{animation-delay:.42s;filter:drop-shadow(0 0 10px rgba(47,130,255,.15))}#app-splash .splash-bar.right{animation-delay:.62s}
+#app-splash .splash-title{margin-top:5px;font:800 clamp(27px,7vw,36px)/1.1 var(--f);letter-spacing:-1.3px;color:#f4f7ff;opacity:0;transform:translateY(12px);animation:cr-text-in .7s .95s ease-out forwards}
+#app-splash .splash-title span{color:#55a1ff}
+#app-splash .splash-tagline{margin-top:12px;font-size:12px;letter-spacing:2.6px;text-transform:uppercase;color:#8c9bb9;opacity:0;animation:cr-fade-in .7s 1.25s ease forwards}
+#app-splash .splash-line{width:108px;height:3px;border-radius:20px;background:rgba(145,169,211,.14);overflow:hidden;margin-top:35px;opacity:0;animation:cr-fade-in .5s 1.4s ease forwards}
+#app-splash .splash-line:after{content:"";display:block;width:38%;height:100%;border-radius:20px;background:linear-gradient(90deg,#2875ff,#78c5ff);box-shadow:0 0 12px rgba(49,136,255,.6);animation:cr-load 2.1s 1.6s ease-in-out infinite}
+#app-splash .splash-hint{position:absolute;bottom:calc(22px + env(safe-area-inset-bottom));color:#53617d;font-size:11px;letter-spacing:.5px;opacity:0;animation:cr-fade-in .7s 1.7s ease forwards}
+@keyframes cr-bar-rise{0%{transform:scaleY(.03);opacity:.15}68%{transform:scaleY(1.045);opacity:1}100%{transform:scaleY(1);opacity:1}}
+@keyframes cr-mark-in{from{opacity:0;transform:translateY(8px) scale(.94)}to{opacity:1;transform:translateY(-1vh) scale(1)}}
+@keyframes cr-halo-in{to{opacity:1}}@keyframes cr-text-in{to{opacity:1;transform:translateY(0)}}@keyframes cr-fade-in{to{opacity:1}}
+@keyframes cr-ambient{0%,100%{opacity:.03;transform:scale(.8)}50%{opacity:.13;transform:scale(1.12)}}
+@keyframes cr-load{0%{transform:translateX(-110%)}55%{transform:translateX(180%)}100%{transform:translateX(310%)}}
+@media(prefers-reduced-motion:reduce){#app-splash *,#app-splash:before{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}}
 </style>
 </head>
 <body>
+<div id="app-splash" role="status" aria-label="Loading Challenge Room">
+  <div class="splash-ambient" aria-hidden="true"></div>
+  <div class="splash-inner">
+    <div class="splash-halo" aria-hidden="true"></div>
+    <svg class="splash-mark" viewBox="0 0 400 400" role="img" aria-label="Challenge Room three-bar logo" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="cr-splash-blue" x1="0" y1="0" x2=".2" y2="1"><stop offset="0" stop-color="#55adff"/><stop offset="1" stop-color="#2878ff"/></linearGradient>
+        <linearGradient id="cr-splash-muted-left" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8198c4"/><stop offset="1" stop-color="#3e5788"/></linearGradient>
+        <linearGradient id="cr-splash-muted-right" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c0d7ff"/><stop offset="1" stop-color="#87a8e2"/></linearGradient>
+      </defs>
+      <g transform="translate(17 0)">
+        <rect class="splash-bar left" x="43" y="166" width="80" height="136" rx="19" fill="url(#cr-splash-muted-left)"/>
+        <rect class="splash-bar center" x="140" y="70" width="86" height="232" rx="20" fill="url(#cr-splash-blue)"/>
+        <rect class="splash-bar right" x="243" y="202" width="80" height="100" rx="19" fill="url(#cr-splash-muted-right)"/>
+      </g>
+    </svg>
+    <div class="splash-title">Challenge <span>Room</span></div>
+    <div class="splash-tagline">Show up. Level up.</div>
+    <div class="splash-line" aria-hidden="true"></div>
+  </div>
+  <div class="splash-hint" aria-hidden="true">BUILT FOR YOUR NEXT LEVEL</div>
+</div>
 <header class="top"><div class="top-in">
   <button class="back" id="back" data-act="back" aria-label="Go back"><svg class="i" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Back</button>
   <div class="brand">Challenge Room</div>
@@ -1657,17 +1734,27 @@ function renderBadgeSheet(){
   if(!all.length){el.innerHTML='<div class="meta">No badges defined.</div>';return;}
   const earnedList=all.filter(k=>earned.has(k));
   const lockedList=all.filter(k=>!earned.has(k));
-  const imgOrLock=(k,size=52)=>{const src=BADGE_IMGS[k];return src?`<img src="${src}" width="${size}" height="${size}" style="border-radius:10px;object-fit:cover" alt="${k}">`:
-    `<div style="width:${size}px;height:${size}px;border-radius:10px;background:var(--s2);display:grid;place-items:center;font-size:22px">🔒</div>`;};
+  const pct=Math.round((earnedList.length/Math.max(1,all.length))*100);
+  const imgOrLock=(k,size=52)=>{const src=BADGE_IMGS[k];return src?`<img src="${src}" width="${size}" height="${size}" alt="${BADGE_DEFS[k]?.name||k}" loading="lazy">`:
+    `<div style="width:${size}px;height:${size}px;border-radius:16px;display:grid;place-items:center;font-size:22px">🔒</div>`;};
+  const card=k=>{const d=BADGE_DEFS[k];return`<div class="badge-card ${earned.has(k)?'earned':'locked'}"><div>${imgOrLock(k,76)}</div><div class="bc-name">${d.name}</div><div class="bc-sub">${d.sub}</div></div>`;};
   el.innerHTML=`
-    ${earnedList.length?`<div style="font-size:10px;font-weight:800;color:var(--acc);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Earned (${earnedList.length})</div>
-    <div class="badge-wall" style="margin-bottom:16px">
-      ${earnedList.map(k=>{const d=BADGE_DEFS[k];return`<div class="badge-card earned"><div>${imgOrLock(k)}</div><div class="bc-name">${d.name}</div><div class="bc-sub">${d.sub}</div></div>`;}).join('')}
-    </div>`:`<div class="meta" style="margin-bottom:16px">No badges earned yet — win a mega challenge!</div>`}
-    <div style="font-size:10px;font-weight:800;color:var(--mut);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Locked (${lockedList.length})</div>
-    <div class="badge-wall">
-      ${lockedList.map(k=>{const d=BADGE_DEFS[k];return`<div class="badge-card locked"><div>${imgOrLock(k)}</div><div class="bc-name" style="opacity:.45">${d.name}</div><div class="bc-sub">${d.sub}</div></div>`;}).join('')}
-    </div>`;
+    <div class="badge-collection-head">
+      <div style="flex:1;min-width:0">
+        <div class="bch-title">Your collection</div>
+        <div class="bch-count">${earnedList.length} of ${all.length} badges discovered</div>
+        <div class="badge-progress"><span style="width:${pct}%"></span></div>
+      </div>
+      <div class="bch-number">${pct}%</div>
+    </div>
+    ${earnedList.length?`
+      <div class="badge-section-title"><span>✦ Unlocked</span><span class="bst-count">${earnedList.length}</span></div>
+      <div class="badge-wall">${earnedList.map(card).join('')}</div>
+    `:`<div class="meta" style="padding:14px;border:1px dashed var(--line);border-radius:14px;margin:8px 0 14px">Your collection starts with your first win. Complete a mega challenge to unlock a badge.</div>`}
+    ${lockedList.length?`
+      <div class="badge-section-title"><span>◈ Still to discover</span><span class="bst-count">${lockedList.length}</span></div>
+      <div class="badge-wall">${lockedList.map(card).join('')}</div>
+    `:''}`;
 }
 function openBadgeSheet(){ renderBadgeSheet(); $('badge-sheet')?.classList.add('open'); $('badge-trigger')?.classList.add('active'); }
 function closeBadgeSheet(){ $('badge-sheet')?.classList.remove('open'); $('badge-trigger')?.classList.remove('active'); }
@@ -2472,6 +2559,18 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) window
 history.replaceState({ crApp: true, view: S.view, pane: S.pane, modal: null }, '', location.href);
 document.body.classList.add('auth-pending');
 start();
+</script>
+<script>
+(function(){
+  const splash=document.getElementById('app-splash');
+  if(!splash)return;
+  let dismissed=false;
+  const dismiss=()=>{if(dismissed)return;dismissed=true;splash.classList.add('splash-hidden');};
+  // Let the full logo reveal play, while keeping a hard upper bound on startup delay.
+  const minimumShow=window.matchMedia('(prefers-reduced-motion: reduce)').matches?450:2550;
+  setTimeout(dismiss,minimumShow);
+  setTimeout(dismiss,4200);
+})();
 </script>
 </body>
 </html>
