@@ -13,7 +13,20 @@ service cloud.firestore {
       // Every other challenge cannot be listed, so its 6-character code is the invite.
       allow list: if request.auth != null && resource.data.public == true;
       allow create: if request.auth != null && request.resource.data.ownerUid == request.auth.uid;
-      allow update, delete: if request.auth != null && resource.data.ownerUid == request.auth.uid;
+      // Owners retain full control. Explicitly selected editors can change challenge content only;
+      // they cannot change ownership, editor permissions, visibility, live state, or delete the challenge.
+      allow update: if request.auth != null && (
+        resource.data.ownerUid == request.auth.uid ||
+        (
+          'editorUids' in resource.data && request.auth.uid in resource.data.editorUids &&
+          exists(/databases/$(db)/documents/challenges/$(code)/members/$(request.auth.uid)) &&
+          request.resource.data.ownerUid == resource.data.ownerUid &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'title', 'desc', 'startDate', 'endDate', 'targets', 'childChallenges', 'updatedAt'
+          ])
+        )
+      );
+      allow delete: if request.auth != null && resource.data.ownerUid == request.auth.uid;
 
       match /members/{uid} {
         allow read: if request.auth != null;

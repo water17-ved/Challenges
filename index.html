@@ -765,6 +765,7 @@ function demoSync() {
 }
 const demoMsg = () => toast('Demo mode. Open the hosted site to do this.');
 const metaOf = c => ({ targets: (c.targets || []).map(g => ({ id: g.id, text: g.text, points: g.points || 0, daily: !!g.daily, subject: g.subject || '' })), announcement: c.announcement || '', announcementAt: c.announcementAt || '', archived: !!c.archived, allowSuggest: !!c.allowSuggest, title: c.title, startDate: c.startDate, endDate: c.endDate, live: c.live, n: (c.targets || []).length, owner: c.ownerUid, challengeType: c.challengeType || 'standard', childChallenges: c.childChallenges || [], desc: c.desc || '' });
+const canEditChallenge = c => !!c && (c.ownerUid === S.uid || (Array.isArray(c.editorUids) && c.editorUids.includes(S.uid)));
 
 /* ---------- boot ---------- */
 async function loadFirebase() {
@@ -1420,6 +1421,10 @@ function renderAdmin() {
     <div class="btns"><button class="btn sec" data-act="admin-transfer">Transfer ownership</button></div>
     <div class="lbl">Members</div>
     <div class="group">${memberRows}</div>
+    <div class="lbl">Challenge editors</div>
+    <p class="sub">Choose a member to let them edit the challenge title, dates, subjects, chapters, topics and tasks. Editors cannot delete the challenge, transfer ownership, manage editors, or change member access.</p>
+    <div class="row"><select id="editor-select" class="grow" aria-label="Choose a member to grant editing access"><option value="">— choose a member —</option>${members.filter(m=>m.id!==S.uid).map(m=>`<option value="${esc(m.id)}">${esc(m.name||'Player')}${(c.editorUids||[]).includes(m.id)?' · Editor':''}</option>`).join('')}</select><button class="btn sm" data-act="grant-editor">Allow editing</button></div>
+    <div class="group" style="margin-top:8px">${(c.editorUids||[]).map(uid=>{const m=members.find(x=>x.id===uid);return `<div class="admin-row"><div class="grow"><b>${esc(m?.name||'Challenge editor')}</b><div class="meta">Can edit challenge content</div></div><button class="btn bad sm" data-act="revoke-editor" data-uid="${esc(uid)}">Revoke</button></div>`;}).join('')||'<div class="meta" style="padding:8px 0">No editors yet.</div>'}</div>
     <div class="lbl">Completion rate — today's daily tasks</div>
     <div class="group" style="padding:10px 14px">${targetRows||'<div class="meta">No tasks.</div>'}</div>
     <div class="lbl">Activity feed</div>
@@ -1461,7 +1466,7 @@ async function kickMember(uid, name) {
   const c = S.chal; if (!c || c.ownerUid !== S.uid) return;
   if (!confirm(`Remove ${name} from this challenge?`)) return;
   if (DEMO) return demoMsg();
-  try { await deleteDoc(doc(db, 'challenges', c.id, 'members', uid)); toast(`${name} removed.`); } catch { toast('Could not remove member.'); }
+  try { const editors=(c.editorUids||[]).filter(x=>x!==uid); if(editors.length !== (c.editorUids||[]).length) await updateDoc(doc(db,'challenges',c.id),{editorUids:editors,updatedAt:serverTimestamp()}); await deleteDoc(doc(db, 'challenges', c.id, 'members', uid)); toast(`${name} removed.`); } catch { toast('Could not remove member.'); }
 }
 async function adminTransfer() {
   const c = S.chal; if (!c || c.ownerUid !== S.uid) return;
@@ -1470,6 +1475,22 @@ async function adminTransfer() {
   if (!confirm(`Transfer ownership to ${name}? You will lose admin access.`)) return;
   if (DEMO) return demoMsg();
   try { await updateDoc(doc(db, 'challenges', c.id), { ownerUid: uid, ownerName: name }); toast('Ownership transferred.'); } catch { toast('Could not transfer.'); }
+}
+async function setChallengeEditor(uid, enabled) {
+  const c = S.chal;
+  if (!c || c.ownerUid !== S.uid) return toast('Only the owner can manage editors.');
+  if (!uid || uid === S.uid) return toast('Choose a valid member.');
+  if (DEMO) return demoMsg();
+  if (enabled && !S.members.some(m => m.id === uid)) return toast('That person must join the challenge before becoming an editor.');
+  const current = Array.isArray(c.editorUids) ? c.editorUids : [];
+  const next = enabled ? [...new Set([...current, uid])] : current.filter(x => x !== uid);
+  if (next.length === current.length && next.every((x,i)=>x===current[i])) return toast(enabled ? 'This member is already an editor.' : 'Editor access was already disabled.');
+  try {
+    await updateDoc(doc(db, 'challenges', c.id), { editorUids: next, updatedAt: serverTimestamp() });
+    S.chal = { ...c, editorUids: next };
+    renderAll();
+    toast(enabled ? 'Editing access granted.' : 'Editing access revoked.');
+  } catch (e) { console.error(e); toast('Could not update editor access. Check Firestore rules and connection.'); }
 }
 async function archiveChallenge() {
   const c = S.chal; if (!c || c.ownerUid !== S.uid) return;
@@ -1836,7 +1857,7 @@ async function createChallenge() {
 }
 function beginEditChallenge() {
   const c = S.chal;
-  if (!c || c.ownerUid !== S.uid) return toast('Only the challenge owner can edit it.');
+  if (!c || !canEditChallenge(c)) return toast('The owner has not granted you editing access.');
   if (DEMO) return demoMsg();
   S.editCode = c.id;
   S.editTargets = (c.targets || []).map((t, i) => ({ id: t.id || `t${Date.now().toString(36)}${i}`, text: t.text || '', subject: t.subject || 'General', chapter: t.chapter || 'General', topic: t.topic || 'General', daily: !!t.daily, points: Number(t.points) || 10 }));
@@ -1875,7 +1896,7 @@ function addEditTask() {
 }
 async function saveEditChallenge() {
   if (DEMO) return demoMsg();
-  const c = S.chal; if (!c || c.id !== S.editCode || c.ownerUid !== S.uid) return toast('You can only edit a challenge you own.');
+  const c = S.chal; if (!c || c.id !== S.editCode || !canEditChallenge(c)) return toast('You do not have editing access to this challenge.');
   const title = $('e-title').value.trim(), desc = $('e-desc').value.trim(), startDate = $('e-start').value, endDate = $('e-end').value;
   if (!title) return toast('Add a title.');
   if (!startDate || !endDate || endDate < startDate) return toast('Check the start and end dates.');
@@ -2186,6 +2207,7 @@ function renderQuests() {
   const targets = c.targets || [], daily = targets.filter(g => g.daily), once = targets.filter(g => !g.daily);
   const dn = daily.filter(isDone).length, pct = daily.length ? Math.round(dn / daily.length * 100) : 0;
   const owner = c.ownerUid === S.uid;
+  const canEdit = canEditChallenge(c);
   const tree = list => {
     const subjects = {};
     list.forEach(g => { const su=g.subject||'General', ch=g.chapter||'General', to=g.topic||'General'; (((subjects[su] ||= {})[ch] ||= {})[to] ||= []).push(g); });
@@ -2208,7 +2230,7 @@ function renderQuests() {
     <div class="lbl">Invite friends</div>
     <div class="group"><div class="li"><div class="grow"><b>Code ${esc(c.id)}</b><div class="meta">Friends enter this code or open your link.</div></div>
       <button class="btn sm" data-act="share" data-code="${esc(c.id)}">Share</button></div></div>
-    ${owner ? `<div class="btns"><button class="btn sec" data-act="edit-challenge">Edit challenge</button></div>` : ''}
+    ${canEdit ? `<div class="btns"><button class="btn sec" data-act="edit-challenge">${owner ? 'Edit challenge' : 'Edit challenge · Editor access'}</button></div>` : ''}
     <div class="btns"><button class="btn bad" data-act="leave">Leave</button></div>`;
 }
 
@@ -2561,6 +2583,8 @@ document.addEventListener('click', e => {
   else if (a === 'close-challenge-now') closeChallengeNow();
   else if (a === 'kick-member') kickMember(b.dataset.uid, b.dataset.name);
   else if (a === 'admin-transfer') adminTransfer();
+  else if (a === 'grant-editor') setChallengeEditor($('editor-select')?.value, true);
+  else if (a === 'revoke-editor') setChallengeEditor(b.dataset.uid, false);
   else if (a === 'archive-challenge') archiveChallenge();
   else if (a === 'export-csv') exportCSV();
   else if (a === 'clone-challenge') cloneChallenge();
