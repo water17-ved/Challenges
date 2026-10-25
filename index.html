@@ -324,6 +324,22 @@ button.stat{text-align:left;color:inherit;width:100%;cursor:pointer}
 @keyframes cr-ambient{0%,100%{opacity:.03;transform:scale(.8)}50%{opacity:.13;transform:scale(1.12)}}
 @keyframes cr-load{0%{transform:translateX(-110%)}55%{transform:translateX(180%)}100%{transform:translateX(310%)}}
 @media(prefers-reduced-motion:reduce){#app-splash *,#app-splash:before{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}}
+
+.quest-subject{border:1px solid var(--line);border-radius:13px;background:var(--s1);margin:9px 0;overflow:hidden}
+.quest-subject>summary,.quest-chapter>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;padding:13px 14px;min-height:46px;font-weight:800}
+.quest-subject>summary::-webkit-details-marker,.quest-chapter>summary::-webkit-details-marker{display:none}
+.quest-subject>summary:before,.quest-chapter>summary:before{content:'›';font-size:21px;color:var(--acc);transform:rotate(0);transition:transform .16s;flex:none;order:0}
+.quest-subject[open]>summary:before,.quest-chapter[open]>summary:before{transform:rotate(90deg)}
+.quest-subject>summary .qs-name{flex:1;min-width:0}
+.quest-subject>summary .meta,.quest-chapter>summary .meta{font-weight:600;text-align:right}
+.quest-chapters{padding:0 9px 9px}
+.quest-chapter{border-top:1px solid var(--line);margin:0 4px}
+.quest-chapter>summary{padding:11px 8px;font-size:14px}
+.quest-chapter .tree-branch{margin:0 0 10px 8px;padding-left:10px}
+.quest-subject .topic-head{margin-top:8px}
+#toast{display:flex;align-items:center;gap:8px;justify-content:center}
+#toast.show{pointer-events:auto}
+
 </style>
 </head>
 <body>
@@ -675,6 +691,13 @@ const genCode = () => Array.from({ length: 6 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ2
 const ini = n => (String(n || '?').trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2) || '?').toUpperCase();
 let toastT;
 function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2600); }
+function undoToast(message, code, seconds = 10) {
+  const el = $('toast'); clearTimeout(toastT); let remaining = seconds;
+  el.innerHTML = `<span>${esc(message)} <b id="undo-count">${remaining}s</b></span> <button type="button" class="btn sm" data-act="undo-delete" data-code="${esc(code)}" style="margin-left:8px;background:#0B1020;color:#fff;border:1px solid currentColor">Undo</button>`;
+  el.classList.add('show');
+  const tick = () => { remaining = Math.max(0, Math.ceil((pendingDelete?.deadline || Date.now()) - Date.now()) / 1000); const counter = $('undo-count'); if (counter) counter.textContent = `${Math.ceil(remaining)}s`; if (remaining > 0) toastT = setTimeout(tick, 250); };
+  tick();
+}
 async function copy(text, ok) { try { await navigator.clipboard.writeText(text); toast(ok); } catch { prompt('Copy this:', text); } }
 
 /* ---------- state ---------- */
@@ -1774,10 +1797,39 @@ async function leave() {
   try { await deleteDoc(doc(db, 'challenges', c.id, 'members', S.uid)); } catch {}
   removeMine(c.id); setView('home');
 }
+let pendingDelete = null;
 async function removeChallenge() {
   if (DEMO) return demoMsg();
-  const c = S.chal; if (!c || c.ownerUid !== S.uid || !confirm('Delete this challenge for everyone?')) return;
-  try { await deleteDoc(doc(db, 'challenges', c.id)); } catch { toast('Could not delete.'); }
+  const c = S.chal;
+  if (!c || c.ownerUid !== S.uid) return toast('Only the challenge owner can delete it.');
+  if (pendingDelete) return toast('Finish or undo the current deletion first.');
+  if (!confirm(`Delete “${c.title || 'this challenge'}” for everyone?\n\nThe challenge will disappear now. You have 10 seconds to undo this action. After that, deletion is permanent.`)) return;
+  const code = c.id, original = { ...c }, originalMine = [...S.mine];
+  pendingDelete = { code, original, originalMine, deadline: Date.now() + 10000, timer: null };
+  removeMine(code);
+  if (S.view === 'challenge') setView('home');
+  undoToast('Challenge deletion pending.', code);
+  pendingDelete.timer = setTimeout(async () => {
+    const job = pendingDelete;
+    if (!job || job.code !== code) return;
+    try {
+      await deleteDoc(doc(db, 'challenges', code));
+      pendingDelete = null; $('toast').classList.remove('show');
+      toast('Challenge permanently deleted.');
+    } catch (e) {
+      console.error(e);
+      pendingDelete = null; addMine(code, original.title); S.meta[code] = metaOf(original);
+      toast('Deletion failed. The challenge has been restored. Check your connection and permissions.'); renderAll();
+    }
+  }, 10000);
+}
+function undoChallengeDelete(code) {
+  const job = pendingDelete;
+  if (!job || job.code !== code || Date.now() > job.deadline) return toast('The undo window has expired.');
+  clearTimeout(job.timer); pendingDelete = null;
+  addMine(code, job.original.title || 'Challenge'); S.meta[code] = metaOf(job.original);
+  $('toast').classList.remove('show');
+  openChallenge(code); toast('Challenge restored.');
 }
 async function createChallenge() {
   try { await createChallengeAutoMega(); } catch(e) { console.error(e); toast('Could not create. Check Firestore rules and your connection.'); }
@@ -2134,11 +2186,24 @@ function renderQuests() {
   const targets = c.targets || [], daily = targets.filter(g => g.daily), once = targets.filter(g => !g.daily);
   const dn = daily.filter(isDone).length, pct = daily.length ? Math.round(dn / daily.length * 100) : 0;
   const owner = c.ownerUid === S.uid;
-  const tree = (list, heading) => { const subjects = {}; list.forEach(g => { const su=g.subject||'General', ch=g.chapter||'General', to=g.topic||'General'; (((subjects[su] ||= {})[ch] ||= {})[to] ||= []).push(g); }); return Object.entries(subjects).map(([su, chapters]) => `<div class="tree-sub">${esc(heading)} · ${esc(su)}</div>${Object.entries(chapters).map(([ch, topics]) => `<div class="tree-branch"><b>${esc(ch)}</b>${Object.entries(topics).map(([to, tasks]) => `<div class="topic-head">${esc(to)}</div><div class="group">${tasks.map(row).join('')}</div>`).join('')}</div>`).join('')}`).join(''); };
+  const tree = list => {
+    const subjects = {};
+    list.forEach(g => { const su=g.subject||'General', ch=g.chapter||'General', to=g.topic||'General'; (((subjects[su] ||= {})[ch] ||= {})[to] ||= []).push(g); });
+    const taskCount = obj => Object.values(obj).reduce((n, v) => n + (Array.isArray(v) ? v.length : taskCount(v)), 0);
+    return Object.entries(subjects).map(([su, chapters], si) => {
+      const sc = taskCount(chapters);
+      const chapterHtml = Object.entries(chapters).map(([ch, topics], ci) => {
+        const cc = taskCount(topics);
+        const topicHtml = Object.entries(topics).map(([to, tasks]) => { const d=tasks.filter(g=>g.daily), o=tasks.filter(g=>!g.daily); return `<div class="topic-head">${esc(to)}</div>${d.length?`<div class="meta" style="margin:7px 0 3px">Daily</div><div class="group">${d.map(row).join('')}</div>`:''}${o.length?`<div class="meta" style="margin:7px 0 3px">One-time</div><div class="group">${o.map(row).join('')}</div>`:''}`; }).join('');
+        return `<details class="quest-chapter"><summary><span>${esc(ch)}</span><span class="meta">${cc} ${cc===1?'task':'tasks'}</span></summary><div class="tree-branch">${topicHtml}</div></details>`;
+      }).join('');
+      return `<details class="quest-subject" ${si===0?'open':''}><summary><span class="qs-name">${esc(su)}</span><span class="meta">${sc} ${sc===1?'task':'tasks'}</span></summary><div class="quest-chapters">${chapterHtml}</div></details>`;
+    }).join('');
+  };
   const children = c.childChallenges || [];
   $('pane-quests').innerHTML = `
-    ${daily.length ? tree(daily, 'Daily tasks') + `<div class="bar" aria-hidden="true"><i style="width:${pct}%"></i></div><div class="sub" style="font-size:13px;margin-top:6px">${dn} of ${daily.length} daily tasks done today</div>` : ''}
-    ${once.length ? tree(once, 'One-time tasks') : ''}
+    ${targets.length ? tree(targets) : empty('No tasks yet', 'This challenge has no tasks yet.')}
+    ${daily.length ? `<div class="bar" aria-hidden="true"><i style="width:${pct}%"></i></div><div class="sub" style="font-size:13px;margin-top:6px">${dn} of ${daily.length} daily tasks done today</div>` : ''}
     ${children.length ? megaSummary(children) + `<div class="lbl">Mega challenge branches</div><div class="group">${children.map(ch => `<button class="li" data-act="mega-branch" data-code="${esc(ch.code)}"><div class="grow"><b>${esc(ch.title)}</b><div class="meta">${branchMeta(ch.code)}</div></div><span>›</span></button>`).join('')}</div>` : ''}
     <div class="lbl">Invite friends</div>
     <div class="group"><div class="li"><div class="grow"><b>Code ${esc(c.id)}</b><div class="meta">Friends enter this code or open your link.</div></div>
@@ -2329,8 +2394,8 @@ function renderDraft() {
 }
 
 /* ---------- AI Plan + local memory backups ---------- */
-const AI_START_PROMPT = `You are my Challenge Room planning assistant. Help me design a practical challenge by asking one clear question at a time. Establish the goal, timeframe, daily available time, subjects/fields, chapters/topics, task difficulty, and which tasks should be Daily versus One-time. Keep the plan realistic and structured as Subject → Chapter → Topic → Task. Do not output the final JSON yet. Summarize the agreed plan and wait until I send my final conversion prompt.`;
-const AI_FINAL_PROMPT = `Convert the challenge plan from this conversation into a valid JSON object ONLY (no Markdown fences or commentary), ready to import into Challenge Room. Use this schema: {"title":"Challenge title","description":"Short description","startDate":"YYYY-MM-DD","endDate":"YYYY-MM-DD","tasks":[{"text":"Task text","subject":"Physics","chapter":"Chapter","topic":"Topic","frequency":"daily","points":10}]}. Each task's frequency must be exactly "daily" or "once". Use "once" for one-time tasks. Include every agreed task, do not invent tasks, use today's date for startDate only if no date was agreed, and make endDate on or after startDate. Keep each task concise. Return a single JSON object only.`;
+const AI_START_PROMPT = `You are my Challenge Room planning assistant. Help me design a practical, organised challenge. Ask at most one clear question at a time, and do not ask again for information already provided. Establish the goal, start/end dates or duration, available time, and workload. Organise work as Subject → Chapter → Topic → Task; a subject may contain many chapters, and each chapter may contain many topics and tasks. Every task must belong to the most specific known subject/chapter/topic. Use the exact subject names the user gives (for example Physics, Chemistry, Mathematics); use General only when the information truly is not applicable or unknown. Mark each task Daily or One-time, keep workload realistic, preserve every user requirement, and do not silently omit or invent tasks. At the end, summarise the plan grouped by subject and chapter, with task frequency, and wait for my final conversion prompt. Do not output JSON yet.`;
+const AI_FINAL_PROMPT = `Convert the agreed challenge plan from this conversation into one valid JSON object ONLY. Do not use Markdown fences, comments, or extra text. Required schema: {"title":"Challenge title","description":"Short description","startDate":"YYYY-MM-DD","endDate":"YYYY-MM-DD","tasks":[{"text":"Actionable task","subject":"Physics","chapter":"Ray Optics","topic":"Refraction","frequency":"daily","points":10}]}. Keep tasks in a flat tasks array; the app builds the collapsible Subject → Chapter → Topic → Tasks hierarchy from each task's fields. Every task must have non-empty text, subject, chapter, and topic; use "General" only if a value is genuinely unknown/not applicable. frequency must be exactly "daily" or "once" (use once for one-time tasks), and points must be a positive number (default 10). Include every agreed task exactly once unless repetition was explicitly requested. Do not invent, merge, or omit tasks. Use YYYY-MM-DD dates; use today's date for startDate only if none was agreed, and ensure endDate is on or after startDate. Return one JSON object only.`;
 function parseAIPlan(raw) {
   const text = String(raw || '').trim(); if (!text) throw new Error('Paste the AI response first.');
   let obj;
@@ -2343,7 +2408,13 @@ function parseAIPlan(raw) {
     const title = String(obj.title || obj.name || 'AI planned challenge').trim();
     const description = String(obj.description || obj.desc || '').trim();
     const tasksRaw = Array.isArray(obj.tasks) ? obj.tasks : Array.isArray(obj.targets) ? obj.targets : [];
-    const tasks = tasksRaw.map((t,i) => ({ id:'ai'+Date.now().toString(36)+i, text:String(t.text || t.task || t.title || '').trim(), subject:String(t.subject || t.field || 'General').trim(), chapter:String(t.chapter || t.branch || 'General').trim(), topic:String(t.topic || t.subtopic || 'General').trim(), daily: String(t.frequency || (t.daily ? 'daily' : 'once')).toLowerCase() === 'daily' || t.daily === true, points:Number(t.points)||10 })).filter(t=>t.text);
+    const tasks = tasksRaw.map((t,i) => {
+      const frequency = String(t.frequency || (t.daily ? 'daily' : 'once')).toLowerCase();
+      if (frequency !== 'daily' && frequency !== 'once') throw new Error(`Task ${i+1} has an invalid frequency. Use daily or once.`);
+      const points = Number(t.points ?? 10);
+      if (!Number.isFinite(points) || points <= 0) throw new Error(`Task ${i+1} has invalid points. Use a positive number.`);
+      return { id:'ai'+Date.now().toString(36)+i, text:String(t.text || t.task || t.title || '').trim(), subject:String(t.subject || t.field || 'General').trim() || 'General', chapter:String(t.chapter || t.branch || 'General').trim() || 'General', topic:String(t.topic || t.subtopic || 'General').trim() || 'General', daily: frequency === 'daily', points };
+    }).filter(t=>t.text);
     if (!tasks.length) throw new Error('JSON found, but no tasks were recognized. Include a tasks array with text fields.');
     const startDate = /^\d{4}-\d{2}-\d{2}$/.test(obj.startDate || obj.start_date || '') ? (obj.startDate || obj.start_date) : today();
     const endDate = /^\d{4}-\d{2}-\d{2}$/.test(obj.endDate || obj.end_date || '') ? (obj.endDate || obj.end_date) : dayOff(13);
@@ -2366,7 +2437,10 @@ function previewAIOutput() {
   try {
     parsedAIPlan = parseAIPlan($('ai-output').value);
     $('ai-preview').hidden = false;
-    $('ai-preview').innerHTML = `<b>${esc(parsedAIPlan.title)}</b><p class="sub">${esc(parsedAIPlan.desc || 'No description')}</p><div class="meta">${esc(parsedAIPlan.startDate)} → ${esc(parsedAIPlan.endDate)} · ${parsedAIPlan.targets.length} tasks · ${parsedAIPlan.targets.filter(t=>t.daily).length} daily · ${parsedAIPlan.targets.filter(t=>!t.daily).length} one-time</div><div class="tree-branch">${parsedAIPlan.targets.map(t=>`<div style="padding:6px 0;border-bottom:1px solid var(--line)"><b>${esc(t.text)}</b><div class="meta">${esc(t.subject)} → ${esc(t.chapter)} → ${esc(t.topic)} · ${t.daily?'Daily':'One-time'}</div></div>`).join('')}</div>`;
+    const grouped = {};
+    parsedAIPlan.targets.forEach(t => { (((grouped[t.subject] ||= {})[t.chapter] ||= {})[t.topic] ||= []).push(t); });
+    const groupedHtml = Object.entries(grouped).map(([subject, chapters], si) => `<details class="quest-subject" ${si===0?'open':''}><summary><span class="qs-name">${esc(subject)}</span><span class="meta">${Object.values(chapters).reduce((n,topics)=>n+Object.values(topics).reduce((m,arr)=>m+arr.length,0),0)} tasks</span></summary><div class="quest-chapters">${Object.entries(chapters).map(([chapter,topics])=>`<details class="quest-chapter"><summary><span>${esc(chapter)}</span></summary><div class="tree-branch">${Object.entries(topics).map(([topic,tasks])=>`<div class="topic-head">${esc(topic)}</div>${tasks.map(t=>`<div style="padding:7px 0;border-bottom:1px solid var(--line)"><b>${esc(t.text)}</b><div class="meta">${t.daily?'Daily':'One-time'} · ${t.points} pts</div></div>`).join('')}`).join('')}</div></details>`).join('')}</div></details>`).join('');
+    $('ai-preview').innerHTML = `<b>${esc(parsedAIPlan.title)}</b><p class="sub">${esc(parsedAIPlan.desc || 'No description')}</p><div class="meta">${esc(parsedAIPlan.startDate)} → ${esc(parsedAIPlan.endDate)} · ${parsedAIPlan.targets.length} tasks · ${parsedAIPlan.targets.filter(t=>t.daily).length} daily · ${parsedAIPlan.targets.filter(t=>!t.daily).length} one-time</div>${groupedHtml}`;
     $('ai-create-btn').disabled = false; toast('AI output parsed. Review before creating.');
   } catch (e) { parsedAIPlan = null; $('ai-preview').hidden = false; $('ai-preview').innerHTML = `<b>Could not parse output</b><p class="sub">${esc(e.message)}</p>`; $('ai-create-btn').disabled = true; }
 }
@@ -2515,6 +2589,7 @@ document.addEventListener('click', e => {
   else if (a === 'refresh-progress-access') loadProgressAccess();
   else if (a === 'toggle-live') toggleLive();
   else if (a === 'delete') removeChallenge();
+  else if (a === 'undo-delete') undoChallengeDelete(b.dataset.code);
   else if (a === 'leave') leave();
   else if (a === 'save-name') saveName();
   else if (a === 'profile-save') saveProfile();
