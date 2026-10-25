@@ -1,5 +1,6 @@
-const CACHE = 'challenge-room-v26-animated-splash';
-const SHELL = ['./', './index.html', './manifest.json', './icon.svg', './icon-192.png', './icon-512.png'];
+const CACHE = 'challenge-room-v29-syllabus-tree';
+const SHELL = ['./', './index.html', './styles.css', './manifest.json', './icon.svg', './icon-192.png', './icon-512.png',
+  './js/core.js', './js/syllabus.js', './js/demo.js', './js/data.js', './js/home.js', './js/home-extras.js', './js/admin.js', './js/extras.js', './js/challenge-actions.js', './js/profile.js', './js/views.js', './js/ai-backup.js', './js/main.js'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
 });
