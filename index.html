@@ -960,7 +960,7 @@ function rollup(kids) {
 }
 const pills = c => c ? `<div class="pills"><span class="pill">Daily ${c.dd}/${c.dt}</span><span class="pill">One-time ${c.od}/${c.ot}</span></div>` : '';
 const pctOf = (a, b) => b ? Math.round(a / b * 100) : 0;
-const megaList = () => S.mine.filter(m => S.meta[m.code]?.challengeType === 'mega' && !S.meta[m.code]?.gone);
+const megaList = () => S.mine.filter(m => { const x = S.meta[m.code]; return x?.challengeType === 'mega' && !x.gone && !isArchived(x); });
 const megaOf = code => megaList().find(m => (S.meta[m.code].childChallenges || []).some(ch => ch.code === code))?.code || '';
 const claimed = (code, except) => megaList().some(m => m.code !== except && (S.meta[m.code].childChallenges || []).some(ch => ch.code === code));
 const CHEV = '<svg class="i chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>';
@@ -2471,11 +2471,37 @@ async function createChallengeFromAI() {
   if (DEMO) return toast('AI challenge creation needs an authenticated or guest Firebase session.');
   const plan = parsedAIPlan; if (!S.uid) return toast('Sign in or continue as guest first.');
   try {
+    const subjects = [...new Set(plan.targets.map(t => (t.subject || '').trim()).filter(Boolean))];
+    const makeCode = async () => {
+      for (let i=0;i<8;i++) { const candidate=genCode(); if (!(await getDoc(doc(db,'challenges',candidate))).exists()) return candidate; }
+      throw new Error('Could not generate a unique challenge code.');
+    };
     let code;
-    for (let i=0;i<6;i++) { code=genCode(); if (!(await getDoc(doc(db,'challenges',code))).exists()) break; }
-    await setDoc(doc(db,'challenges',code), {title:plan.title.slice(0,60),desc:plan.desc.slice(0,140),startDate:plan.startDate,endDate:plan.endDate,targets:plan.targets.map((t,i)=>({...t,id:'t'+Date.now().toString(36)+i})),childChallenges:[],challengeType:'standard',discoverable:true,live:true,ownerUid:S.uid,ownerName:S.name||'Guest',createdAt:serverTimestamp()});
-    await ensureMember(code); addMine(code,plan.title); await loadMeta(); watch(code); parsedAIPlan=null; $('ai-create-btn').disabled=true; $('ai-output').value=''; $('ai-preview').hidden=true; toast('Challenge created from AI plan.'); openChallenge(code);
-  } catch { toast('Could not create the challenge. Check Firebase permissions and connection.'); }
+    if (subjects.length >= 3) {
+      // Match normal challenge creation: 3+ subjects means a Mega Challenge
+      // with one standard child challenge per subject.
+      const childChallenges = [];
+      for (const subject of subjects) {
+        const childCode = await makeCode();
+        const tasks = plan.targets.filter(t => (t.subject || '').trim() === subject)
+          .map((t,i) => ({...t,id:'t'+Date.now().toString(36)+i+'-'+childCode}));
+        const childTitle = `${plan.title.slice(0,42)} – ${subject}`.slice(0,60);
+        await setDoc(doc(db,'challenges',childCode), {title:childTitle,desc:plan.desc.slice(0,140),startDate:plan.startDate,endDate:plan.endDate,targets:tasks,childChallenges:[],challengeType:'standard',discoverable:true,live:true,ownerUid:S.uid,ownerName:S.name||'Guest',createdAt:serverTimestamp()});
+        await ensureMember(childCode); addMine(childCode,childTitle);
+        childChallenges.push({code:childCode,title:childTitle});
+      }
+      code = await makeCode();
+      await setDoc(doc(db,'challenges',code), {title:plan.title.slice(0,60),desc:plan.desc.slice(0,140),startDate:plan.startDate,endDate:plan.endDate,targets:[],childChallenges,challengeType:'mega',discoverable:true,live:true,ownerUid:S.uid,ownerName:S.name||'Guest',createdAt:serverTimestamp()});
+      await ensureMember(code); addMine(code,plan.title);
+    } else {
+      code = await makeCode();
+      const targets = plan.targets.map((t,i)=>({...t,id:'t'+Date.now().toString(36)+i}));
+      await setDoc(doc(db,'challenges',code), {title:plan.title.slice(0,60),desc:plan.desc.slice(0,140),startDate:plan.startDate,endDate:plan.endDate,targets,childChallenges:[],challengeType:'standard',discoverable:true,live:true,ownerUid:S.uid,ownerName:S.name||'Guest',createdAt:serverTimestamp()});
+      await ensureMember(code); addMine(code,plan.title);
+    }
+    await loadMeta(); watch(code); parsedAIPlan=null; $('ai-create-btn').disabled=true; $('ai-output').value=''; $('ai-preview').hidden=true;
+    toast(subjects.length >= 3 ? `Mega Challenge created with ${subjects.length} subject branches.` : 'Challenge created from AI plan.'); openChallenge(code);
+  } catch (e) { console.error(e); toast('Could not create the challenge. Check Firebase permissions and connection.'); }
 }
 function downloadJSON(payload, filename) {
   const blob = new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}), url=URL.createObjectURL(blob), a=document.createElement('a');
